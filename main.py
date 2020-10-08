@@ -14,6 +14,7 @@ SCRIPT_DIR, SCRIPT_FILENAME = os.path.split(os.path.abspath(__file__))
 load_dotenv() # Loads tokens form env
 TOKEN = os.getenv("DISCORD_TOKEN")
 GUILD = os.getenv("DISCORD_GUILD")
+BOT_CHANNEL = "bot-test"
 
 LOG_DIR = os.path.join(SCRIPT_DIR, "logs") # The directory containing logs
 LOG_FILE_PATH = os.path.join(LOG_DIR, datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".log") # Absolute path of the new log file
@@ -39,6 +40,9 @@ async def on_ready():
     """When the bot is connected to the guild, print guild informations"""
     guild = discord.utils.get(bot.guilds, name=GUILD)
     print(f"{bot.user} is connected to the following guild:\n{guild.name} (id: {guild.id})")
+
+    bot_channel = discord.utils.get(guild.channels, name=BOT_CHANNEL)
+    await bot_channel.send("Salut, je suis le BotAToutFer ! Je suis réveillé donc vous pouvez m'utiliser :smirk:")
 
 
 @bot.event
