@@ -12,6 +12,7 @@ GUILD = os.getenv('DISCORD_GUILD')
 
 bot = commands.Bot(command_prefix='!')
 
+
 @bot.event
 async def on_ready():
     guild = discord.utils.get(bot.guilds, name=GUILD)
@@ -20,13 +21,14 @@ async def on_ready():
         f'{guild.name}(id: {guild.id})'
     )
 
-@bot.event
-async def on_error(event, *args, **kwargs):
-    with open('err.log', 'a') as f:
-        if event == 'on_message':
-            f.write(f'Unhandled message: {args[0]}\n')
-        else:
-            raise
+
+#@bot.event
+#async def on_error(event, *args, **kwargs):
+#    with open('err.log', 'a') as f:
+#        if event == 'on_message':
+#            f.write(f'Unhandled message: {args[0]}\n')
+#        else:
+#            raise
 
 
 @bot.command(name='ping', help='Respond pong')
@@ -35,15 +37,12 @@ async def ping(ctx):
     await ctx.send(response)
 
 
-@bot.command(name='99', help='Respond a B99 quote')
+@bot.command(name='99', help='Respond a B99 quote.')
 async def nine_nine(ctx):
     brooklyn_99_quotes = [
-        'I\'m the human form of the 💯 emoji.',
+        'I\'m the human form of the :100: emoji.',
         'Bingpot!',
-        (
-            'Cool. Cool cool cool cool cool cool cool, '
-            'no doubt no doubt no doubt no doubt.'
-        ),
+        'Cool. Cool cool cool cool cool cool cool, no doubt no doubt no doubt no doubt.',
     ]
 
     response = random.choice(brooklyn_99_quotes)
@@ -59,10 +58,16 @@ async def roll(ctx, number_of_dice: int, number_of_sides: int):
     await ctx.send(', '.join(dice))
 
 
-@bot.command(name='green', help='Send a tree')
+@bot.command(name='green', help='Send a tree.')
 @commands.has_role('Design4green')
 async def green(ctx):
-    response = '🌲'
+    response = ':evergreen_tree:'
+    await ctx.send(response)
+
+
+@bot.command(name='coffee', help='Send a coffee.')
+async def green(ctx):
+    response = ':coffee:'
     await ctx.send(response)
 
 
@@ -71,8 +76,7 @@ async def on_command_error(ctx, error):
     if isinstance(error, commands.errors.CheckFailure):
         await ctx.send('Nope, t\'as pas le droit :P')
     else:
-        await ctx.send('C\'est pas faux')
-
+        await ctx.send('https://tenor.com/view/of-its-not-false-its-true-agree-gif-16911578')
 
 
 bot.run(TOKEN)
