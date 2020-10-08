@@ -16,7 +16,7 @@ TOKEN = os.getenv("DISCORD_TOKEN")
 GUILD = os.getenv("DISCORD_GUILD")
 
 LOG_DIR = os.path.join(SCRIPT_DIR, "logs") # The directory containing logs
-LOG_FILE_PATH = os.path.join(LOG_DIR, datetime.datetime.now().strftime("%Y_%m_%d") + ".log") # Absolute path of the new log file
+LOG_FILE_PATH = os.path.join(LOG_DIR, datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".log") # Absolute path of the new log file
 
 if not os.path.exists(LOG_DIR): # If the logs directory does not exist, we create it
     os.makedirs(LOG_DIR)
