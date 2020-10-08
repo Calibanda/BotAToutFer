@@ -3,6 +3,7 @@ import os
 import random
 import logging
 import datetime
+import re
 from pathlib import Path
 
 import discord
@@ -66,11 +67,9 @@ async def on_message(message):
     if message.author == bot.user:
         return
     
-    await bot.process_commands(message) # We process all the commands events
-
-    if "je suis" in message.content.lower():
-        i_am = message.content.split("je suis ", 1)[1]
-        response = f"Salut {i_am}, moi c'est le BotAToutFer"
+    if "je suis " in message.content.lower():
+        i_am = re.split(r"je suis ", message.content, 1, flags=re.IGNORECASE)[-1]
+        response = f"Salut *{i_am}*, moi c'est le BotAToutFer"
         await message.channel.send(response)
 
 @bot.command(name="ping", help="Responds pong.")
