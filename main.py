@@ -41,7 +41,7 @@ async def on_ready():
     """When the bot is connected to the guild, print guild informations"""
     guild = discord.utils.get(bot.guilds, name=GUILD)
     print(f"{bot.user} is connected to the following guild:\n{guild.name} (id: {guild.id})")
-    logger.warning(f"{bot.user} is connected to the following guild:\n{guild.name} (id: {guild.id})")
+    logger.warning(f"{bot.user} is connected to the following guild: {guild.name} (id: {guild.id})")
 
     bot_channel = discord.utils.get(guild.channels, name=BOT_CHANNEL)
     # await bot_channel.send("Salut, je suis le BotAToutFer ! Je suis réveillé donc vous pouvez m'utiliser :smirk:")

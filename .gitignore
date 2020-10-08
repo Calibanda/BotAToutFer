@@ -2,3 +2,5 @@
 
 .env
 logs/*.log
+city.list.json
+convertcity.py
