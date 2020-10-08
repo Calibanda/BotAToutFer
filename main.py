@@ -3,6 +3,7 @@ import os
 import random
 import logging
 import datetime
+from pathlib import Path
 
 import discord
 from discord.ext import commands
@@ -10,24 +11,27 @@ from dotenv import load_dotenv
 
 SCRIPT_DIR, SCRIPT_FILENAME = os.path.split(os.path.abspath(__file__))
 
-load_dotenv()
+load_dotenv() # Loads tokens form env
 TOKEN = os.getenv("DISCORD_TOKEN")
 GUILD = os.getenv("DISCORD_GUILD")
 
-LOG_FILENAME = datetime.datetime.now().strftime("%Y_%m_%d") + ".log"
-LOG_FILE_PATH = os.path.join(SCRIPT_DIR, "logs", LOG_FILENAME)
+LOG_DIR = os.path.join(SCRIPT_DIR, "logs") # The directory containing logs
+LOG_FILE_PATH = os.path.join(LOG_DIR, datetime.datetime.now().strftime("%Y_%m_%d") + ".log") # Absolute path of the new log file
 
+if not os.path.exists(LOG_DIR): # If the logs directory does not exist, we create it
+    os.makedirs(LOG_DIR)
+
+# Setting up the logging system
 logger = logging.getLogger("discord")
 logger.setLevel(logging.DEBUG)
 handler = logging.FileHandler(filename=LOG_FILE_PATH, encoding="utf-8", mode="a")
 handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s"))
 logger.addHandler(handler)
 
+BOT_DESCRIPTION = "BotAToutFer, le bot qui fait tout, même le café !"
 
 
-bot_description = "BotAToutFer, le bot qui fait tout, même le café !"
-
-bot = commands.Bot(command_prefix="!", description=bot_description)
+bot = commands.Bot(command_prefix="!", description=BOT_DESCRIPTION)
 
 
 @bot.event
