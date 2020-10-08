@@ -7,8 +7,8 @@ from discord.ext import commands
 from dotenv import load_dotenv
 
 load_dotenv()
-TOKEN = os.getenv('DISCORD_TOKEN') #TOKEN = "NzYzNDE2NDI1ODQyODY4MjI2.X33Y8w.oD0xhHO4owXBvP3fiwl1ztqtrhs"
-GUILD = os.getenv('DISCORD_GUILD') #GUILD = "La crème de la crème"
+TOKEN = os.getenv('DISCORD_TOKEN')
+GUILD = os.getenv('DISCORD_GUILD')
 
 bot = commands.Bot(command_prefix='!')
 
