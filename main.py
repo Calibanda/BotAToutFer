@@ -4,6 +4,8 @@ import random
 import logging
 import datetime
 import re
+import json
+import requests
 from pathlib import Path
 
 import discord
@@ -67,9 +69,11 @@ async def on_message(message):
     if message.author == bot.user:
         return
     
+    await bot.process_commands(message)
+
     if "je suis " in message.content.lower():
         i_am = re.split(r"je suis ", message.content, 1, flags=re.IGNORECASE)[-1]
-        response = f"Salut *{i_am}*, moi c'est le BotAToutFer"
+        response = f"Salut *{i_am}*, moi c'est le {bot.user.mention}"
         await message.channel.send(response)
 
 @bot.command(name="ping", help="Responds pong.")
@@ -92,11 +96,9 @@ async def nine_nine(ctx):
 
 @bot.command(name="roll_dice", help="Simulates rolling dice.")
 async def roll(ctx, number_of_dice: int, number_of_sides: int):
-    dice = [
-        str(random.choice(range(1, number_of_sides + 1)))
-        for _ in range(number_of_dice)
-    ]
-    await ctx.send(", ".join(dice))
+    dice = [ str(random.choice(range(1, number_of_sides + 1))) for _ in range(number_of_dice) ]
+    response = ", ".join(dice)
+    await ctx.send(response)
 
 
 @bot.command(name="green", help="Sends a tree.")
@@ -111,9 +113,24 @@ async def green(ctx):
     response = ":coffee:"
     await ctx.send(response)
 
+
 @bot.command(name="tea", help="Send a tea.")
 async def green(ctx):
     response = ":tea:"
+    await ctx.send(response)
+
+
+@bot.command(name="meteo", help="Gives the weather (of a random city in the world).")
+async def meteo(ctx):
+    with open(os.path.join(SCRIPT_DIR, "package", "list_city_id.json"), "r") as f:
+        list_city_id = json.load(f)
+    
+    random_city = random.choice(list_city_id)
+    weather = requests.get(f"http://api.openweathermap.org/data/2.5/weather?id={random_city}&appid=d9261c180caef00c5a538827a0b32612&units=metric&lang=fr").json()
+    logger.warning(f"Asking for the weather of the city number {random_city}")
+    w_description = weather["weather"][0]["description"]
+    w_temp = round(weather["main"]["temp"], 1)
+    response = f"Actuellement {w_description}, il fait {w_temp} °C (quelque part dans le monde :earth_africa:)."
     await ctx.send(response)
 
 
