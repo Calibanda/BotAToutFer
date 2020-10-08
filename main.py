@@ -40,9 +40,10 @@ async def on_ready():
     """When the bot is connected to the guild, print guild informations"""
     guild = discord.utils.get(bot.guilds, name=GUILD)
     print(f"{bot.user} is connected to the following guild:\n{guild.name} (id: {guild.id})")
+    logger.warning(f"{bot.user} is connected to the following guild:\n{guild.name} (id: {guild.id})")
 
     bot_channel = discord.utils.get(guild.channels, name=BOT_CHANNEL)
-    await bot_channel.send("Salut, je suis le BotAToutFer ! Je suis réveillé donc vous pouvez m'utiliser :smirk:")
+    # await bot_channel.send("Salut, je suis le BotAToutFer ! Je suis réveillé donc vous pouvez m'utiliser :smirk:")
 
 
 @bot.event
@@ -59,6 +60,18 @@ async def on_error(event, *args, **kwargs):
     logger.error(event, exc_info=args[0])
     raise
 
+
+@bot.event
+async def on_message(message):
+    if message.author == bot.user:
+        return
+    
+    await bot.process_commands(message) # We process all the commands events
+
+    if "je suis" in message.content.lower():
+        i_am = message.content.split("je suis ", 1)[1]
+        response = f"Salut {i_am}, moi c'est le BotAToutFer"
+        await message.channel.send(response)
 
 @bot.command(name="ping", help="Responds pong.")
 async def ping(ctx):
