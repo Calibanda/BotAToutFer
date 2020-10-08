@@ -23,7 +23,7 @@ if not os.path.exists(LOG_DIR): # If the logs directory does not exist, we creat
 
 # Setting up the logging system
 logger = logging.getLogger("discord")
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.WARNING)
 handler = logging.FileHandler(filename=LOG_FILE_PATH, encoding="utf-8", mode="a")
 handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s"))
 logger.addHandler(handler)
@@ -50,13 +50,10 @@ async def on_command_error(ctx, error):
         await ctx.send("https://tenor.com/view/of-its-not-false-its-true-agree-gif-16911578")
 
 
-#@bot.event
-#async def on_error(event, *args, **kwargs):
-#    with open('err.log', 'a') as f:
-#        if event == 'on_message':
-#            f.write(f'Unhandled message: {args[0]}\n')
-#        else:
-#            raise
+@bot.event
+async def on_error(event, *args, **kwargs):
+    logger.error(event, exc_info=args[0])
+    raise
 
 
 @bot.command(name="ping", help="Responds pong.")
