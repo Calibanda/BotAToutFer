@@ -1,6 +1,7 @@
 # Content of the gitignore file
 
 .env
-logs/*.log
+*.log
+*pyc
 city.list.json
 convertcity.py
