@@ -17,6 +17,7 @@ SCRIPT_DIR, SCRIPT_FILENAME = os.path.split(os.path.abspath(__file__))
 load_dotenv() # Loads tokens form env
 TOKEN = os.getenv("DISCORD_TOKEN")
 GUILD = os.getenv("DISCORD_GUILD")
+WEATHER_TOKEN = os.getenv("WEATHER_TOKEN")
 BOT_CHANNEL = "bot-test"
 
 LOG_DIR = os.path.join(SCRIPT_DIR, "logs") # The directory containing logs
@@ -126,7 +127,7 @@ async def meteo(ctx):
         list_city_id = json.load(f)
     
     random_city = random.choice(list_city_id)
-    weather = requests.get(f"http://api.openweathermap.org/data/2.5/weather?id={random_city}&appid=d9261c180caef00c5a538827a0b32612&units=metric&lang=fr").json()
+    weather = requests.get(f"http://api.openweathermap.org/data/2.5/weather?id={random_city}&appid={WEATHER_TOKEN}&units=metric&lang=fr").json()
     logger.warning(f"Asking for the weather of the city number {random_city}")
     w_description = weather["weather"][0]["description"]
     w_temp = round(weather["main"]["temp"], 1)
