@@ -8,5 +8,5 @@ class Discussion(commands.Cog):
 
     @commands.command(name="ptdrtki", help="Are you serious?")
     async def ptdrtki(self, ctx):
-        response = f"Alors déjà tu me parle pas comme ça petite :poop:. Ensuite tu sais pas qui je suis ? Sérieux ?\nAlors pour ta culture je suis le grand {bot.user.mention}, le bot Discord qui fait tout, même le café !"
+        response = f"Alors déjà tu me parle pas comme ça petite :poop:. Ensuite tu sais pas qui je suis ? Sérieux ?\nAlors pour ta culture je suis le grand {self.bot.user.mention}, le bot Discord qui fait tout, même le café !"
         await ctx.send(response)
