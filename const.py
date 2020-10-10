@@ -10,7 +10,9 @@ load_dotenv() # Loads tokens form env
 TOKEN = os.getenv("DISCORD_TOKEN")
 GUILD = os.getenv("DISCORD_GUILD")
 WEATHER_TOKEN = os.getenv("WEATHER_TOKEN")
+
 BOT_CHANNEL = "bot-test"
+BOT_CHANNEL_ID = "763426416167485481"
 
 LOG_DIR = os.path.join(SCRIPT_DIR, "logs") # The directory containing logs
 LOG_FILE_PATH = os.path.join(LOG_DIR, datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".log") # Absolute path of the new log file

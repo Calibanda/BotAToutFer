@@ -1,15 +1,15 @@
-# green command for BotAToutFer
+# says command for BotAToutFer
 from discord.ext import commands
 
-class Green(commands.Cog):
+class Says(commands.Cog):
     def __init__(self, bot, bot_channel_id):
         self.bot = bot
         self.bot_channel_id = bot_channel_id
         self._last_member = None
 
-    @commands.command(name="green", help="Sends a tree.")
-    @commands.has_role("Design4green")
-    async def green(self, ctx):
+    @commands.command(name="says", help="Make the bot says something.")
+    async def says(self, ctx, *, arg: str):
         if str(ctx.channel.id) == self.bot_channel_id:
-            response = ":evergreen_tree:"
+            response = arg
+            await ctx.message.delete()
             await ctx.send(response)
