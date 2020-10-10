@@ -19,5 +19,6 @@ BOT_DESCRIPTION = "BotAToutFer, le bot qui fait tout, même le café !"
 
 CURSE_LIST = [
     {"curse_word": "merde", "traduction": "merle"},
-    
+    {"curse_word": "fuck", "traduction": "fork"},
+
 ]
