@@ -15,8 +15,8 @@ class Quotes(commands.Cog):
             "Bingpot!",
             "Cool. Cool cool cool cool cool cool cool, no doubt no doubt no doubt no doubt.",
             "Every time someone steps up and says who they are, the world becomes a better, more interesting place.",
-            "Haha, angel puked!!",
-
+            "Haha, the angel puked!",
+            "- I'm not a thug, I'm police.\n- Ok, then name one law.\n- Don't kill people?\n-It's on me. I set the bar too low..."
         ]
 
         response = random.choice(brooklyn_99_quotes)
