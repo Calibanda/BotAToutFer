@@ -45,7 +45,7 @@ async def on_command_error(ctx, error):
     if isinstance(error, commands.errors.CheckFailure):
         await ctx.send("Nope, t'as pas le droit :P")
     else:
-        await ctx.send("https://tenor.com/view/of-its-not-false-its-true-agree-gif-16911578")
+        await ctx.send("https://tenor.com/uqe8.gif") # Send a "C'est pas faux" gif
 
 
 @bot.event
