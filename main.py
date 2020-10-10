@@ -64,6 +64,12 @@ async def on_message(message):
         response = f"Salut *{i_am}*, moi c'est le {bot.user.mention}"
         await message.channel.send(response)
 
+    if any(curse_dict["curse_word"] in message.content.lower() for curse_dict in const.CURSE_LIST):
+        response = message.content
+        for curse_dict in const.CURSE_LIST:
+            response = response.replace(curse_dict["curse_word"], "*" + curse_dict["traduction"] + "*")
+        await message.channel.send(response)
+
     await bot.process_commands(message)
 
 

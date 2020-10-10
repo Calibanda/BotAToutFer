@@ -16,3 +16,8 @@ LOG_DIR = os.path.join(SCRIPT_DIR, "logs") # The directory containing logs
 LOG_FILE_PATH = os.path.join(LOG_DIR, datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".log") # Absolute path of the new log file
 
 BOT_DESCRIPTION = "BotAToutFer, le bot qui fait tout, même le café !"
+
+CURSE_LIST = [
+    {"curse_word": "merde", "traduction": "merle"},
+    
+]
