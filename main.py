@@ -7,24 +7,24 @@ from discord.ext import commands
 import const
 import set_logger
 
-from package.commands.cmd_99 import Nine_nine
 from package.commands.cmd_discussion import Discussion
 from package.commands.cmd_drinks import Drinks
 from package.commands.cmd_green import Green
 from package.commands.cmd_meteo import Weather
 from package.commands.cmd_ping import Ping
+from package.commands.cmd_quotes import Quotes
 from package.commands.cmd_roll_dice import Roll_dice
 
 logger = set_logger.init()
 
 bot = commands.Bot(command_prefix="!", description=const.BOT_DESCRIPTION)
 
-bot.add_cog(Nine_nine(bot))
 bot.add_cog(Discussion(bot))
 bot.add_cog(Drinks(bot))
 bot.add_cog(Green(bot))
 bot.add_cog(Weather(bot, logger))
 bot.add_cog(Ping(bot))
+bot.add_cog(Quotes(bot))
 bot.add_cog(Roll_dice(bot))
 
 
