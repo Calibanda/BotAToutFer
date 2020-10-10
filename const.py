@@ -19,6 +19,14 @@ BOT_DESCRIPTION = "BotAToutFer, le bot qui fait tout, même le café !"
 
 CURSE_LIST = [
     {"curse_word": "merde", "traduction": "merle"},
+    {"curse_word": "putain", "traduction": "mutin"},
+
     {"curse_word": "fuck", "traduction": "fork"},
+    {"curse_word": "shit", "traduction": "shirt"},
+    {"curse_word": "bitch", "traduction": "bench"},
+    {"curse_word": "asshole", "traduction": "ash-hole"},
+    {"curse_word": "ass", "traduction": "ash"},
+    {"curse_word": "cock", "traduction": "cork"},
+    {"curse_word": "dick", "traduction": "deck"},
 
 ]
