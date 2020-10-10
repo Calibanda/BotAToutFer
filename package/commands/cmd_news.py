@@ -20,7 +20,7 @@ class News(commands.Cog):
 
             async with aiohttp.ClientSession() as session:
                 self.logger.warning(f"Asking for the local news")
-                async with session.get(f"http://newsapi.org/v2/top-headlines?country=fr&apiKey={const.NEWS_TOKEN}") as r:
+                async with session.get(f"http://newsapi.org/v2/top-headlines?country=fr&apiKey={const.NEWS_TOKEN}") as r: # Retreve last news
                     if r.status == 200:
                         news = await r.json()
 
@@ -29,17 +29,17 @@ class News(commands.Cog):
                         if os.path.isfile(const.LAST_NEWS_URL_PATH):
                             with open(const.LAST_NEWS_URL_PATH, "r") as f:
                                 try:
-                                    old_news = json.load(f)
+                                    old_news = json.load(f) # We try to load the news who have already been displayed by the bot
                                 except Exception:
                                     pass
 
-                        today_news = [ article["url"] for article in news["articles"] if article["url"] not in old_news ]
-                        news_to_display = today_news[:number_tiles]
+                        today_news = [ article["url"] for article in news["articles"] if article["url"] not in old_news ] # We retreve all the url who hasn't been already displayed
+                        news_to_display = today_news[:number_tiles] # We keep at most the number of articles asked from the user
 
                         for news in news_to_display:
                             await ctx.send(news)
 
-                        old_news = old_news + news_to_display
+                        old_news = old_news + news_to_display # We add the just displayed news to the old ones
 
                         with open(const.LAST_NEWS_URL_PATH, "w") as f:
-                            json.dump(old_news[:50], f, indent=4)
+                            json.dump(old_news[-25:], f, indent=4) # We store the 25 most recent displayed articles in a json file
