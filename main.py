@@ -11,6 +11,7 @@ from package.commands.cmd_discussion import Discussion
 from package.commands.cmd_drinks import Drinks
 from package.commands.cmd_green import Green
 from package.commands.cmd_meteo import Weather
+from package.commands.cmd_news import News
 from package.commands.cmd_ping import Ping
 from package.commands.cmd_quotes import Quotes
 from package.commands.cmd_roll_dice import Roll_dice
@@ -24,6 +25,7 @@ bot.add_cog(Discussion(bot, const.BOT_CHANNEL_ID))
 bot.add_cog(Drinks(bot, const.BOT_CHANNEL_ID))
 bot.add_cog(Green(bot, const.BOT_CHANNEL_ID))
 bot.add_cog(Weather(bot, logger, const.BOT_CHANNEL_ID))
+bot.add_cog(News(bot, logger, const.BOT_CHANNEL_ID))
 bot.add_cog(Ping(bot, const.BOT_CHANNEL_ID))
 bot.add_cog(Quotes(bot, const.BOT_CHANNEL_ID))
 bot.add_cog(Roll_dice(bot, const.BOT_CHANNEL_ID))
@@ -44,7 +46,7 @@ async def on_ready():
 @bot.event
 async def on_command_error(ctx, error):
     """When a command error occures displays the reason in the gild chat"""
-    if ctx.channel.id == const.BOT_CHANNEL_ID:
+    if str(ctx.channel.id) == const.BOT_CHANNEL_ID:
         if isinstance(error, commands.errors.CheckFailure):
             await ctx.send("Nope, t'as pas le droit :P")
         else:
@@ -68,7 +70,7 @@ async def on_message(message):
         await message.channel.send(response)
 
     if any(curse_dict["curse_word"] in message.content.lower() for curse_dict in const.CURSE_LIST):
-        response = f"{message.author.mention}: " + message.content
+        response = f"{message.author.mention} : " + message.content
         for curse_dict in const.CURSE_LIST:
             response = re.sub(curse_dict["curse_word"], "*" + curse_dict["traduction"] + "*", response, flags=re.IGNORECASE)
         
