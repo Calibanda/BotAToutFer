@@ -8,8 +8,12 @@ class Roll_dice(commands.Cog):
         self.bot = bot
         self._last_member = None
 
-    @commands.command(name="roll_dice", help="Simulates rolling dice.")
-    async def roll(self, ctx, number_of_dice: int, number_of_sides: int):
-        dice = [ str(random.choice(range(1, number_of_sides + 1))) for _ in range(number_of_dice) ]
-        response = ", ".join(dice)
-        await ctx.send(response)
+    @commands.command(name="roll_dice", help="Simulates rolling dice in the xDx format.")
+    async def roll(self, ctx, dice: str):
+        """Rolls a dice in xDx format."""
+        try:
+            number_of_sides, number_of_dice = map(int, dice.lower().split('d'))
+            response = ", ".join(str(random.randint(1, number_of_sides)) for r in range(number_of_dice))
+            await ctx.send(response)
+        except Exception:
+            await ctx.send('Format has to be in xDx!')
