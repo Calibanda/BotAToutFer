@@ -67,7 +67,7 @@ async def on_message(message):
     if any(curse_dict["curse_word"] in message.content.lower() for curse_dict in const.CURSE_LIST):
         response = f"{message.author.mention}: " + message.content
         for curse_dict in const.CURSE_LIST:
-            re.sub(curse_dict["curse_word"], "*" + curse_dict["traduction"] + "*", response, flags=re.IGNORECASE)
+            response = re.sub(curse_dict["curse_word"], "*" + curse_dict["traduction"] + "*", response, flags=re.IGNORECASE)
         
         await message.delete()
         await message.channel.send(response)
