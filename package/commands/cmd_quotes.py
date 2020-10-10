@@ -18,6 +18,7 @@ class Quotes(commands.Cog):
             "Haha, the angel puked!",
             "- I'm not a thug, I'm police.\n- Ok, then name one law.\n- Don't kill people?\n- It's on me. I set the bar too low...",
             "https://tenor.com/VdlE.gif",
+            "YOU PUNK!",
             
         ]
 
