@@ -9,7 +9,7 @@ class Quotes(commands.Cog):
         self.bot_channel_id = bot_channel_id
         self._last_member = None
 
-    @commands.command(name="99", help="Responds a B99 quote.")
+    @commands.command(name="99", help="Répond une réplique de B99")
     async def nine_nine(self, ctx):
         if str(ctx.channel.id) == self.bot_channel_id:
             brooklyn_99_quotes = [
@@ -27,11 +27,13 @@ class Quotes(commands.Cog):
             response = random.choice(brooklyn_99_quotes)
             await ctx.send(response)
 
-    @commands.command(name="good_place", help="Responds a The Good Place quote.")
+    @commands.command(name="good_place", help="Répond une réplique de TGP")
     async def good_place(self, ctx):
         if str(ctx.channel.id) == self.bot_channel_id:
             the_good_place_quotes = [
                 "Everything is fine",
+                "I'm telling you, Molotov cocktails work. Anytime I had a problem and I threw a Molotov cocktail, boom! Right away, I had a different problem.",
+                "Not a girl",
                 
             ]
 
