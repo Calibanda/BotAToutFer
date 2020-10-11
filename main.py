@@ -10,6 +10,7 @@ import set_logger
 from package.commands.cmd_discussion import Discussion
 from package.commands.cmd_drinks import Drinks
 from package.commands.cmd_green import Green
+from package.commands.cmd_help import Help
 from package.commands.cmd_ping import Ping
 from package.commands.cmd_quotes import Quotes
 from package.commands.cmd_roll_dice import Roll_dice
@@ -19,10 +20,12 @@ from package.commands.cmd_utilitaries import Utilitaire
 logger = set_logger.init()
 
 bot = commands.Bot(command_prefix="!", description=const.BOT_DESCRIPTION)
+bot.remove_command('help')
 
 bot.add_cog(Discussion(bot, const.BOT_CHANNEL_ID))
 bot.add_cog(Drinks(bot, const.BOT_CHANNEL_ID))
 bot.add_cog(Green(bot, const.BOT_CHANNEL_ID))
+bot.add_cog(Help(bot, const.BOT_CHANNEL_ID))
 bot.add_cog(Ping(bot, const.BOT_CHANNEL_ID))
 bot.add_cog(Quotes(bot, const.BOT_CHANNEL_ID))
 bot.add_cog(Roll_dice(bot, const.BOT_CHANNEL_ID))
@@ -44,6 +47,7 @@ async def on_ready():
 @bot.event
 async def on_command_error(ctx, error):
     """When a command error occures displays the reason in the gild chat"""
+    logger.error(f"On command error: {error}")
     if str(ctx.channel.id) == const.BOT_CHANNEL_ID:
         if isinstance(error, commands.errors.CheckFailure):
             await ctx.send("Nope, t'as pas le droit :P")
