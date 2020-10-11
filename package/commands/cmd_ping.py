@@ -7,7 +7,7 @@ class Ping(commands.Cog):
         self.bot_channel_id = bot_channel_id
         self._last_member = None
 
-    @commands.command(name="ping", help="Responds pong.")
+    @commands.command(name="ping", help="Répond pong")
     async def ping(self, ctx):
         if str(ctx.channel.id) == self.bot_channel_id:
             response = "pong"

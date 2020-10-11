@@ -9,7 +9,7 @@ class Roll_dice(commands.Cog):
         self.bot_channel_id = bot_channel_id
         self._last_member = None
 
-    @commands.command(name="roll_dice", help="Simulates rolling dice in the xDx format.")
+    @commands.command(name="roll_dice", help="Simule un lancer de dés au format xDx")
     async def roll(self, ctx, dice: str):
         """Rolls a dice in xDx format."""
         if str(ctx.channel.id) == self.bot_channel_id:

@@ -15,7 +15,7 @@ class Utilitaire(commands.Cog):
         self.bot_channel_id = bot_channel_id
         self._last_member = None
 
-    @commands.command(name="news", help="Donne le lien d'un ou plusieur article de presse du jour (par défaut 1).") # https://discordpy.readthedocs.io/en/latest/faq.html#how-do-i-make-a-web-request
+    @commands.command(name="news", help="Donne le lien d'un ou plusieurs articles de presse du jour (par défaut 1).") # https://discordpy.readthedocs.io/en/latest/faq.html#how-do-i-make-a-web-request
     async def news(self, ctx, number_tiles: int=1):
         if str(ctx.channel.id) == self.bot_channel_id:
 

@@ -7,14 +7,14 @@ class Drinks(commands.Cog):
         self.bot_channel_id = bot_channel_id
         self._last_member = None
 
-    @commands.command(name="coffee", help="Send a coffee.")
+    @commands.command(name="coffee", help="Envoie un café")
     async def coffee(self, ctx):
         if str(ctx.channel.id) == self.bot_channel_id:
             response = ":coffee:"
             await ctx.send(response)
 
 
-    @commands.command(name="tea", help="Send a tea.")
+    @commands.command(name="tea", help="Envoie un thé")
     async def tea(self, ctx):
         if str(ctx.channel.id) == self.bot_channel_id:
             response = ":tea:"

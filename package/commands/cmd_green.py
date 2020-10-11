@@ -7,7 +7,7 @@ class Green(commands.Cog):
         self.bot_channel_id = bot_channel_id
         self._last_member = None
 
-    @commands.command(name="green", help="Sends a tree.")
+    @commands.command(name="green", help="Envoie un arbre")
     @commands.has_role("Design4green")
     async def green(self, ctx):
         if str(ctx.channel.id) == self.bot_channel_id:
