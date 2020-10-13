@@ -26,6 +26,11 @@ class Quotes(commands.Cog):
             "Clearly, the pineapple IS the slut.",
             "It's time to sauce up!",
             "Oh, damn",
+            "Eyes up here, Gina. I'm more than just a piece of ass.",
+            "The only thing I’m not good at is modesty, because I’m great at it.",
+            "The English language cannot fully capture the depth and complexity of my thoughts, so I’m incorporating emoji into my speech to better express myself. Winky face.",
+            "Your butt is the bomb.",
+            "\"Grave\" singular? Charles, \"grave\" singular?",
             
         ]
 
