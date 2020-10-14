@@ -172,7 +172,7 @@ class Utilitaire(commands.Cog):
             await ctx.send(response)
 
 
-    @commands.command(name="inutile", help="Donne un savoir innutile")
+    @commands.command(name="inutile", help="Donne un savoir inutile")
     async def scrabble(self, ctx, number=1):
         if str(ctx.channel.id) != self.bot_channel_id:
             return
