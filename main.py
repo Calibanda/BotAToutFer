@@ -47,7 +47,7 @@ async def on_ready():
 @bot.event
 async def on_command_error(ctx, error):
     """When a command error occures displays the reason in the gild chat"""
-    logger.error(f"On command error: {error}")
+    logger.error(f"On command error: {repr(error)}")
     if str(ctx.channel.id) == const.BOT_CHANNEL_ID:
         if isinstance(error, commands.errors.CheckFailure):
             await ctx.send("Nope, t'as pas le droit :P")
