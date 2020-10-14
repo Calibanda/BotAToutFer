@@ -173,20 +173,24 @@ class Utilitaire(commands.Cog):
 
 
     @commands.command(name="inutile", help="Donne un savoir innutile")
-    async def scrabble(self, ctx):
+    async def scrabble(self, ctx, number=1):
         if str(ctx.channel.id) != self.bot_channel_id:
             return
 
-        async with aiohttp.ClientSession() as session:
-            self.logger.warning(f"Asking a useless piece of knowledge")
-            async with session.get("https://www.savoir-inutile.com/") as r: # Retreve a useless piece of knowledge
-                if r.status == 200:
-                    html = await r.text("utf-8")
-                    soup = BeautifulSoup(html, "html.parser")
+        number = min(number, 5)
 
-                    knowledge = soup.find(id="phrase").string
-                    link = soup.find("meta", attrs={"name": "og:url"})["content"]
-                    publication_date = soup.find("div", id="publication").find_all("span")[-1].string.strip()
+        for _ in range(number):
 
-                    response = f"{knowledge}\nSavoir inutile posté le {publication_date}. {link}"
-                    await ctx.send(response)
+            async with aiohttp.ClientSession() as session:
+                self.logger.warning(f"Asking a useless piece of knowledge")
+                async with session.get("https://www.savoir-inutile.com/") as r: # Retreve a useless piece of knowledge
+                    if r.status == 200:
+                        html = await r.text("utf-8")
+                        soup = BeautifulSoup(html, "html.parser")
+
+                        knowledge = soup.find(id="phrase").string
+                        link = soup.find("meta", attrs={"name": "og:url"})["content"]
+                        publication_date = soup.find("div", id="publication").find_all("span")[-1].string.strip()
+
+                        response = f"{knowledge}\nSavoir inutile posté le {publication_date}. {link}"
+                        await ctx.send(response)
