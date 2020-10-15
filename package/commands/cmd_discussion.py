@@ -20,9 +20,18 @@ class Discussion(commands.Cog):
         if time_delta.days < 0:
             time_delta = datetime.datetime(datetime.datetime.today().year + 1, 12, 25, 0, 0, 0) - datetime.date.now()
 
-        #number_days = time_delta.days
-        #number_hours = time_delta.seconds - number_days // 3600
-        #number_minutes = time_delta - number_days - number_hours // 60
+        seconds = int(round(time_delta.total_seconds(), 0))
+        days = seconds // 86400
+        seconds = seconds % 86400
 
-        response = f"Il reste {time_delta.days} jour(s), avant Noël ! :christmas_tree:"
+        hours = seconds // 3600
+        seconds = seconds % 3600
+
+        minutes = seconds // 60
+        seconds = seconds % 60
+
+        response = f"Il reste {days} jour(s), {hours} heure(s), {minutes} minute(s) et {seconds} seconde(s) avant Noël ! :christmas_tree:"
+        await ctx.send(response)
+
+        response = f"Un peu de patience {ctx.author.mention}, je sais que tu veux tes cadeaux petit vénal :gift:"
         await ctx.send(response)
