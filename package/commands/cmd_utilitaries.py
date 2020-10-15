@@ -57,15 +57,16 @@ class Utilitaire(commands.Cog):
 
         async with aiohttp.ClientSession() as session:
             async with session.get(f"http://api.openweathermap.org/data/2.5/weather?id={random_city}&appid={const.WEATHER_TOKEN}&units=metric&lang=fr") as r:
-
                 if r.status == 200:
                     weather = await r.json()
 
-                    #weather = requests.get(f"http://api.openweathermap.org/data/2.5/weather?id={random_city}&appid={WEATHER_TOKEN}&units=metric&lang=fr").json()
-                    self.logger.warning("Asking for the weather of the city " + weather["name"] + " in " + weather["sys"]["country"] + f" (id: {random_city})")
                     w_description = weather["weather"][0]["description"]
                     w_temp = round(weather["main"]["temp"], 1)
-                    response = f"Actuellement {w_description}, il fait {w_temp} °C (quelque part dans le monde :earth_africa:)."
+                    w_city = weather["name"]
+                    w_country = weather["sys"]["country"]
+
+                    self.logger.warning(f"Asking for the weather of the city {w_city} in {w_country} (id: {random_city})")
+                    response = f"Actuellement {w_description}, il fait {w_temp} °C à {w_city} ({w_country}) :earth_africa:"
                     await ctx.send(response)
 
 
