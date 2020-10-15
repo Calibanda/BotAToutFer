@@ -10,17 +10,13 @@ from discord.ext import commands
 import const
 
 class Utilitaire(commands.Cog):
-    def __init__(self, bot, logger, bot_channel_id):
+    def __init__(self, bot, logger):
         self.bot = bot
         self.logger = logger
-        self.bot_channel_id = bot_channel_id
         self._last_member = None
 
     @commands.command(name="news", help="Donne le lien d'un ou plusieurs articles de presse du jour (par défaut 1)") # https://discordpy.readthedocs.io/en/latest/faq.html#how-do-i-make-a-web-request
     async def news(self, ctx, number_tiles: int=1):
-        if str(ctx.channel.id) != self.bot_channel_id:
-            return
-
         async with aiohttp.ClientSession() as session:
             self.logger.warning(f"Asking for the local news")
             async with session.get(f"http://newsapi.org/v2/top-headlines?country=fr&apiKey={const.NEWS_TOKEN}") as r: # Retreve last news
@@ -54,9 +50,6 @@ class Utilitaire(commands.Cog):
 
     @commands.command(name="meteo", help="Donne la météo (d'une ville au hasard dans le monde)") # https://discordpy.readthedocs.io/en/latest/faq.html#how-do-i-make-a-web-request
     async def meteo(self, ctx):
-        if str(ctx.channel.id) != self.bot_channel_id:
-            return
-
         with open(os.path.join(const.SCRIPT_DIR, "package", "list_city_id.json"), "r") as f:
             list_city_id = json.load(f)
 
@@ -78,9 +71,6 @@ class Utilitaire(commands.Cog):
 
     @commands.command(name="scrabble", help="Donne les mots possibles au Scrabble avec une combinaison donnée (entrer une * pour saisir un joker)")
     async def scrabble(self, ctx, trestle=""):
-        if str(ctx.channel.id) != self.bot_channel_id:
-            return
-
         self.logger.warning(f"Scrabble command is invoked")
 
         if not trestle.strip():
@@ -174,13 +164,9 @@ class Utilitaire(commands.Cog):
 
     @commands.command(name="inutile", help="Donne un savoir inutile")
     async def scrabble(self, ctx, number=1):
-        if str(ctx.channel.id) != self.bot_channel_id:
-            return
-
         number = min(number, 5)
 
         for _ in range(number):
-
             async with aiohttp.ClientSession() as session:
                 self.logger.warning(f"Asking a useless piece of knowledge")
                 async with session.get("https://www.savoir-inutile.com/") as r: # Retreve a useless piece of knowledge

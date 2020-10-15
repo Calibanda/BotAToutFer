@@ -2,20 +2,17 @@
 from discord.ext import commands
 
 class Drinks(commands.Cog):
-    def __init__(self, bot, bot_channel_id):
+    def __init__(self, bot):
         self.bot = bot
-        self.bot_channel_id = bot_channel_id
         self._last_member = None
 
     @commands.command(name="coffee", help="Envoie un café")
     async def coffee(self, ctx):
-        if str(ctx.channel.id) == self.bot_channel_id:
-            response = ":coffee:"
-            await ctx.send(response)
+        response = ":coffee:"
+        await ctx.send(response)
 
 
     @commands.command(name="tea", help="Envoie un thé")
     async def tea(self, ctx):
-        if str(ctx.channel.id) == self.bot_channel_id:
-            response = ":tea:"
-            await ctx.send(response)
+        response = ":tea:"
+        await ctx.send(response)

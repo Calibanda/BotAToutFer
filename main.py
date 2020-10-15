@@ -22,15 +22,15 @@ logger = set_logger.init()
 bot = commands.Bot(command_prefix="!", description=const.BOT_DESCRIPTION)
 bot.remove_command('help')
 
-bot.add_cog(Discussion(bot, const.BOT_CHANNEL_ID))
-bot.add_cog(Drinks(bot, const.BOT_CHANNEL_ID))
-bot.add_cog(Green(bot, const.BOT_CHANNEL_ID))
-bot.add_cog(Help(bot, const.BOT_CHANNEL_ID))
-bot.add_cog(Ping(bot, const.BOT_CHANNEL_ID))
-bot.add_cog(Quotes(bot, const.BOT_CHANNEL_ID))
-bot.add_cog(Roll_dice(bot, const.BOT_CHANNEL_ID))
-bot.add_cog(Says(bot, const.BOT_CHANNEL_ID))
-bot.add_cog(Utilitaire(bot, logger, const.BOT_CHANNEL_ID))
+bot.add_cog(Discussion(bot))
+bot.add_cog(Drinks(bot))
+bot.add_cog(Green(bot))
+bot.add_cog(Help(bot))
+bot.add_cog(Ping(bot))
+bot.add_cog(Quotes(bot))
+bot.add_cog(Roll_dice(bot))
+bot.add_cog(Says(bot))
+bot.add_cog(Utilitaire(bot, logger))
 
 
 @bot.event
@@ -66,6 +66,10 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
+    if str(message.channel) == const.BOT_CHANNEL and message.content.startswith("!"):
+        await bot.process_commands(message)
+        return
+
     if "je suis " in message.content.lower():
         i_am = re.split(r"je suis ", message.content, 1, flags=re.IGNORECASE)[-1]
         response = f"Salut *{i_am}*, moi c'est le {bot.user.mention}"
@@ -78,8 +82,6 @@ async def on_message(message):
         
         await message.delete()
         await message.channel.send(response)
-
-    await bot.process_commands(message)
 
 
 bot.run(const.TOKEN) # See help here for the loggout message

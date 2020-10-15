@@ -4,16 +4,12 @@ import secrets
 from discord.ext import commands
 
 class Quotes(commands.Cog):
-    def __init__(self, bot, bot_channel_id):
+    def __init__(self, bot):
         self.bot = bot
-        self.bot_channel_id = bot_channel_id
         self._last_member = None
 
     @commands.command(name="99", help="Répond une réplique de B99")
     async def nine_nine(self, ctx):
-        if str(ctx.channel.id) != self.bot_channel_id:
-            return
-        
         brooklyn_99_quotes = [
             "I'm the human form of the :100: emoji.",
             "Bingpot!",
@@ -39,9 +35,6 @@ class Quotes(commands.Cog):
 
     @commands.command(name="good_place", help="Répond une réplique de TGP")
     async def good_place(self, ctx):
-        if str(ctx.channel.id) != self.bot_channel_id:
-            return
-        
         the_good_place_quotes = [
             "Everything is fine",
             "I'm telling you, Molotov cocktails work. Anytime I had a problem and I threw a Molotov cocktail, boom! Right away, I had a different problem.",
