@@ -75,11 +75,12 @@ async def on_message(message):
         response = f"Salut *{i_am}*, moi c'est le {bot.user.mention}"
         await message.channel.send(response)
 
-    if any(curse_dict["curse_word"] in message.content.lower() for curse_dict in const.CURSE_LIST):
+    if any(re.match(r"(?<![:\w*:])" + curse_dict["curse_word"], message.content.lower()) for curse_dict in const.CURSE_LIST):
         response = f"{message.author.mention} : " + message.content
         for curse_dict in const.CURSE_LIST:
-            response = re.sub(curse_dict["curse_word"], "*" + curse_dict["traduction"] + "*", response, flags=re.IGNORECASE)
+            response = re.sub(r"(?<![:\w*:])" + curse_dict["curse_word"], "*" + curse_dict["traduction"] + "*", response, flags=re.IGNORECASE)
         
+        any(re.match(r"(?<![:\w*:])" + curse_dict["curse_word"], message.content.lower()) for curse_dict in const.CURSE_LIST)
         await message.delete()
         await message.channel.send(response)
 
