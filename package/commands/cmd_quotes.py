@@ -44,3 +44,19 @@ class Quotes(commands.Cog):
 
         response = secrets.choice(the_good_place_quotes)
         await ctx.send(response)
+
+    @commands.command(name="sherlock", help="Répond une réplique de Sherlock")
+    async def sherlock(self, ctx):
+        sherlock_quotes = [
+            "I'm not an addict, I'm a user. I alleviate boredom and occasionally heighten my thought processes.",
+            "Nothing made me. I made me.",
+            "Bravery is by far the kindest word for stupidity.",
+            "Fear is wisdom in the face of danger, it is nothing to be ashamed of.",
+            "Stress can ruin everyday of your life, dying can only ruin one.",
+            "Good afternoon. I am Sherlock Holmes, this is my friend and colleague, Dr. Watson. You may speak freely in front of him, as he rarely understands a word.",
+            "The problems of your past are your business. The problems of your future are my privilege.",
+
+        ]
+
+        response = secrets.choice(sherlock_quotes)
+        await ctx.send(response)
