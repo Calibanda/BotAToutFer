@@ -54,7 +54,7 @@ class Quotes(commands.Cog):
             "It's a rare occurrence, like a double rainbow. Or like someone on the internet saying, \"You know what? You’ve convinced me I was wrong.\"",
             "Now we're going to do the most human thing of all: attempt something futile with a ton of unearned confidence and fail spectacularly!",
             "Okay, shouldn't take long. Between an hour and, um, 11 months.",
-            
+
         ]
 
         response = secrets.choice(the_good_place_quotes)
@@ -74,4 +74,40 @@ class Quotes(commands.Cog):
         ]
 
         response = secrets.choice(sherlock_quotes)
+        await ctx.send(response)
+
+    @commands.command(name="kaamelott", help="Répond une réplique de Kaamelott")
+    async def kaamelott(self, ctx):
+        kaamelott_quotes = [
+            "- Et va falloir vous y faire parce qu'à partir de maintenant, on va s'appeler \"Les Chevaliers de la Table Ronde\" !\n- Ben heureusement qu'on s'est pas fait construire un buffet à vaisselle !",
+            "J'ai rêvé qu'il y avait des scorpions qui voulaient me piquer. En plus, y en avait un il était mi-ours, mi-scorpion et re mi-ours derrière !",
+            "- C'est vrai que vous êtes le fils d'un démon et d'une pucelle ?\n- Oui pourquoi ?\n- Vous avez plus pris de la pucelle...",
+            "J'irai me coucher quand vous m'aurez juré qu'il n'y a pas dans cette forêt d'animal plus dangereux que le lapin adulte !",
+            "Moi j'ai appris à lire, ben je souhaite ça à personne.",
+            "Vous avez été marié comme moi ; vous savez que la monstruosité peut prendre des formes diverses.",
+            "- Qu'est-ce qui est petit et marron ?\n- Un marron !\n- Putain il est fort, ce con.",
+            "Moi, je m'en fous, si on me force à y retourner, je retiens ma respiration jusqu'à ce qu'on arrête de me forcer à y retourner.",
+            "Elle est où la poulette ?",
+            "Une pluie de pierres ? En intérieur ? Ah, je vous prenais pour un pied de chaise, mais en fait vous êtes un précurseur, Monsieur !",
+            "JE NE MANGE PAS DE GRAINES !!",
+            "Eh bien, c'est l'histoire d'un petit ourson qui s'appelle... Arthur. Et y'a une fée, un jour, qui vient voir le petit ourson et qui lui dit : « Arthur tu vas partir à la recherche du Vase Magique ». Et elle lui donne une épée hmm... magique (ouais, parce qu'y a plein de trucs magiques dans l'histoire, bref) alors le petit ourson il se dit : « Heu, chercher le Vase Magique ça doit être drôlement difficile, alors il faut que je parte dans la forêt pour trouver des amis pour m'aider ». Alors il va voir son ami Lancelot... le cerf (parce que le cerf c'est majestueux comme ça), heu, Bohort le faisan et puis Léodagan... heu... l'ours, ouais c'est un ours aussi, c'est pas tout à fait le même ours mais bon. Donc Léodagan qui est le père de la femme du petit ourson, qui s'appelle Guenièvre la truite... non, non, parce que c'est la fille de... non c'est un ours aussi puisque c'est la fille de l'autre ours, non parce qu'après ça fait des machins mixtes, en fait un ours et une truite... non en fait ça va pas. Bref, sinon y'a Gauvain le neveu du petit ourson qui est le fils de sa soeur Anna, qui est restée à Tintagel avec sa mère Igerne la... bah non, ouais du coup je suis obligé de foutre des ours de partout sinon on pige plus rien dans la famille... Donc c'est des ours, en gros, enfin bref... Ils sont tous là et donc Petit Ourson il part avec sa troupe à la recherche du Vase Magique. Mais il le trouve pas, il le trouve pas parce qu'en fait pour la plupart d'entre eux c'est... c'est des nazes : ils sont hyper mous, ils sont bêtes, en plus y'en a qu'ont la trouille. Donc il décide de les faire bruler dans une grange pour s'en débarrasser... Donc la fée revient pour lui dire : « Attention petit ourson, il faut être gentil avec ses amis de la forêt » quand même c'est vrai, et du coup Petit Ourson il lui met un taquet dans la tête à la fée, comme ça : « BAH ! ». Alors la fée elle est comme ça et elle s'en va... et voilà et en fait il trouve pas le vase. En fait il est... il trouve pas... et Petit Ourson il fait de la dépression et tout les jours il se demande s'il va se tuer ou... pas...",
+            "- Et ils avaient des éléphants ?\n- Des éléphants ?! Non non, mais ils avaient des chevaux tout gris, tout chelous avec la queue au milieu du visage !\n- Ah oui, des éléphants...",
+            "Donc, pour résumer, je suis souvent victime des colibris, sous-entendu des types qu’oublient toujours tout, euh, non... Bref, tout ça pour dire, que je voudrais bien qu’on me considère en tant que tel.",
+            "Le gras c’est la vie !",
+            "De toute façon, les réunions de la Table Ronde c’est deux fois par mois. Donc si le mec il dit après-demain à partir de dans deux jours, suivant s’il le dit à la fin du mois, ça reporte.",
+            "Faut pas respirer la compote, ça fait tousser.",
+            "PAYS DE GALLE INDÉPENDAAAAAAAAAAAAAAAAAAAANT !!!",
+            "CUUUUUUUUUILLÈÈÈÈÈÈRE !!",
+            "Si vous prenez aujourd’hui, que vous comptez sept jours, on retombe le même jour mais une semaine plus tard... Enfin à une vache près, c’est pas une science exacte.",
+            "C’est pas moi qui explique mal, c’est les autres qui sont cons.",
+            "Un engin comme vous, ça devrait être livré avec une notice !",
+            "Ah, le printemps ! La nature se réveille, les oiseaux reviennent, on crame des mecs.",
+            "- Ça va je vous force pas à manger des briques non plus !\n- Enfin sans vouloir me la ramener, la seule différence concrète avec des briques, c’est que vous appelez ça des tartes !",
+            "Vous, vous devriez arrêter de sourire. J’vous promets ; ça devient vraiment malsain.",
+            "Non mais c’est dingue cette histoire ! C’est pas parce que vous faite des tartes pour des petits enfants qui n’existent pas, que je dois les emmener à la pêche !",
+            "Odi panem quid meliora. Ça veut rien dire, mais je trouve que ça boucle bien.",
+            
+        ]
+
+        response = secrets.choice(kaamelott_quotes)
         await ctx.send(response)
