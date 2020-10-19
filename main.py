@@ -86,4 +86,5 @@ async def on_message(message):
         await message.channel.send(response)
 
 
-bot.run(const.TOKEN) # See help here for the loggout message
+if __name__ == "__main__":
+    bot.run(const.TOKEN) # See help here for the loggout message
