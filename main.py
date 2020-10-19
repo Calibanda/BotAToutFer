@@ -70,7 +70,7 @@ async def on_message(message):
         await bot.process_commands(message)
         return
 
-    if const.LIST_JE_SUIS in message.content.lower():
+    if any(je_suis in message.content.lower() for je_suis in const.LIST_JE_SUIS):
         regex_je_suis = "(" + ")|(".join(const.LIST_JE_SUIS) + ")"
         i_am = re.split(regex_je_suis, message.content, 1, flags=re.IGNORECASE)[-1]
         response = f"Salut *{i_am}*, moi c'est le {bot.user.mention}"
