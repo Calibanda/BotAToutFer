@@ -54,7 +54,9 @@ class Quotes(commands.Cog):
             "It's a rare occurrence, like a double rainbow. Or like someone on the internet saying, \"You know what? You’ve convinced me I was wrong.\"",
             "Now we're going to do the most human thing of all: attempt something futile with a ton of unearned confidence and fail spectacularly!",
             "Okay, shouldn't take long. Between an hour and, um, 11 months.",
-
+            "Attention... I have been murdered.",
+            "Now, all of you, get the fork out of my neighborhood.",
+            
         ]
 
         response = secrets.choice(the_good_place_quotes)
@@ -106,6 +108,8 @@ class Quotes(commands.Cog):
             "Vous, vous devriez arrêter de sourire. J’vous promets ; ça devient vraiment malsain.",
             "Non mais c’est dingue cette histoire ! C’est pas parce que vous faite des tartes pour des petits enfants qui n’existent pas, que je dois les emmener à la pêche !",
             "Odi panem quid meliora. Ça veut rien dire, mais je trouve que ça boucle bien.",
+            "Victoriae mundis et mundis lacrima ! Ça ne veut absolument rien dire, mais je trouve que c'est assez dans le ton",
+            "Les momes, maintenant, ils lisent, ils lisent, ils lisent... Et résultat : ils sont encore puceaux à 10 ans",
             
         ]
 
