@@ -85,6 +85,14 @@ async def on_message(message):
         await message.delete()
         await message.channel.send(response)
 
+    if "echec" in message.content.lower() or "échec" in message.content.lower():
+        response = "https://tenor.com/bq4o5.gif"
+        await message.channel.send(response)
+
+    if "possible" in message.content.lower():
+        response = "https://tenor.com/XiKZ.gif"
+        await message.channel.send(response)
+
 
 if __name__ == "__main__":
     bot.run(const.TOKEN) # See help here for the loggout message
