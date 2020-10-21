@@ -26,7 +26,9 @@ CURSE_LIST = [
     {"curse_word": "merde", "traduction": "merle"},
     {"curse_word": "putain", "traduction": "mutin"},
     {"curse_word": "connard", "traduction": "canard"},
-    {"curse_word": "pute", "traduction": "pull"},
+    {"curse_word": "pute", "traduction": "butte"},
+    {"curse_word": "bordel", "traduction": "bordé"},
+    {"curse_word": "foutre", "traduction": "floute"},
 
     {"curse_word": "fuck", "traduction": "fork"},
     {"curse_word": "shit", "traduction": "shirt"},
