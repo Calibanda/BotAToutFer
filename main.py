@@ -84,10 +84,10 @@ async def on_message(message):
         response = "https://tenor.com/XiKZ.gif"
         await message.channel.send(response)
 
-    if any(re.match(r"(?<![:\w*:])" + curse_dict["curse_word"], message.content.lower() + " ") for curse_dict in const.CURSE_LIST):
-        response = f"{message.author.mention} : {message.content} "
+    if any(re.match(r"(?<!\:)" + curse_dict["curse_word"], message.content.lower()) for curse_dict in const.CURSE_LIST):
+        response = f"{message.author.mention} : {message.content}"
         for curse_dict in const.CURSE_LIST:
-            response = re.sub(r"(?<![:\w*:])" + curse_dict["curse_word"], "*" + curse_dict["traduction"] + "*", response, flags=re.IGNORECASE)
+            response = re.sub(r"(?<!\:)" + curse_dict["curse_word"], "*" + curse_dict["traduction"] + "*", response, flags=re.IGNORECASE)
         
         await message.delete()
         await message.channel.send(response)
