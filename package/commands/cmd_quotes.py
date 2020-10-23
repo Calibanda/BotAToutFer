@@ -110,6 +110,7 @@ class Quotes(commands.Cog):
             "Odi panem quid meliora. Ça veut rien dire, mais je trouve que ça boucle bien.",
             "Victoriae mundis et mundis lacrima ! Ça ne veut absolument rien dire, mais je trouve que c'est assez dans le ton",
             "Les momes, maintenant, ils lisent, ils lisent, ils lisent... Et résultat : ils sont encore puceaux à 10 ans",
+            "Ces conneries de gauche et de droite ! Ça veut rien dire ces machins ! Selon comme on est tourné ça change tout !",
             
         ]
 
