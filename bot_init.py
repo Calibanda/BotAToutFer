@@ -7,6 +7,7 @@ import const
 import set_logger
 
 from package.on_message_jokes import on_message_jokes
+from package.background_tasks import Tasks
 from package.commands.cmd_discussion import Discussion
 from package.commands.cmd_drinks import Drinks
 from package.commands.cmd_green import Green
@@ -24,16 +25,6 @@ def bot_init():
     bot = commands.Bot(command_prefix="!", description=const.BOT_DESCRIPTION)
     bot.remove_command('help')
 
-    bot.add_cog(Discussion(bot))
-    bot.add_cog(Drinks(bot))
-    bot.add_cog(Green(bot))
-    bot.add_cog(Help(bot))
-    bot.add_cog(Ping(bot))
-    bot.add_cog(Quotes(bot))
-    bot.add_cog(Roll_dice(bot))
-    bot.add_cog(Says(bot))
-    bot.add_cog(Utilitaire(bot, logger))
-
 
     @bot.event
     async def on_ready():
@@ -44,6 +35,24 @@ def bot_init():
         for guild in bot.guilds:
             print(f"{guild.name} (id: {guild.id})")
             logger.warning(f"{bot.user} is connected to the following guild: {guild.name} (id: {guild.id})")
+        
+        # general_channels = discord.utils.get(bot.get_all_channels(), name="general")
+        # print(general_channels)
+        # print(channel.name for channel in bot.get_all_channels())
+        # channel = discord.utils.get(client.get_all_channels(), guild__name='Cool', name='general')
+
+        cat_channels = [bot.get_channel(763426416167485481)]  
+
+        bot.add_cog(Tasks(bot, cat_channels, logger))
+        bot.add_cog(Discussion(bot))
+        bot.add_cog(Drinks(bot))
+        bot.add_cog(Green(bot))
+        bot.add_cog(Help(bot))
+        bot.add_cog(Ping(bot))
+        bot.add_cog(Quotes(bot))
+        bot.add_cog(Roll_dice(bot))
+        bot.add_cog(Says(bot))
+        bot.add_cog(Utilitaire(bot, logger))
 
         # bot_channel = discord.utils.get(guild.channels, name=const.BOT_CHANNEL)
 
