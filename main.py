@@ -1,5 +1,4 @@
 # main.py
-import re
 
 import discord
 from discord.ext import commands
@@ -7,6 +6,7 @@ from discord.ext import commands
 import const
 import set_logger
 
+from package.on_message_jokes import on_message_jokes
 from package.commands.cmd_discussion import Discussion
 from package.commands.cmd_drinks import Drinks
 from package.commands.cmd_green import Green
@@ -36,12 +36,12 @@ bot.add_cog(Utilitaire(bot, logger))
 @bot.event
 async def on_ready():
     """When the bot is connected to the guild, print guild informations"""
-    guild = discord.utils.get(bot.guilds, name=const.GUILD)
-    print(f"{bot.user} is connected to the following guild:\n{guild.name} (id: {guild.id})")
-    logger.warning(f"{bot.user} is connected to the following guild: {guild.name} (id: {guild.id})")
+    print(f"{bot.user} is connected to the following guild(s):")
+    for guild in bot.guilds:
+        print(f"{guild.name} (id: {guild.id})")
+        logger.warning(f"{bot.user} is connected to the following guild: {guild.name} (id: {guild.id})")
 
-    bot_channel = discord.utils.get(guild.channels, name=const.BOT_CHANNEL)
-    # await bot_channel.send("Salut, je suis le BotAToutFer ! Je suis réveillé donc vous pouvez m'utiliser :smirk:")
+    # bot_channel = discord.utils.get(guild.channels, name=const.BOT_CHANNEL)
 
 
 @bot.event
@@ -70,29 +70,7 @@ async def on_message(message):
         await bot.process_commands(message)
         return
 
-    if any(je_suis in message.content.lower() for je_suis in const.LIST_JE_SUIS):
-        regex_je_suis = "(" + ")|(".join(const.LIST_JE_SUIS) + ")"
-        i_am = re.split(regex_je_suis, message.content, 1, flags=re.IGNORECASE)[-1]
-        response = f"Salut *{i_am}*, moi c'est le {bot.user.mention}"
-        await message.channel.send(response)
-
-    if "echec" in message.content.lower() or "échec" in message.content.lower():
-        response = "https://tenor.com/bq4o5.gif"
-        await message.channel.send(response)
-
-    if "possible" in message.content.lower():
-        response = "https://tenor.com/XiKZ.gif"
-        await message.channel.send(response)
-
-    if any(re.search(r"(?<!\:)" + curse_dict["curse_word"], message.content, flags=re.IGNORECASE) for curse_dict in const.CURSE_LIST):
-        response = message.content
-        print(response)
-        for curse_dict in const.CURSE_LIST:
-            response = re.sub(r"(?<!\:)" + curse_dict["curse_word"], "*" + curse_dict["traduction"] + "*", response, 0, flags=re.IGNORECASE)
-        
-        response = f"{message.author.mention} : {response}"
-        await message.delete()
-        await message.channel.send(response)
+    await on_message_jokes(bot, message)
 
 
 if __name__ == "__main__":
