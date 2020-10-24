@@ -181,3 +181,52 @@ class Utilitaire(commands.Cog):
 
                         response = f"{knowledge}\nSavoir inutile posté le {publication_date}. {link}"
                         await ctx.send(response)
+
+
+    @commands.command(name="tv", help="Donne le programme de la TNT de ce soir")
+    async def tv(self, ctx):
+        async with aiohttp.ClientSession() as session:
+            self.logger.warning(f"Asking for the TNT programm of the night")
+            async with session.get("https://www.programme-tv.net/programme/programme-tnt.html") as r: # Retreve the TNT programm of the night
+                if r.status == 200:
+                    html = await r.text("utf-8")
+
+                    soup = BeautifulSoup(html, "html.parser")
+
+                    date_and_hour = soup.find(class_="timeNavigationOverlay-currentDate").p.string
+                    date_and_hour = " ".join(line.strip() for line in date_and_hour.split("\n") if line.strip())
+                    date, hour = date_and_hour.split(" de ")
+
+                    response = f"```Programme de ce {date} soir :\n"
+
+                    channels = soup.findAll(class_="doubleBroadcastCard")
+
+                    for i in range(24):
+                        name_channel = channels[i].find(class_="doubleBroadcastCard-channel").a.string.strip()
+                        nb_channel = channels[i].find(class_="doubleBroadcastCard-channelNumber").string.strip()
+
+                        programm_hours = [ hour.string.strip() for hour in channels[i].findAll(class_="doubleBroadcastCard-hour") ]
+                        programm_infos = channels[i].findAll(class_="doubleBroadcastCard-infos")
+                        programm = []
+
+                        response += f"\n  Sur la chaîne {name_channel} ({nb_channel}) :\n"
+
+                        for j in range(len(programm_hours)):
+                            programm_title = programm_infos[j].find(class_="doubleBroadcastCard-title").string.strip()
+
+                            if programm_infos[j].findAll(class_="doubleBroadcastCard-subtitle"):
+                                programm_subtitle = programm_infos[j].findAll(class_="doubleBroadcastCard-subtitle")[0].string.strip()
+                                programm_subtitle = " ".join(line.strip() for line in programm_subtitle.split("\n") if line.strip())
+                                programm_title += " - " + programm_subtitle
+                            
+                            programm_link = programm_infos[j].find(class_="doubleBroadcastCard-title")["href"]
+                            programm_category = programm_infos[j].find(class_="doubleBroadcastCard-type").string.strip()
+                            programm_hour = programm_hours[j]
+                            programm_duration = programm_infos[j].find(class_="doubleBroadcastCard-durationContent").string.strip()
+
+                            response += f"    À {programm_hour} {programm_title}\n"
+
+                        if (i+1)%12 == 0:
+                            response += "```"
+                            await ctx.send(response)
+                            response = "```"
