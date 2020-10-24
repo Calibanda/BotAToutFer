@@ -184,7 +184,7 @@ class Utilitaire(commands.Cog):
 
 
     @commands.command(name="tv", help="Donne le programme de la TNT de ce soir")
-    async def tv(self, ctx):
+    async def tv(self, ctx, channel_number=0):
         async with aiohttp.ClientSession() as session:
             self.logger.warning(f"Asking for the TNT programm of the night")
             async with session.get("https://www.programme-tv.net/programme/programme-tnt.html") as r: # Retreve the TNT programm of the night
@@ -197,36 +197,54 @@ class Utilitaire(commands.Cog):
                     date_and_hour = " ".join(line.strip() for line in date_and_hour.split("\n") if line.strip())
                     date, hour = date_and_hour.split(" de ")
 
-                    response = f"```Programme de ce {date} soir :\n"
+                    div_channels = soup.findAll(class_="doubleBroadcastCard")
+                    channels = []
 
-                    channels = soup.findAll(class_="doubleBroadcastCard")
+                    for channel in div_channels:
+                        name_channel = channel.find(class_="doubleBroadcastCard-channel").a.string.strip()
+                        nb_channel = channel.find(class_="doubleBroadcastCard-channelNumber").string.strip()
 
-                    for i in range(24):
-                        name_channel = channels[i].find(class_="doubleBroadcastCard-channel").a.string.strip()
-                        nb_channel = channels[i].find(class_="doubleBroadcastCard-channelNumber").string.strip()
-
-                        programm_hours = [ hour.string.strip() for hour in channels[i].findAll(class_="doubleBroadcastCard-hour") ]
-                        programm_infos = channels[i].findAll(class_="doubleBroadcastCard-infos")
+                        programm_hours = [ hour.string.strip() for hour in channel.findAll(class_="doubleBroadcastCard-hour") ]
+                        programm_infos = channel.findAll(class_="doubleBroadcastCard-infos")
                         programm = []
 
-                        response += f"\n  Sur la chaîne {name_channel} ({nb_channel}) :\n"
+                        channel_response= f"\n  Sur la chaîne {name_channel} ({nb_channel}) :\n"
 
-                        for j in range(len(programm_hours)):
-                            programm_title = programm_infos[j].find(class_="doubleBroadcastCard-title").string.strip()
+                        for i in range(len(programm_hours)):
+                            programm_title = programm_infos[i].find(class_="doubleBroadcastCard-title").string.strip()
 
-                            if programm_infos[j].findAll(class_="doubleBroadcastCard-subtitle"):
-                                programm_subtitle = programm_infos[j].findAll(class_="doubleBroadcastCard-subtitle")[0].string.strip()
+                            if programm_infos[i].findAll(class_="doubleBroadcastCard-subtitle"):
+                                programm_subtitle = programm_infos[i].findAll(class_="doubleBroadcastCard-subtitle")[0].string.strip()
                                 programm_subtitle = " ".join(line.strip() for line in programm_subtitle.split("\n") if line.strip())
                                 programm_title += " - " + programm_subtitle
                             
-                            programm_link = programm_infos[j].find(class_="doubleBroadcastCard-title")["href"]
-                            programm_category = programm_infos[j].find(class_="doubleBroadcastCard-type").string.strip()
-                            programm_hour = programm_hours[j]
-                            programm_duration = programm_infos[j].find(class_="doubleBroadcastCard-durationContent").string.strip()
+                            programm_link = programm_infos[i].find(class_="doubleBroadcastCard-title")["href"]
+                            programm_category = programm_infos[i].find(class_="doubleBroadcastCard-type").string.strip()
+                            programm_hour = programm_hours[i]
+                            programm_duration = programm_infos[i].find(class_="doubleBroadcastCard-durationContent").string.strip()
 
-                            response += f"    À {programm_hour} {programm_title}\n"
-
-                        if (i+1)%12 == 0:
-                            response += "```"
+                            channel_response += f"    À {programm_hour} {programm_title}\n"
+                        
+                        channels.append(channel_response)
+                    
+                    if channel_number:
+                        try:
+                            response = f"```Programme de ce {date} soir :\n" + channels[channel_number - 1] + "```"
                             await ctx.send(response)
-                            response = "```"
+                        except Exception:
+                            await ctx.send("Je ne connais pas cette chaîne.")
+                        finally:
+                            return
+                    
+                    else:
+                        response = f"```Programme de ce {date} soir :\n"
+                        for i in range(12):
+                            response += channels[i]
+                        response += "```"
+                        await ctx.send(response)
+
+                        response = "```"
+                        for i in range(12, 24):
+                            response += channels[i]
+                        response += "```"
+                        await ctx.send(response)
