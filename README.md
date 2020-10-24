@@ -10,4 +10,5 @@ You can also manualy install them:
 ```
 pip3 install -U discord.py
 pip3 install -U python-dotenv
+pip3 install -U bs4
 ```
