@@ -38,6 +38,8 @@ def bot_init():
     @bot.event
     async def on_ready():
         """When the bot is connected to the guild, print guild informations"""
+        print(f"Logged in as:\nUsername: {bot.user.name}\nUser ID: {bot.user.id}")
+        logger.warning(f"Logged in as:\nUsername: {bot.user.name}\nUser ID: {bot.user.id}")
         print(f"{bot.user} is connected to the following guild(s):")
         for guild in bot.guilds:
             print(f"{guild.name} (id: {guild.id})")
