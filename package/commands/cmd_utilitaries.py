@@ -164,7 +164,7 @@ class Utilitaire(commands.Cog):
 
 
     @commands.command(name="inutile", help="Donne un savoir inutile")
-    async def scrabble(self, ctx, number=1):
+    async def inutile(self, ctx, number=1):
         number = min(number, 5)
 
         for _ in range(number):
