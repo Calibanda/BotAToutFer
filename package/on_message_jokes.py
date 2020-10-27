@@ -23,16 +23,18 @@ async def on_message_jokes(bot, message):
     
     if any(entry["word"].split(" ")[0].lower() in message.content.lower() for entry in const.DICO_MARSEILLAIS):
         present_words = [ entry for entry in const.DICO_MARSEILLAIS if entry["word"].split(" ")[0].lower() in message.content.lower() ]
+        response = f"Hey <@{const.ANTOINE_TAG}>"
         for entry in present_words:
             word = entry["word"]
             description = entry["description"]
-            response = f"Hey <@{const.ANTOINE_TAG}>, \"{word}\" ça veut dire {description}"
+            response += f", \"{word}\" ça veut dire {description}"
+        await message.channel.send(response)
 
     if any(re.search(r"(?<!\:)" + curse_dict["curse_word"], message.content, flags=re.IGNORECASE) for curse_dict in const.CURSE_LIST):
         response = message.content
         for curse_dict in const.CURSE_LIST:
             response = re.sub(r"(?<!\:)" + curse_dict["curse_word"], "*" + curse_dict["traduction"] + "*", response, 0, flags=re.IGNORECASE)
-        
+
         response = f"{message.author.mention} : {response}"
         await message.delete()
         await message.channel.send(response)
