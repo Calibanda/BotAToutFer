@@ -1,6 +1,7 @@
 # const.py
 import os
 import datetime
+import json
 
 from dotenv import load_dotenv
 
@@ -12,6 +13,7 @@ GUILD = os.getenv("DISCORD_GUILD")
 WEATHER_TOKEN = os.getenv("WEATHER_TOKEN")
 NEWS_TOKEN = os.getenv("NEWS_TOKEN")
 CAT_TOKEN = os.getenv("CAT_TOKEN")
+ANTOINE_TAG = int(os.getenv("ANTOINE_TAG"))
 
 BOT_CHANNEL = "bot-test"
 BOT_CHANNEL_ID = "763426416167485481"
@@ -56,3 +58,6 @@ LIST_JE_SUIS = [
     "j suis ",
     "j sui ",
 ]
+
+with open(os.path.join(SCRIPT_DIR, "package", "dico_marseillais.json"), "r") as f:
+    DICO_MARSEILLAIS = json.load(f)
