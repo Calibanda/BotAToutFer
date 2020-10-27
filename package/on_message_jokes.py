@@ -21,6 +21,10 @@ async def on_message_jokes(bot, message):
         response = "https://tenor.com/XiKZ.gif"
         await message.channel.send(response)
     
+    if "aled" in message.content.lower():
+        response ="https://assets.classicfm.com/2017/23/aled-jones-new-1497019550-editorial-long-form-1.png"
+        await message.channel.send(response)
+    
     if any(entry["word"].split(" ")[0].lower() in message.content.lower() for entry in const.DICO_MARSEILLAIS):
         present_words = [ entry for entry in const.DICO_MARSEILLAIS if entry["word"].split(" ")[0].lower() in message.content.lower() ]
         response = f"Hey <@{const.ANTOINE_TAG}>"
