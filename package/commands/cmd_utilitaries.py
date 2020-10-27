@@ -128,6 +128,9 @@ class Utilitaire(commands.Cog):
                     trestle = trestle.replace(lettre, '', 1)
                 else:
                     capitalized_word = capitalized_word + lettre.lower()
+            
+            if len(capitalized_word) >= 7: # If a word is 7 letters or more, we add a 50 points bonus
+                value += 50
 
             dico_possible_words[capitalized_word] = value
 
@@ -244,7 +247,7 @@ class Utilitaire(commands.Cog):
                         await ctx.send(response)
 
                         response = "```"
-                        for i in range(12, 24):
+                        for i in range(12, 23):
                             response += channels[i]
                         response += "```"
                         await ctx.send(response)
