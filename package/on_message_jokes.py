@@ -43,7 +43,7 @@ async def cursed_words(message, words_in_message):
 
 
 async def marseillais_word(message, words_in_message):
-    present_words = [ word for word in words_in_message for entry in const.DICO_MARSEILLAIS if word == entry["word"].split(" ")[0].lower() ] # Catch all the marseillais words
+    present_words = [ entry for entry in const.DICO_MARSEILLAIS for word in words_in_message if word == entry["word"].split(" ")[0].lower() ] # Catch all the marseillais words
     if present_words: # If any marseillais word in the original message
         response = f"Hey <@{const.ANTOINE_TAG}>, "
         for entry in present_words:
