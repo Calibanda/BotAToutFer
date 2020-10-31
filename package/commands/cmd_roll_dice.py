@@ -13,7 +13,9 @@ class Roll_dice(commands.Cog):
         """Rolls a dice in xDx format."""
         try:
             number_of_dice, number_of_sides = map(int, dice.lower().split('d'))
-            response = ", ".join(str(random.randint(1, number_of_sides)) for r in range(number_of_dice))
+            dices = [ random.randint(1, number_of_sides) for r in range(number_of_dice) ]
+            total = sum(dices)
+            response = f"**{total}** (" + " + ".join(dices) + f" = {total})"
             await ctx.send(response)
         except Exception:
             await ctx.send('Format has to be in xDx!')
