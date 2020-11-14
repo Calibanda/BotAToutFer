@@ -33,10 +33,6 @@ class Pendu(commands.Cog):
             response = f"Une partie est déjà en cours !\nIl reste {self.number_stroke} coup(s) et voici le mot à deviner : " + self.visible_word.replace("*", "\*")
             await ctx.send(response)
 
-        elif option=="stop" and not self.playing:
-            response = "Aucune partie de pendu n'est en cours ! Mais vous pouvez en lancer une avec la commande '!pendu start'"
-            await ctx.send(response)
-
         elif option=="stop":
             self.playing = False
             response = f"Ohhh, dommage, mais je comprend que vous souhaitez arrêter. Voici le mot qui était à deviner : {self.secret_word}"
@@ -49,7 +45,7 @@ class Pendu(commands.Cog):
 
             await self.start(ctx)
 
-        elif re.match(r"^[a-z]$", option):
+        elif re.match(r"^[a-z]$", option) and self.playing:
             response = ""
             if option in self.gessed_letters:
                 response = f"Vous avez déjà demandé la lettre {option} !"
@@ -82,6 +78,10 @@ class Pendu(commands.Cog):
 
             await ctx.send(response)
             await self.display_status_message(ctx)
+
+        elif (option=="stop" or re.match(r"^[a-z]$", option)) and not self.playing:
+            response = "Aucune partie de pendu n'est en cours ! Mais vous pouvez en lancer une avec la commande '!pendu start'"
+            await ctx.send(response)
 
         else: # Display help
             response = "Les commandes du jeu du pendu :\n```\n!pendu start                       Lance une partie\n!pendu stop                        Arrête la partie en cours\n!pendu restart (ou !pendu reboot)  Arrête la partie en cours et en relance une\n!pendu status                      Affiche le status de la partie en cours\n!pendu <lettre>                    Proposer une lettre\n```"
