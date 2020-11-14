@@ -63,6 +63,7 @@ class Pendu(commands.Cog):
                         self.visible_word = self.visible_word[:i] + option + self.visible_word[i + 1:]
                 if self.visible_word == self.secret_word: #WIN
                     response += f" C'est gagné ! Vous avez deviné le mot {self.secret_word}."
+                    self.playing = False
                     await ctx.send(response)
                     return
 
