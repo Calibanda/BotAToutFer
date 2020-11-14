@@ -241,13 +241,13 @@ class Utilitaire(commands.Cog):
                     
                     else:
                         response = f"```Programme de ce {date} soir :\n"
-                        for i in range(12):
+                        for i in range(11):
                             response += channels[i]
                         response += "```"
                         await ctx.send(response)
 
                         response = "```"
-                        for i in range(12, 23):
+                        for i in range(11, 23):
                             response += channels[i]
                         response += "```"
                         await ctx.send(response)
