@@ -12,6 +12,7 @@ from package.commands.cmd_discussion import Discussion
 from package.commands.cmd_drinks import Drinks
 from package.commands.cmd_green import Green
 from package.commands.cmd_help import Help
+from package.commands.cmd_pendu import Pendu
 from package.commands.cmd_ping import Ping
 from package.commands.cmd_quotes import Quotes
 from package.commands.cmd_roll_dice import Roll_dice
@@ -48,6 +49,7 @@ def bot_init():
         bot.add_cog(Drinks(bot))
         bot.add_cog(Green(bot))
         bot.add_cog(Help(bot))
+        bot.add_cog(Pendu(bot))
         bot.add_cog(Ping(bot))
         bot.add_cog(Quotes(bot))
         bot.add_cog(Roll_dice(bot))
