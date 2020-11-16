@@ -42,7 +42,7 @@ def bot_init():
         # print(channel.name for channel in bot.get_all_channels())
         # channel = discord.utils.get(client.get_all_channels(), guild__name='Cool', name='general')
 
-        cat_channels = [bot.get_channel(763426416167485481)]  
+        cat_channels = [ bot.get_channel(channel_id) for channel_id in const.AUTORIZED_CHANNELS ]
 
         bot.add_cog(Tasks(bot, cat_channels, logger))
         #bot.add_cog(Music(bot, logger))
@@ -63,7 +63,7 @@ def bot_init():
     async def on_command_error(ctx, error):
         """When a command error occures displays the reason in the gild chat"""
         logger.error(f"On command error: {repr(error)}")
-        if str(ctx.channel.id) == const.BOT_CHANNEL_ID:
+        if ctx.channel in [ bot.get_channel(channel_id) for channel_id in const.AUTORIZED_CHANNELS ]:
             if isinstance(error, commands.errors.CheckFailure):
                 await ctx.send("Nope, t'as pas le droit :P")
             else:
