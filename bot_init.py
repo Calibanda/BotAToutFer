@@ -30,8 +30,8 @@ def bot_init():
     @bot.event
     async def on_ready():
         """When the bot is connected to the guild, print guild informations"""
-        print(f"Logged in as:\nUsername: {bot.user.name}\nUser ID: {bot.user.id}")
-        logger.warning(f"Logged in as:\nUsername: {bot.user.name}\nUser ID: {bot.user.id}")
+        print(f"Logged in as {bot.user} (user ID: {bot.user.id})")
+        logger.warning(f"Logged in as {bot.user} (user ID: {bot.user.id})")
         print(f"{bot.user} is connected to the following guild(s):")
         for guild in bot.guilds:
             print(f"{guild.name} (id: {guild.id})")
@@ -62,10 +62,13 @@ def bot_init():
     @bot.event
     async def on_command_error(ctx, error):
         """When a command error occures displays the reason in the gild chat"""
-        logger.error(f"On command error: {repr(error)}")
+        error_name = error.__class__.__name__
+        logger.error(f"{error_name}: {error}")
         if ctx.channel in [ bot.get_channel(channel_id) for channel_id in const.AUTORIZED_CHANNELS ]:
             if isinstance(error, commands.errors.CheckFailure):
                 await ctx.send("Nope, t'as pas le droit :P")
+            elif isinstance(error, discord.HTTPException):
+                await ctx.send("https://tenor.com/bmQvt.gif") # Send a "Far too long" gif
             else:
                 await ctx.send("https://tenor.com/uqe8.gif") # Send a "C'est pas faux" gif
 
