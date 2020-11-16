@@ -17,6 +17,7 @@ from package.commands.cmd_pendu import Pendu
 from package.commands.cmd_ping import Ping
 from package.commands.cmd_quotes import Quotes
 from package.commands.cmd_roll_dice import Roll_dice
+from package.commands.cmd_santa import Santa
 from package.commands.cmd_says import Says
 from package.commands.cmd_utilitaries import Utilitaire
 
@@ -51,6 +52,7 @@ def bot_init():
         bot.add_cog(Ping(bot))
         bot.add_cog(Quotes(bot))
         bot.add_cog(Roll_dice(bot))
+        bot.add_cog(Santa(bot))
         bot.add_cog(Says(bot))
         bot.add_cog(Utilitaire(bot))
 
