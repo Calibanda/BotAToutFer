@@ -128,7 +128,7 @@ class Utilitaire(commands.Cog):
                     trestle = trestle.replace(lettre, '', 1)
                 else:
                     capitalized_word = capitalized_word + lettre.lower()
-            
+
             if len(capitalized_word) >= 7: # If a word is 7 letters or more, we add a 50 points bonus
                 value += 50
 
@@ -145,7 +145,7 @@ class Utilitaire(commands.Cog):
                     if value == maximum_value:
                         response += f"{value} point(s) : {key}\n"
                         del dico_possible_words[key]
-            
+
             response += "```"
             return response
 
@@ -220,16 +220,16 @@ class Utilitaire(commands.Cog):
                                 programm_subtitle = programm_infos[i].findAll(class_="doubleBroadcastCard-subtitle")[0].string.strip()
                                 programm_subtitle = " ".join(line.strip() for line in programm_subtitle.split("\n") if line.strip())
                                 programm_title += " - " + programm_subtitle
-                            
+
                             programm_link = programm_infos[i].find(class_="doubleBroadcastCard-title")["href"]
                             programm_category = programm_infos[i].find(class_="doubleBroadcastCard-type").string.strip()
                             programm_hour = programm_hours[i]
                             programm_duration = programm_infos[i].find(class_="doubleBroadcastCard-durationContent").string.strip()
 
                             channel_response += f"    À {programm_hour} {programm_title}\n"
-                        
+
                         channels.append(channel_response)
-                    
+
                     if channel_number:
                         try:
                             response = f"```Programme de ce {date} soir :\n" + channels[channel_number - 1] + "```"
@@ -238,7 +238,7 @@ class Utilitaire(commands.Cog):
                             await ctx.send("Je ne connais pas cette chaîne.")
                         finally:
                             return
-                    
+
                     else:
                         response = f"```Programme de ce {date} soir :\n"
                         for i in range(11):
