@@ -8,6 +8,7 @@ import set_logger
 
 from package.on_message_jokes import on_message_jokes
 from package.background_tasks import Tasks
+#from package.audio.music import Music
 from package.commands.cmd_discussion import Discussion
 from package.commands.cmd_drinks import Drinks
 from package.commands.cmd_green import Green
@@ -26,6 +27,7 @@ def bot_init():
     bot = commands.Bot(command_prefix="!", description=const.BOT_DESCRIPTION)
     bot.remove_command('help')
 
+    bot_channels = [ bot.get_channel(channel_id) for channel_id in const.AUTORIZED_CHANNELS ]
 
     @bot.event
     async def on_ready():
@@ -45,6 +47,7 @@ def bot_init():
         cat_channels = [bot.get_channel(763426416167485481)]  
 
         bot.add_cog(Tasks(bot, cat_channels, logger))
+        #bot.add_cog(Music(bot, logger))
         bot.add_cog(Discussion(bot))
         bot.add_cog(Drinks(bot))
         bot.add_cog(Green(bot))
@@ -57,7 +60,6 @@ def bot_init():
         bot.add_cog(Utilitaire(bot, logger))
 
         # bot_channel = discord.utils.get(guild.channels, name=const.BOT_CHANNEL)
-
 
     @bot.event
     async def on_command_error(ctx, error):
@@ -81,7 +83,7 @@ def bot_init():
         if message.author == bot.user:
             return
 
-        if str(message.channel) == const.BOT_CHANNEL and message.content.startswith("!"):
+        if message.channel in bot_channels and message.content.startswith("!"):
             await bot.process_commands(message)
             return
 

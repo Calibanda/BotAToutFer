@@ -15,8 +15,7 @@ NEWS_TOKEN = os.getenv("NEWS_TOKEN")
 CAT_TOKEN = os.getenv("CAT_TOKEN")
 ANTOINE_TAG = int(os.getenv("ANTOINE_TAG"))
 
-BOT_CHANNEL = "bot-test"
-BOT_CHANNEL_ID = "763426416167485481"
+AUTORIZED_CHANNELS = [763426416167485481, 777200257992884230, 777839870252285982]
 
 LOG_DIR = os.path.join(SCRIPT_DIR, "logs") # The directory containing logs
 LOG_FILE_PATH = os.path.join(LOG_DIR, datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".log") # Absolute path of the new log file
