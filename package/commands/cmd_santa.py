@@ -15,6 +15,11 @@ class Santa(commands.Cog):
 
     @commands.command(name="santa", help="Tire les pèrers Noëls secret avec les utilisateurs précisés")
     async def santa(self, ctx, *users: discord.User):
+        if len(users) < 2:
+            response = "Il faut au moins 2 personnes pour tirer les pères Noël secrets !"
+            ctx.send(response)
+            return
+
         christmas_is_ready = False
 
         while not christmas_is_ready:
