@@ -38,8 +38,8 @@ async def cursed_words(message, words_in_message):
             response = re.sub(r"(?<!\:)" + curse_dict["curse_word"], "*" + curse_dict["traduction"] + "*", response, 0, flags=re.IGNORECASE)
 
         response = f"{message.author.mention} : {response}"
-        await message.delete()
         await message.channel.send(response)
+        await message.delete()
 
 
 async def marseillais_word(message, words_in_message):
