@@ -27,8 +27,6 @@ def bot_init():
     bot = commands.Bot(command_prefix="!", description=const.BOT_DESCRIPTION)
     bot.remove_command('help')
 
-    bot_channels = [ bot.get_channel(channel_id) for channel_id in const.AUTORIZED_CHANNELS ]
-
     @bot.event
     async def on_ready():
         """When the bot is connected to the guild, print guild informations"""
@@ -83,7 +81,7 @@ def bot_init():
         if message.author == bot.user:
             return
 
-        if message.channel in bot_channels and message.content.startswith("!"):
+        if message.channel in [ bot.get_channel(channel_id) for channel_id in const.AUTORIZED_CHANNELS ] and message.content.startswith("!"):
             await bot.process_commands(message)
             return
 
