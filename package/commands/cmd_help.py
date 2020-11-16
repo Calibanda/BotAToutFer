@@ -12,7 +12,7 @@ class Help(commands.Cog):
     async def help(self, ctx, command=""):
         response = f"```\n{self.bot.description}\n\n"
 
-        list_cogs = sorted([ cog for cog in self.bot.cogs ])
+        list_cogs = sorted([ cog for cog in self.bot.cogs if not hasattr(self.bot.get_cog(cog), "hidden_cog") or not self.bot.get_cog(cog).hidden_cog])
         number_spaces = len(sorted([c.name for c in self.bot.commands], key=lambda command: len(command))[-1]) + 1
 
         for cog in list_cogs:
@@ -23,6 +23,6 @@ class Help(commands.Cog):
 
             response += "\n"
 
-        response += "Taper '!help commande' pour avoir plus d'infos sur cette commande.\n```"
+        response += "```"
 
         await ctx.send(response)

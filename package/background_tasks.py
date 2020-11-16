@@ -10,6 +10,7 @@ class Tasks(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.cat.start()
+        self.hidden_cog = True
 
     def cog_unload(self):
         self.cat.cancel()
