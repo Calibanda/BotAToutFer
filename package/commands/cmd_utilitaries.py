@@ -10,15 +10,14 @@ from discord.ext import commands
 import const
 
 class Utilitaire(commands.Cog):
-    def __init__(self, bot, logger):
+    def __init__(self, bot):
         self.bot = bot
-        self.logger = logger
         self._last_member = None
 
     @commands.command(name="news", help="Donne le lien d'un ou plusieurs articles de presse du jour (par défaut 1)") # https://discordpy.readthedocs.io/en/latest/faq.html#how-do-i-make-a-web-request
     async def news(self, ctx, number_tiles: int=1):
         async with aiohttp.ClientSession() as session:
-            self.logger.warning(f"Asking for the local news")
+            self.bot.log.warning(f"Asking for the local news")
             async with session.get(f"http://newsapi.org/v2/top-headlines?country=fr&apiKey={const.NEWS_TOKEN}") as r: # Retreve last news
                 if r.status == 200:
                     news = await r.json()
@@ -65,14 +64,14 @@ class Utilitaire(commands.Cog):
                     w_city = weather["name"]
                     w_country = weather["sys"]["country"]
 
-                    self.logger.warning(f"Asking for the weather of the city {w_city} in {w_country} (id: {random_city})")
+                    self.bot.log.warning(f"Asking for the weather of the city {w_city} in {w_country} (id: {random_city})")
                     response = f"Actuellement {w_description}, il fait {w_temp} °C à {w_city} ({w_country}) :earth_africa:"
                     await ctx.send(response)
 
 
     @commands.command(name="scrabble", help="Donne les mots possibles au Scrabble avec une combinaison donnée (entrer une * pour saisir un joker)")
     async def scrabble(self, ctx, trestle=""):
-        self.logger.warning(f"Scrabble command is invoked")
+        self.bot.log.warning(f"Scrabble command is invoked")
 
         if not trestle.strip():
             response = "Utilise la commande '!scrabble' suivie de ton chevalet pour que je puisse te donner les combnaisons possible (entre une * pour saisir un joker)."
@@ -172,7 +171,7 @@ class Utilitaire(commands.Cog):
 
         for _ in range(number):
             async with aiohttp.ClientSession() as session:
-                self.logger.warning(f"Asking a useless piece of knowledge")
+                self.bot.log.warning(f"Asking a useless piece of knowledge")
                 async with session.get("https://www.savoir-inutile.com/") as r: # Retreve a useless piece of knowledge
                     if r.status == 200:
                         html = await r.text("utf-8")
@@ -189,7 +188,7 @@ class Utilitaire(commands.Cog):
     @commands.command(name="tv", help="Donne le programme de la TNT de ce soir")
     async def tv(self, ctx, channel_number=0):
         async with aiohttp.ClientSession() as session:
-            self.logger.warning(f"Asking for the TNT programm of the night")
+            self.bot.log.warning(f"Asking for the TNT programm of the night")
             async with session.get("https://www.programme-tv.net/programme/programme-tnt.html") as r: # Retreve the TNT programm of the night
                 if r.status == 200:
                     html = await r.text("utf-8")

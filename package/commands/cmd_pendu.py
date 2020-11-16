@@ -18,7 +18,7 @@ class Pendu(commands.Cog):
         self.visible_word = ""
         self.number_stroke = 10
         self.gessed_letters = []
-    
+
     @commands.command(name="pendu", help="Joue au pendu")
     async def pendu(self, ctx, option: str="help"):
         option = option.casefold().strip()

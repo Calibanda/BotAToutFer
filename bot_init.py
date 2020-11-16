@@ -20,32 +20,29 @@ from package.commands.cmd_roll_dice import Roll_dice
 from package.commands.cmd_says import Says
 from package.commands.cmd_utilitaries import Utilitaire
 
+
 def bot_init():
 
-    logger = set_logger.init()
-
-    bot = commands.Bot(command_prefix="!", description=const.BOT_DESCRIPTION)
+    bot = commands.Bot(command_prefix="!", description=const.BOT_DESCRIPTION, case_insensitive=True)
     bot.remove_command('help')
+
+    bot.log = set_logger.init()
+
 
     @bot.event
     async def on_ready():
         """When the bot is connected to the guild, print guild informations"""
         print(f"Logged in as {bot.user} (user ID: {bot.user.id})")
-        logger.warning(f"Logged in as {bot.user} (user ID: {bot.user.id})")
+        bot.log.warning(f"Logged in as {bot.user} (user ID: {bot.user.id})")
         print(f"{bot.user} is connected to the following guild(s):")
         for guild in bot.guilds:
             print(f"{guild.name} (id: {guild.id})")
-            logger.warning(f"{bot.user} is connected to the following guild: {guild.name} (id: {guild.id})")
-        
-        # general_channels = discord.utils.get(bot.get_all_channels(), name="general")
-        # print(general_channels)
-        # print(channel.name for channel in bot.get_all_channels())
-        # channel = discord.utils.get(client.get_all_channels(), guild__name='Cool', name='general')
+            bot.log.warning(f"{bot.user} is connected to the following guild: {guild.name} (id: {guild.id})")
 
-        cat_channels = [ bot.get_channel(channel_id) for channel_id in const.AUTORIZED_CHANNELS ]
+        bot.autorized_channel = [ bot.get_channel(channel_id) for channel_id in const.AUTORIZED_CHANNELS ]
 
-        bot.add_cog(Tasks(bot, cat_channels, logger))
-        #bot.add_cog(Music(bot, logger))
+        bot.add_cog(Tasks(bot))
+        #bot.add_cog(Music(bot))
         bot.add_cog(Discussion(bot))
         bot.add_cog(Drinks(bot))
         bot.add_cog(Green(bot))
@@ -55,16 +52,15 @@ def bot_init():
         bot.add_cog(Quotes(bot))
         bot.add_cog(Roll_dice(bot))
         bot.add_cog(Says(bot))
-        bot.add_cog(Utilitaire(bot, logger))
+        bot.add_cog(Utilitaire(bot))
 
-        # bot_channel = discord.utils.get(guild.channels, name=const.BOT_CHANNEL)
 
     @bot.event
     async def on_command_error(ctx, error):
         """When a command error occures displays the reason in the gild chat"""
         error_name = error.__class__.__name__
-        logger.error(f"{error_name}: {error}")
-        if ctx.channel in [ bot.get_channel(channel_id) for channel_id in const.AUTORIZED_CHANNELS ]:
+        bot.log.error(f"{error_name}: {error}")
+        if ctx.channel in bot.autorized_channel:
             if isinstance(error, commands.errors.CheckFailure):
                 await ctx.send("Nope, t'as pas le droit :P")
             elif isinstance(error, discord.HTTPException):
@@ -75,7 +71,7 @@ def bot_init():
 
     @bot.event
     async def on_error(event, *args, **kwargs):
-        logger.error(event, exc_info=args[0])
+        bot.log.error(event, exc_info=args[0])
         raise
 
 
@@ -84,11 +80,11 @@ def bot_init():
         if message.author == bot.user:
             return
 
-        if message.channel in [ bot.get_channel(channel_id) for channel_id in const.AUTORIZED_CHANNELS ] and message.content.startswith("!"):
+        if message.channel in bot.autorized_channel and message.content.startswith("!"):
             await bot.process_commands(message)
             return
 
         await on_message_jokes(bot, message)
-    
+
 
     return bot
