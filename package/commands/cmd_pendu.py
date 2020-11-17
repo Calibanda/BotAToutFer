@@ -122,9 +122,9 @@ class Pendu(commands.Cog):
 
                 if self.current_games[ctx.channel.id]["number_stroke"] == 0: # LOSE
                     response += " C'est perdu !"
-                    del self.current_games[ctx.channel.id]
                     response += "\n```\n" + self.hanged_drawing(self.current_games[ctx.channel.id]["number_stroke"]) + "\n```\n"
                     response += f"Le mot à deviner était : {self.current_games[ctx.channel.id]['secret_word']}"
+                    del self.current_games[ctx.channel.id]
                     await ctx.send(response)
                     return
 
