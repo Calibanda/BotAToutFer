@@ -99,7 +99,7 @@ class Pendu(commands.Cog):
     async def guess(self, ctx, option):
         if ctx.channel.id in self.current_games:
             response = ""
-            if option in self.current_games[ctx.channel.id]["gessed_letters"]:
+            if option in [ re.findall(r"[a-z]", element, flags=re.IGNORECASE)[0] for element in self.current_games[ctx.channel.id]["gessed_letters"] ]:
                 response = f"Vous avez déjà demandé la lettre {option} !"
 
             elif option in self.current_games[ctx.channel.id]["secret_word"]:
