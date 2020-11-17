@@ -14,7 +14,7 @@ class Pendu(commands.Cog):
         self.bot = bot
         self._last_member = None
 
-        self.current_games = {} # {discord.TextChannel: {secret_word: "", visible_word: "", number_stroke: 10, gessed_letters: []}}
+        self.current_games = {} # {discord.TextChannel: {"secret_word": "", "visible_word": "", "number_stroke": 10, "gessed_letters": []}}
 
 
     @commands.command(name="pendu", help="Joue au pendu")
@@ -43,10 +43,10 @@ class Pendu(commands.Cog):
 
     async def status(self, ctx):
         if ctx.channel in self.current_games:
-            response = "Le mot à deviner : " + self.current_games[ctx.channel][visible_word].replace("*", "\*") + "\nLes lettres déjà proposées : "
-            for letter in self.current_games[ctx.channel][gessed_letters]:
+            response = "Le mot à deviner : " + self.current_games[ctx.channel]["visible_word"].replace("*", "\*") + "\nLes lettres déjà proposées : "
+            for letter in self.current_games[ctx.channel]["gessed_letters"]:
                 response += f"{letter} "
-            response += "\nLe pendu :\n```\n" + self.hanged_drawing(self.current_games[ctx.channel][number_stroke]) + "\n```"
+            response += "\nLe pendu :\n```\n" + self.hanged_drawing(self.current_games[ctx.channel]["number_stroke"]) + "\n```"
             await ctx.send(response)
         else:
             await self.no_game(ctx)
@@ -57,25 +57,25 @@ class Pendu(commands.Cog):
             game = {}
 
             with open(const.SCRABBLE_DICTIONARY_PATH, "r", encoding="utf-8") as scrabble_disctionary:
-                game[secret_word] = random.choice(scrabble_disctionary.readlines()).casefold().strip()
+                game["secret_word"] = random.choice(scrabble_disctionary.readlines()).casefold().strip()
 
-            game[visible_word] = "*" * len(self.current_games[ctx.channel][secret_word])
-            game[number_stroke] = 10
-            game[gessed_letters] = []
+            game["visible_word"] = "*" * len(self.current_games[ctx.channel]["secret_word"])
+            game["number_stroke"] = 10
+            game["gessed_letters"] = []
 
             self.current_games[ctx.channel] = game
 
-            response = f"Je lance une partie de pendu !\nVous avez {game[number_stroke]} coup(s) pour trouver le mot secret selon les règles du pendu !\nVoici le mot à deviner : " + game[visible_word].replace("*", "\*")
+            response = f"Je lance une partie de pendu !\nVous avez {game['number_stroke']} coup(s) pour trouver le mot secret selon les règles du pendu !\nVoici le mot à deviner : " + game["visible_word"].replace("*", "\*")
 
         else:
-            response = f"Une partie est déjà en cours !\nIl reste {self.current_games[ctx.channel][number_stroke]} coup(s) et voici le mot à deviner : " + self.current_games[ctx.channel][visible_word].replace("*", "\*")
+            response = f"Une partie est déjà en cours !\nIl reste {self.current_games[ctx.channel]['number_stroke']} coup(s) et voici le mot à deviner : " + self.current_games[ctx.channel]["visible_word"].replace("*", "\*")
 
         await ctx.send(response)
 
 
     async def stop(self, ctx):
         if ctx.channel in self.current_games:
-            response = f"Ohhh, dommage, mais je comprend que vous souhaitez arrêter. Voici le mot qui était à deviner : {self.current_games[ctx.channel][secret_word]}"
+            response = f"Ohhh, dommage, mais je comprend que vous souhaitez arrêter. Voici le mot qui était à deviner : {self.current_games[ctx.channel]['secret_word']}"
             del self.current_games[ctx.channel]
             await ctx.send(response)
         else:
@@ -89,7 +89,7 @@ class Pendu(commands.Cog):
 
     async def restart(self, ctx):
         if ctx.channel in self.current_games:
-            response = f"Bon, on recommence. Mais juste pour info, le mot précédent à deviner était : {self.current_games[ctx.channel][secret_word]}"
+            response = f"Bon, on recommence. Mais juste pour info, le mot précédent à deviner était : {self.current_games[ctx.channel]['secret_word']}"
             del self.current_games[ctx.channel]
             await ctx.send(response)
 
@@ -99,32 +99,32 @@ class Pendu(commands.Cog):
     async def guess(self, ctx, option):
         if ctx.channel in self.current_games:
             response = ""
-            if option in self.current_games[ctx.channel][gessed_letters]:
+            if option in self.current_games[ctx.channel]["gessed_letters"]:
                 response = f"Vous avez déjà demandé la lettre {option} !"
 
-            elif option in self.current_games[ctx.channel][secret_word]:
+            elif option in self.current_games[ctx.channel]["secret_word"]:
                 response = "Oui !"
-                self.current_games[ctx.channel][gessed_letters].append(option)
+                self.current_games[ctx.channel]["gessed_letters"].append(option)
 
-                for i in range(len(self.current_games[ctx.channel][secret_word])):
-                    if self.current_games[ctx.channel][secret_word][i] == option:
-                        self.current_games[ctx.channel][visible_word] = self.current_games[ctx.channel][visible_word][:i] + option + self.current_games[ctx.channel][visible_word][i + 1:]
-                if self.current_games[ctx.channel][visible_word] == self.current_games[ctx.channel][secret_word]: #WIN
-                    response += f" C'est gagné ! Vous avez deviné le mot {self.current_games[ctx.channel][secret_word]}."
+                for i in range(len(self.current_games[ctx.channel]["secret_word"])):
+                    if self.current_games[ctx.channel]["secret_word"][i] == option:
+                        self.current_games[ctx.channel]["visible_word"] = self.current_games[ctx.channel]["visible_word"][:i] + option + self.current_games[ctx.channel]["visible_word"][i + 1:]
+                if self.current_games[ctx.channel]["visible_word"] == self.current_games[ctx.channel]["secret_word"]: #WIN
+                    response += f" C'est gagné ! Vous avez deviné le mot {self.current_games[ctx.channel]['secret_word']}."
                     del self.current_games[ctx.channel]
                     await ctx.send(response)
                     return
 
             else:
                 response = "Non !"
-                self.current_games[ctx.channel][gessed_letters].append(f"~~{option}~~")
-                self.current_games[ctx.channel][number_stroke] -= 1
+                self.current_games[ctx.channel]["gessed_letters"].append(f"~~{option}~~")
+                self.current_games[ctx.channel]["number_stroke"] -= 1
 
-                if self.current_games[ctx.channel][number_stroke] == 0: # LOSE
+                if self.current_games[ctx.channel]["number_stroke"] == 0: # LOSE
                     response += " C'est perdu !"
                     del self.current_games[ctx.channel]
-                    response += "\n```\n" + self.hanged_drawing(self.current_games[ctx.channel][number_stroke]) + "\n```\n"
-                    response += f"Le mot à deviner était : {self.current_games[ctx.channel][secret_word]}"
+                    response += "\n```\n" + self.hanged_drawing(self.current_games[ctx.channel]["number_stroke"]) + "\n```\n"
+                    response += f"Le mot à deviner était : {self.current_games[ctx.channel]['secret_word']}"
                     await ctx.send(response)
                     return
 
