@@ -246,7 +246,7 @@ class Utilitaire(commands.Cog):
                         await ctx.send(response)
 
                         response = "```"
-                        for i in range(11, 23):
+                        for i in range(11, 24):
                             response += channels[i]
                         response += "```"
                         await ctx.send(response)
