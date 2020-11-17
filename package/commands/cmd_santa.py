@@ -43,5 +43,5 @@ class Santa(commands.Cog):
 
         for sender, recipient in list_couples:
             dm_channel = sender.dm_channel if sender.dm_channel else await sender.create_dm()
-            message = f"Salut {sender.name} ! Le tirage au sort des Pères Noëls secrets à été effectué :santa: \nIl ne te reste plus qu'à trouver un cadeau pour <@{recipient.id}> :gift_heart:. Et un joyeux Noël à tous ! "
+            message = f"Salut {sender.name} ! Le tirage au sort des Pères Noëls secrets à été effectué :santa: \nIl ne te reste plus qu'à trouver un cadeau pour {recipient} :gift_heart:. Et un joyeux Noël à tous ! "
             await dm_channel.send(message)
