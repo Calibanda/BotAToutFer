@@ -1,4 +1,5 @@
 # bot_init.py
+import traceback
 
 import discord
 from discord.ext import commands
@@ -60,8 +61,8 @@ def bot_init():
     @bot.event
     async def on_command_error(ctx, error):
         """When a command error occures displays the reason in the gild chat"""
-        error_name = error.__class__.__name__
-        bot.log.error(f"{error_name}: {error}")
+        bot.log.error(traceback.format_exc())
+        bot.log.error(f"{error.__class__.__name__}: {error}")
         if ctx.channel in bot.autorized_channel:
             if isinstance(error, commands.errors.CheckFailure):
                 await ctx.send("Nope, t'as pas le droit :P")
@@ -73,8 +74,7 @@ def bot_init():
 
     @bot.event
     async def on_error(event, *args, **kwargs):
-        bot.log.error(event, exc_info=args[0])
-        raise
+        bot.log.error(traceback.format_exc())
 
 
     @bot.event
