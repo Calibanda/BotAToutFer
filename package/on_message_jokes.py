@@ -69,4 +69,5 @@ async def on_message_jokes(bot, message):
     await joke_possible(message, words_in_message)
     await joke_aled(message, words_in_message)
     await cursed_words(message, words_in_message)
+    await mousse(message, words_in_message)
     # await marseillais_word(message, words_in_message)
