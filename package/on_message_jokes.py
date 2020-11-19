@@ -33,7 +33,7 @@ async def joke_aled(message, words_in_message):
 
 async def mousse(message, words_in_message):
     if "attention" in words_in_message or "mousse" in words_in_message: # If the words "attention" or "mousse" in the original message
-        response ="https://tenor.com/bsXhe.gif" # Send the "ATTENTION À LA MOUSSE !!" gif
+        response ="https://tenor.com/view/gif-19255034" # Send the "ATTENTION À LA MOUSSE !!" gif
         await message.channel.send(response)
 
 
