@@ -31,6 +31,12 @@ async def joke_aled(message, words_in_message):
         await message.channel.send(response)
 
 
+async def mousse(message, words_in_message):
+    if "attention" in words_in_message or "mousse" in words_in_message: # If the words "attention" or "mousse" in the original message
+        response ="https://tenor.com/bsXhe.gif" # Send the "ATTENTION À LA MOUSSE !!" gif
+        await message.channel.send(response)
+
+
 async def cursed_words(message, words_in_message):
     if [ word for word in words_in_message for curse_dict in const.CURSE_LIST if word == curse_dict["curse_word"] ]: # If any curse word in the original message
         response = message.content
