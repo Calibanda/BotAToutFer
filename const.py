@@ -9,11 +9,11 @@ SCRIPT_DIR, SCRIPT_FILENAME = os.path.split(os.path.abspath(__file__))
 
 load_dotenv() # Loads tokens form env
 TOKEN = os.getenv("DISCORD_TOKEN")
-GUILD = os.getenv("DISCORD_GUILD")
+#GUILD = os.getenv("DISCORD_GUILD")
 WEATHER_TOKEN = os.getenv("WEATHER_TOKEN")
 NEWS_TOKEN = os.getenv("NEWS_TOKEN")
 CAT_TOKEN = os.getenv("CAT_TOKEN")
-ANTOINE_TAG = int(os.getenv("ANTOINE_TAG"))
+#ANTOINE_TAG = int(os.getenv("ANTOINE_TAG"))
 
 AUTORIZED_CHANNELS = [
     763426416167485481, # La crème de la crème > bot-test
