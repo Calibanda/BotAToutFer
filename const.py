@@ -14,6 +14,8 @@ WEATHER_TOKEN = os.getenv("WEATHER_TOKEN")
 NEWS_TOKEN = os.getenv("NEWS_TOKEN")
 CAT_TOKEN = os.getenv("CAT_TOKEN")
 #ANTOINE_TAG = int(os.getenv("ANTOINE_TAG"))
+COFFEE_URL = os.getenv("COFFEE_URL")
+COFFEE_TOKEN = os.getenv("COFFEE_TOKEN")
 
 AUTORIZED_CHANNELS = [
     763426416167485481, # La crème de la crème > bot-test
