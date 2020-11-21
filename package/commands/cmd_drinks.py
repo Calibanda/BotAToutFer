@@ -1,5 +1,5 @@
 # drinks command for BotAToutFer
-import aiohttp
+import urllib3
 
 from discord.ext import commands
 
@@ -14,13 +14,15 @@ class Drinks(commands.Cog):
     @commands.command(name="coffee", help="Envoie un café")
     @commands.has_role("CoffeeMaker")
     async def coffee(self, ctx):
-        async with aiohttp.ClientSession() as session:
-            async with session.get(const.COFFEE_URL, params={'token': const.COFFEE_TOKEN}) as r:
-                if r.status == 200:
-                    response = "Je lance le café :coffee:"
-                else:
-                    response = "Ah, non, pas de café :cry:"
-                await ctx.send(response)
+        http = urllib3.PoolManager()
+        #http_response = http.request("GET", const.COFFEE_URL)
+        #http_response = http.request("POST", const.COFFEE_URL, fields={"token": const.COFFEE_TOKEN})
+        http_response = http.request("BREW", const.COFFEE_URL, fields={"token": const.COFFEE_TOKEN}, headers={"Accept-Additions": "sweetener-type"})
+        if http_response.status == 200:
+            response = "Je lance le café :coffee:"
+        else:
+            response = "Ah, non, pas de café :cry:"
+        await ctx.send(response)
 
 
     @commands.command(name="tea", help="Envoie un thé")
