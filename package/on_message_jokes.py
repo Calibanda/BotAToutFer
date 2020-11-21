@@ -37,6 +37,12 @@ async def mousse(message, words_in_message):
         await message.channel.send(response)
 
 
+async def projet(message, words_in_message):
+    if "projet" in words_in_message: # If the words "projet" in the original message
+        response ="https://tenor.com/RGiO.gif" # Send the "CAR C'EST NOTRE PROJEEEEET !!" gif
+        await message.channel.send(response)
+
+
 async def cursed_words(message, words_in_message):
     if [ word for word in words_in_message for curse_dict in const.CURSE_LIST if word == curse_dict["curse_word"] ]: # If any curse word in the original message
         response = message.content
@@ -70,4 +76,5 @@ async def on_message_jokes(bot, message):
     await joke_aled(message, words_in_message)
     await cursed_words(message, words_in_message)
     await mousse(message, words_in_message)
+    await projet(message, words_in_message)
     # await marseillais_word(message, words_in_message)
