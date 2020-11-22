@@ -23,7 +23,8 @@ AUTORIZED_CHANNELS = [
     777901703697661982, # La crème de la crème > santa-secret
     777200257992884230, # Test bot > général
     777839870252285982, # CEH > bot
-    768518770897453058, # CO > Général
+    780142261694103563, # CO > bot
+    768521143945920512, # CO > music
     ]
 
 LOG_DIR = os.path.join(SCRIPT_DIR, "logs") # The directory containing logs
