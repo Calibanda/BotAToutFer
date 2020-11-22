@@ -9,7 +9,7 @@ import set_logger
 
 from package.on_message_jokes import on_message_jokes
 from package.background_tasks import Tasks
-#from package.audio.music import Music
+from package.audio.music import Music
 from package.commands.cmd_discussion import Discussion
 from package.commands.cmd_drinks import Drinks
 from package.commands.cmd_green import Green
@@ -44,7 +44,7 @@ def bot_init():
         bot.autorized_channel = [ bot.get_channel(channel_id) for channel_id in const.AUTORIZED_CHANNELS ]
 
         bot.add_cog(Tasks(bot))
-        #bot.add_cog(Music(bot))
+        bot.add_cog(Music(bot))
         bot.add_cog(Discussion(bot))
         bot.add_cog(Drinks(bot))
         bot.add_cog(Green(bot))

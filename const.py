@@ -2,6 +2,7 @@
 import os
 import datetime
 import json
+from pathlib import Path
 
 from dotenv import load_dotenv
 
@@ -30,6 +31,11 @@ LOG_FILE_PATH = os.path.join(LOG_DIR, datetime.datetime.now().strftime("%Y-%m-%d
 LAST_NEWS_URL_PATH = os.path.join(SCRIPT_DIR, "package", "last_news_url.json")
 
 BOT_DESCRIPTION = "BotAToutFer, le bot qui fait tout, même le café !"
+
+MUSIC_DIR = os.path.join(Path.home(), "Music")
+RPG_COMBAT_DIR = os.path.join(MUSIC_DIR, "RPG_Combat")
+RPG_EXPLORATION_DIR = os.path.join(MUSIC_DIR, "RPG_Exploration")
+RPG_TAVERN_DIR = os.path.join(MUSIC_DIR, "RPG_TAVERN")
 
 CURSE_LIST = [
     {"curse_word": "merde", "traduction": "merle"},
