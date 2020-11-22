@@ -56,6 +56,12 @@ class Quotes(commands.Cog):
             "Okay, shouldn't take long. Between an hour and, um, 11 months.",
             "Attention... I have been murdered.",
             "Now, all of you, get the fork out of my neighborhood.",
+            "Holy motherforking shirtballs",
+            "Ya basic",
+            "I wasn't a failed DJ, I was pre-successful.",
+            "Well fork you too",
+            "Do you have a second to eat my farts?",
+            "Hashtag Tahani time.",
             
         ]
 
