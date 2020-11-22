@@ -7,7 +7,7 @@ import random
 
 import discord
 from discord.ext import commands
-import pyttsx3
+#import pyttsx3
 import youtube_dl
 # import speech_recognition as sr
 # import webbrowser
