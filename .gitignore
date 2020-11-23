@@ -4,6 +4,7 @@
 *.log
 *.pyc
 *.png
+*.mp3
 city.list.json
 convertcity.py
 last_news_url.json
