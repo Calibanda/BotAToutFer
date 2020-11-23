@@ -66,10 +66,14 @@ def bot_init():
         if ctx.channel in bot.autorized_channel:
             if isinstance(error, commands.errors.CheckFailure):
                 await ctx.send("Nope, t'as pas le droit :P")
+            elif isinstance(error, commands.MissingRequiredArgument):
+                await ctx.send("https://tenor.com/bmqvT.gif") # Send a "Did you forget something?" gif
             elif isinstance(error, discord.HTTPException):
                 await ctx.send("https://tenor.com/bmQvt.gif") # Send a "Far too long" gif
-            else:
+            elif isinstance(error, commands.CommandNotFound):
                 await ctx.send("https://tenor.com/uqe8.gif") # Send a "C'est pas faux" gif
+            else:
+                await ctx.send("https://tenor.com/bj9EB.gif") # Send an error gif
 
 
     @bot.event
