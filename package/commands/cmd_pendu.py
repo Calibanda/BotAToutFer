@@ -63,10 +63,11 @@ class Pendu(commands.Cog):
             game["visible_word"] = "*" * len(game["secret_word"])
             game["number_stroke"] = 10
             game["gessed_letters"] = []
+            game["definition"] = ""
 
             async with aiohttp.ClientSession() as session:
                 self.bot.log.warning(f"Asking for word definition")
-                async with session.get(f"https://api.dicolink.com/v1/mot/{game['visible_word']}/definitions?limite=1&api_key={const.DICOLINK_TOKEN}") as r: # Retreve a definition
+                async with session.get(f"https://api.dicolink.com/v1/mot/{game['secret_word']}/definitions?limite=1&api_key={const.DICOLINK_TOKEN}") as r: # Retreve a definition
                     if r.status == 200:
                         definition = await r.json()
                         game["definition"] = definition[0]["definition"]
