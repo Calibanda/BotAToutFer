@@ -11,7 +11,7 @@ class Drinks(commands.Cog):
         self._last_member = None
 
 
-    @commands.command(name="coffee", help="Envoie un café")
+    @commands.command(name="coffee", help="Fais le café")
     @commands.has_role("CoffeeMaker")
     async def coffee(self, ctx):
         http = urllib3.PoolManager()
