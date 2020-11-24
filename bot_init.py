@@ -61,8 +61,7 @@ def bot_init():
     @bot.event
     async def on_command_error(ctx, error):
         """When a command error occures displays the reason in the gild chat"""
-        bot.log.error(traceback.format_exc())
-        bot.log.error(f"{error.__class__.__name__}: {error}")
+        bot.log.exception(f"Catched exeption:")
         if ctx.channel in bot.autorized_channel:
             if isinstance(error, commands.errors.CheckFailure):
                 await ctx.send("Nope, t'as pas le droit :P")
@@ -78,7 +77,7 @@ def bot_init():
 
     @bot.event
     async def on_error(event, *args, **kwargs):
-        bot.log.error(traceback.format_exc())
+        bot.log.exception(f"Catched exeption:")
 
 
     @bot.event
