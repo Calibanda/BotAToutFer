@@ -43,6 +43,7 @@ NEWS_TOKEN= #Enter here the token of your newsapi.org api
 CAT_TOKEN= #Enter here the token of your thecatapi.com api
 COFFEE_URL= #Enter here the URL of your coffee pot
 COFFEE_TOKEN= #Enter here the token needed to access to your coffee URL
+DICOLINK_TOKEN= #Enter here the token of the dicolink dictionnay API
 ```
 
 ## Running the bot
