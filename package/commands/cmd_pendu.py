@@ -3,6 +3,7 @@ import os
 import random
 import json
 import re
+import aiohttp
 
 from discord.ext import commands
 
@@ -63,6 +64,13 @@ class Pendu(commands.Cog):
             game["number_stroke"] = 10
             game["gessed_letters"] = []
 
+            async with aiohttp.ClientSession() as session:
+                self.bot.log.warning(f"Asking for word definition")
+                async with session.get(f"https://api.dicolink.com/v1/mot/{game['visible_word']}/definitions?limite=1&api_key={const.DICOLINK_TOKEN}") as r: # Retreve a definition
+                    if r.status == 200:
+                        definition = await r.json()
+                        game["definition"] = definition[0]["definition"]
+
             self.current_games[ctx.channel.id] = game
 
             response = f"Je lance une partie de pendu !\nVous avez {game['number_stroke']} coup(s) pour trouver le mot secret selon les règles du pendu !\nVoici le mot à deviner : " + game["visible_word"].replace("*", "\*")
@@ -89,7 +97,7 @@ class Pendu(commands.Cog):
 
     async def restart(self, ctx):
         if ctx.channel.id in self.current_games:
-            response = f"Bon, on recommence. Mais juste pour info, le mot précédent à deviner était : {self.current_games[ctx.channel.id]['secret_word']}"
+            response = f"Bon, on recommence. Mais juste pour info, le mot précédent à deviner était : {self.current_games[ctx.channel.id]['secret_word']} ({self.current_games[ctx.channel.id]['definition']})"
             del self.current_games[ctx.channel.id]
             await ctx.send(response)
 
@@ -110,7 +118,7 @@ class Pendu(commands.Cog):
                     if self.current_games[ctx.channel.id]["secret_word"][i] == option:
                         self.current_games[ctx.channel.id]["visible_word"] = self.current_games[ctx.channel.id]["visible_word"][:i] + option + self.current_games[ctx.channel.id]["visible_word"][i + 1:]
                 if self.current_games[ctx.channel.id]["visible_word"] == self.current_games[ctx.channel.id]["secret_word"]: #WIN
-                    response += f" C'est gagné ! Vous avez deviné le mot {self.current_games[ctx.channel.id]['secret_word']}."
+                    response += f" C'est gagné ! Vous avez deviné le mot {self.current_games[ctx.channel.id]['secret_word']} ({self.current_games[ctx.channel.id]['definition']})."
                     del self.current_games[ctx.channel.id]
                     await ctx.send(response)
                     return
@@ -123,7 +131,7 @@ class Pendu(commands.Cog):
                 if self.current_games[ctx.channel.id]["number_stroke"] == 0: # LOSE
                     response += " C'est perdu !"
                     response += "\n```\n" + self.hanged_drawing(self.current_games[ctx.channel.id]["number_stroke"]) + "\n```\n"
-                    response += f"Le mot à deviner était : {self.current_games[ctx.channel.id]['secret_word']}"
+                    response += f"Le mot à deviner était : {self.current_games[ctx.channel.id]['secret_word']} ({self.current_games[ctx.channel.id]['definition']})"
                     del self.current_games[ctx.channel.id]
                     await ctx.send(response)
                     return
