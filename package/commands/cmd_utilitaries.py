@@ -2,6 +2,7 @@
 import os
 import random
 import json
+import re
 import aiohttp
 from bs4 import BeautifulSoup
 
@@ -249,4 +250,16 @@ class Utilitaire(commands.Cog):
                         for i in range(11, 24):
                             response += channels[i]
                         response += "```"
+                        await ctx.send(response)
+
+    @commands.command(name="dico", help="Donne la définition du mot demandé")
+    async def dico(self, ctx, word: str=""):
+        if word:
+            word = re.split("\W", word.lower())[0]
+            async with aiohttp.ClientSession() as session:
+                self.bot.log.warning(f"Asking for word definition")
+                async with session.get(f"https://api.dicolink.com/v1/mot/{word}/definitions?limite=1&api_key={const.DICOLINK_TOKEN}") as r: # Retreve a definition
+                    if r.status == 200:
+                        definition = await r.json()
+                        response = f"Définition du mot \"{definition[0]['mot']}\" : {definition[0]['definition']}"
                         await ctx.send(response)
