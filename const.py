@@ -29,7 +29,7 @@ AUTORIZED_CHANNELS = [
     ]
 
 LOG_DIR = os.path.join(SCRIPT_DIR, "logs") # The directory containing logs
-LOG_FILE_PATH = os.path.join(LOG_DIR, datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".log") # Absolute path of the new log file
+LOG_FILE_PATH = os.path.join(LOG_DIR, datetime.datetime.now().strftime("%Y-%m-%d") + ".log") # Absolute path of the new log file
 
 LAST_NEWS_URL_PATH = os.path.join(SCRIPT_DIR, "package", "last_news_url.json")
 
