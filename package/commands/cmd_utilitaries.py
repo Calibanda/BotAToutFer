@@ -252,6 +252,7 @@ class Utilitaire(commands.Cog):
                         response += "```"
                         await ctx.send(response)
 
+
     @commands.command(name="dico", help="Donne la définition du mot demandé")
     async def dico(self, ctx, word: str=""):
         if word:
@@ -263,3 +264,24 @@ class Utilitaire(commands.Cog):
                         definition = await r.json()
                         response = f"Définition du mot \"{definition[0]['mot']}\" : {definition[0]['definition']}"
                         await ctx.send(response)
+
+    @commands.command(name="marmiton", help="Retourne des recettes liées à un thème donné sur marmiton")
+    async def marmiton(self, ctx, options: str=""):
+        if False:
+            pass
+        else: # Display help
+            response = "```\n"
+                     + "Usage :\n"
+                     + "  !marmiton <nom de la recherche> [--options <arguments>...]\n"
+                     + "\n"
+                     + "Options :\n"
+                     + "  -n <argument>, --nombre <argument>             Précise le nombre de recettes à retourner [défaut : 2]\n"
+                     + "  -p <argument>..., --plat <argument>...         Précise un ou plusieurs types de plats parmi : accompagnement, amusegueule, boisson, confiserie, conseil, dessert, entree, platprincipal, sauce\n"
+                     + "  -d <argument>..., --difficulte <argument>...   Précise un ou plusieurs niveau de difficulé parmi : 1 (très facile), 2 (facile), 3 (moyen), 4 (difficile)\n"
+                     + "  -c <argument>..., --cout <argument>...         Précise un ou plusieurs coût de recette parmi : 1 (bon marché), 2 (coût moyen), 3 (assez cher)\n"
+                     + "  -r <argument>..., --restriction <argument>...  Précise une ou plusieurs restriction alimentaire parmi : 1 (végétarien), 2 (sans gluten), 3 (végan), 4 (sans lactose)\n"
+                     + "  -t <argument>, --temps <argument>              Précise le temps maximum de la recette parmi : 15, 30, 45\n"
+                     + "  --cuisson <argument>...                        Précise un ou plusieurs type de cuisson parmi : 1 (four), 2 (micro-ondes), 3 (aucun)\n"
+                     + "  -s, --saison                                   Précise oui on non si la recette doit être de saison\n"
+                     + "```\n"
+            await ctx.send(response)
