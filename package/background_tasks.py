@@ -29,7 +29,7 @@ class Tasks(commands.Cog):
 
                                 await channel.send(message)
                 except Exception as e:
-                    self.bot.log.exception(f"Unable to send a cat in this channel: {channel.guild} - #{channel.name} ({channel.id})")
+                    self.bot.log.exception(f"Unable to send a cat in this channel: {channel.guild}, #{channel.name} ({channel.id})")
 
     @cat.before_loop
     async def before_cat(self):
