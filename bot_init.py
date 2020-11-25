@@ -5,7 +5,7 @@ import discord
 from discord.ext import commands
 
 import const
-import set_logger
+import logger_init
 
 from package.on_message_jokes import on_message_jokes
 from package.background_tasks import Tasks
@@ -24,11 +24,15 @@ from package.commands.cmd_utilitaries import Utilitaire
 
 
 def bot_init():
+    """Create the Discord bot object with all configuration
 
+    Returns:
+        discord.ext.commands.Bot: The Discord bot client ready to go
+    """
     bot = commands.Bot(command_prefix="!", description=const.BOT_DESCRIPTION, case_insensitive=True)
     bot.remove_command('help')
 
-    bot.log = set_logger.init()
+    bot.log = logger_init.logger_init()
 
 
     @bot.event
