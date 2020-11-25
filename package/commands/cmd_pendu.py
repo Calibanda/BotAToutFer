@@ -4,6 +4,7 @@ import random
 import json
 import re
 import aiohttp
+import datetime
 
 from discord.ext import commands
 
@@ -15,7 +16,7 @@ class Pendu(commands.Cog):
         self.bot = bot
         self._last_member = None
 
-        self.current_games = {} # {discord.TextChannel.id: {"secret_word": "", "visible_word": "", "number_stroke": 10, "gessed_letters": []}}
+        self.current_games = {} # {discord.TextChannel.id: {"secret_word": "", "visible_word": "", "number_stroke": 10, "gessed_letters": [], "definition": "", "starting_time": datetime.datetime}}
 
 
     @commands.command(name="pendu", help="Joue au pendu")
@@ -64,6 +65,7 @@ class Pendu(commands.Cog):
             game["number_stroke"] = 10
             game["gessed_letters"] = []
             game["definition"] = "Désolé, je n'ai pas trouvé cette définition..."
+            game["starting_time"] = datetime.datetime.now()
 
             try:
                 async with aiohttp.ClientSession() as session:
@@ -122,7 +124,7 @@ class Pendu(commands.Cog):
                     if self.current_games[ctx.channel.id]["secret_word"][i] == option:
                         self.current_games[ctx.channel.id]["visible_word"] = self.current_games[ctx.channel.id]["visible_word"][:i] + option + self.current_games[ctx.channel.id]["visible_word"][i + 1:]
                 if self.current_games[ctx.channel.id]["visible_word"] == self.current_games[ctx.channel.id]["secret_word"]: #WIN
-                    response += f" C'est gagné ! Vous avez deviné le mot {self.current_games[ctx.channel.id]['secret_word']} ({self.current_games[ctx.channel.id]['definition']})."
+                    response += f" C'est gagné ! Vous avez deviné le mot {self.current_games[ctx.channel.id]['secret_word']} ({self.current_games[ctx.channel.id]['definition']})\nDurée de la partie : {datetime.datetime.now() - self.current_games[ctx.channel.id]['starting_time']}"
                     del self.current_games[ctx.channel.id]
                     await ctx.send(response)
                     return
