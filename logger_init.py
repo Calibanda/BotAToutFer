@@ -4,6 +4,11 @@ import logging
 import const
 
 def logger_init():
+    """Create the logger object
+
+    Returns:
+        logging.Logger: The logger object ready to go
+    """
     if not os.path.exists(const.LOG_DIR): # If the logs directory does not exist, we create it
         os.makedirs(const.LOG_DIR)
 
