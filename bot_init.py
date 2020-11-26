@@ -10,6 +10,7 @@ import logger_init
 from package.on_message_jokes import on_message_jokes
 from package.background_tasks import Tasks
 from package.audio.music import Music
+from package.commands.cmd_anniv import Anniversaire
 from package.commands.cmd_discussion import Discussion
 from package.commands.cmd_drinks import Drinks
 from package.commands.cmd_green import Green
@@ -49,6 +50,7 @@ def bot_init():
 
         bot.add_cog(Tasks(bot))
         bot.add_cog(Music(bot))
+        bot.add_cog(Anniversaire(bot))
         bot.add_cog(Discussion(bot))
         bot.add_cog(Drinks(bot))
         bot.add_cog(Green(bot))
@@ -62,26 +64,26 @@ def bot_init():
         bot.add_cog(Utilitaire(bot))
 
 
-    @bot.event
-    async def on_command_error(ctx, error):
-        """When a command error occures displays the reason in the gild chat"""
-        bot.log.exception(f"Catched exeption:")
-        if ctx.channel in bot.autorized_channel:
-            if isinstance(error, commands.errors.CheckFailure):
-                await ctx.send("Nope, t'as pas le droit :P")
-            elif isinstance(error, commands.MissingRequiredArgument):
-                await ctx.send("https://tenor.com/bmqvT.gif") # Send a "Did you forget something?" gif
-            elif isinstance(error, discord.HTTPException):
-                await ctx.send("https://tenor.com/bmQvt.gif") # Send a "Far too long" gif
-            elif isinstance(error, commands.CommandNotFound):
-                await ctx.send("https://tenor.com/uqe8.gif") # Send a "C'est pas faux" gif
-            else:
-                await ctx.send("https://tenor.com/bj9EB.gif") # Send an error gif
+    # @bot.event
+    # async def on_command_error(ctx, error):
+    #     """When a command error occures displays the reason in the gild chat"""
+    #     bot.log.exception(f"Catched exeption:")
+    #     if ctx.channel in bot.autorized_channel:
+    #         if isinstance(error, commands.errors.CheckFailure):
+    #             await ctx.send("Nope, t'as pas le droit :P")
+    #         elif isinstance(error, commands.MissingRequiredArgument):
+    #             await ctx.send("https://tenor.com/bmqvT.gif") # Send a "Did you forget something?" gif
+    #         elif isinstance(error, discord.HTTPException):
+    #             await ctx.send("https://tenor.com/bmQvt.gif") # Send a "Far too long" gif
+    #         elif isinstance(error, commands.CommandNotFound):
+    #             await ctx.send("https://tenor.com/uqe8.gif") # Send a "C'est pas faux" gif
+    #         else:
+    #             await ctx.send("https://tenor.com/bj9EB.gif") # Send an error gif
 
 
-    @bot.event
-    async def on_error(event, *args, **kwargs):
-        bot.log.exception(f"Catched exeption:")
+    # @bot.event
+    # async def on_error(event, *args, **kwargs):
+    #     bot.log.exception(f"Catched exeption:")
 
 
     @bot.event
