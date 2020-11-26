@@ -355,8 +355,6 @@ class Utilitaire(commands.Cog):
                         nb_results = soup.find(class_="recipe-search__nb-results").string.strip()
                         nb_results = int(re.search(r"\d+", nb_results)[0])
 
-                        self.bot.log.warning(f"A: {nb_results}")
-
                         if nb_results:
                             div_results = soup.find("div", class_="recipe-results")
                             list_recipes = div_results.find_all(class_="recipe-card")
