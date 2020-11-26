@@ -188,10 +188,6 @@ class Utilitaire(commands.Cog):
                             description=knowledge,
                             url=link
                         )
-                        embed.set_author(
-                            name=ctx.author.name,
-                            icon_url=ctx.author.avatar_url
-                        )
                         embed.add_field(
                             name="Date",
                             value=publication_date,
