@@ -183,8 +183,22 @@ class Utilitaire(commands.Cog):
                         link = soup.find("meta", attrs={"name": "og:url"})["content"]
                         publication_date = soup.find("div", id="publication").find_all("span")[-1].string.strip()
 
-                        response = f"{knowledge}\nSavoir inutile posté le {publication_date}. {link}"
-                        await ctx.send(response)
+                        embed = discord.Embed(
+                            title="Savoir Inutile",
+                            description=knowledge,
+                            url=link
+                        )
+                        embed.set_author(
+                            name=ctx.author.name,
+                            icon_url=ctx.author.avatar_url
+                        )
+                        embed.add_field(
+                            name="Date",
+                            value=publication_date,
+                            inline=True
+                        )
+
+                        await ctx.send(embed=embed)
 
 
     @commands.command(name="tv", help="Donne le programme de la TNT de ce soir")
