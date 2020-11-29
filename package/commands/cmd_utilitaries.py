@@ -449,5 +449,5 @@ class Utilitaire(commands.Cog):
                 await ctx.send(response)
 
         except Exception as e:
-            self.bot.log.exception(f"Unable to send a marmiton recipe in this channel: {channel.guild}, #{channel.name} ({channel.id})")
+            self.bot.log.exception(f"Unable to send a marmiton recipe in this channel: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})")
             await ctx.send("Something went wrong https://tenor.com/s8CP.gif")
