@@ -400,7 +400,7 @@ class Utilitaire(commands.Cog):
                                         color=0xFF9B90
                                     )
                                     embed.set_thumbnail(
-                                        url=div_recipe.find("picture").find("img")["data-src"]
+                                        url=div_recipe.find("img")["data-src"]
                                     )
                                     embed.set_author(
                                         name=ctx.author.name,
