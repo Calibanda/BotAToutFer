@@ -22,7 +22,6 @@ DICOLINK_TOKEN = os.getenv("DICOLINK_TOKEN")
 
 AUTORIZED_CHANNELS = [
     763426416167485481, # La crème de la crème > bot-test
-    777901703697661982, # La crème de la crème > santa-secret
     777200257992884230, # Test bot > général
     777839870252285982, # CEH > bot
     780142261694103563, # CO > bot
