@@ -18,7 +18,7 @@ class Tasks(commands.Cog):
     @tasks.loop(minutes=5.0)
     async def cat(self):
         for channel in self.bot.autorized_channel:
-            if secrets.randbelow(192) < 2 and datetime.datetime.now().hour in range(7, 23):
+            if secrets.randbelow(192) < 1 and datetime.datetime.now().hour in range(7, 23):
                 try:
                     async with aiohttp.ClientSession() as session:
                         self.bot.log.warning(f"Asking for a cat pic")
