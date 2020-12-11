@@ -12,8 +12,10 @@ class Tasks(commands.Cog):
         self.cat.start()
         self.hidden_cog = True
 
+
     def cog_unload(self):
         self.cat.cancel()
+
 
     @tasks.loop(minutes=5.0)
     async def cat(self):
@@ -30,6 +32,7 @@ class Tasks(commands.Cog):
                                 await channel.send(message)
                 except Exception as e:
                     self.bot.log.exception(f"Unable to send a cat in this channel: {channel.guild}, #{channel.name} ({channel.id})")
+
 
     @cat.before_loop
     async def before_cat(self):
