@@ -211,18 +211,18 @@ class Utilitaire(commands.Cog):
                     date_and_hour = " ".join(line.strip() for line in date_and_hour.split("\n") if line.strip())
                     date, hour = date_and_hour.split(" de ")
 
-                    div_channels = soup.findAll(class_="doubleBroadcastCard")
-                    channels = []
+                    div_channels = soup.findAll(class_="doubleBroadcastCard") # List that contain div of all the channels
+                    channels = {} # {1: "Sur la chaîne TF1 (Chaîne n°1) :...", 2: "Sur la chaîne France 2 (Chaîne n°2) :..."}
 
-                    for channel in div_channels:
-                        name_channel = channel.find(class_="doubleBroadcastCard-channel").a.string.strip()
-                        nb_channel = channel.find(class_="doubleBroadcastCard-channelNumber").string.strip()
+                    for channel in div_channels: # For all div in the list, we create a response with the programm of the channel
+                        channel_name = channel.find(class_="doubleBroadcastCard-channel").a.string.strip()
+                        channel_nb = channel.find(class_="doubleBroadcastCard-channelNumber").string.strip()
 
                         programm_hours = [ hour.string.strip() for hour in channel.findAll(class_="doubleBroadcastCard-hour") ]
                         programm_infos = channel.findAll(class_="doubleBroadcastCard-infos")
                         programm = []
 
-                        channel_response= f"\n  Sur la chaîne {name_channel} ({nb_channel}) :\n"
+                        channel_response= f"\n  Sur la chaîne {channel_name} ({channel_nb}) :\n"
 
                         for i in range(len(programm_hours)):
                             programm_title = programm_infos[i].find(class_="doubleBroadcastCard-title").string.strip()
@@ -239,29 +239,30 @@ class Utilitaire(commands.Cog):
 
                             channel_response += f"    À {programm_hour} {programm_title}\n"
 
-                        channels.append(channel_response)
+                        channel_nb = int(re.search(r"\d+", channel_nb)[0]) # The channel number (int) will be a key in the dictionnay
+                        channels[channel_nb] = channel_response # Key: channel number (int). Value: channel programm (str)
 
-                    if channel_number:
-                        try:
-                            response = f"```Programme de ce {date} soir :\n" + channels[channel_number - 1] + "```"
+                    if channel_number: # If the user ask for a specific channel
+                        try: # We try to send the programm of the channel if any
+                            response = f"```Programme de ce {date} soir :\n" + channels[channel_number] + "```"
                             await ctx.send(response)
                         except Exception:
                             await ctx.send("Je ne connais pas cette chaîne.")
                         finally:
                             return
 
-                    else:
-                        response = f"```Programme de ce {date} soir :\n"
-                        for i in range(11):
-                            response += channels[i]
-                        response += "```"
-                        await ctx.send(response)
-
-                        response = "```"
-                        for i in range(11, 24):
-                            response += channels[i]
-                        response += "```"
-                        await ctx.send(response)
+                    else: # If the user DOESNT ask for a specific channel
+                        response = f"```Programme de ce {date} soir :\n" # We create a new response string
+                        for item in channels.values(): # For all the items in the dictionary
+                            if len(response + item) + 3 < 2000: # If next channel can be added without exeed the Discord limit
+                                response += item # We add the programm of the channel to the response
+                            else: # If next channel CANNOT be added without exeed the Discord limit
+                                response += "```"
+                                await ctx.send(response) # We send the response
+                                response = "```\n" # We create a new response
+                        if len(response) > 3:# We exhaust all the dictionary, we send the last channels if any
+                            response += "```"
+                            await ctx.send(response) 
 
 
     @commands.command(name="dico", help="Donne la définition du mot demandé")
@@ -275,6 +276,7 @@ class Utilitaire(commands.Cog):
                         definition = await r.json()
                         response = f"Définition du mot \"{definition[0]['mot']}\" : {definition[0]['definition']}"
                         await ctx.send(response)
+
 
     @commands.command(name="marmiton", help="Retourne des recettes liées à un thème donné sur marmiton")
     async def marmiton(self, ctx, *, options:str=""):
@@ -359,9 +361,6 @@ class Utilitaire(commands.Cog):
                         if r.status == 200:
                             html = await r.text("utf-8")
                             soup = BeautifulSoup(html, "html.parser")
-
-                            # with open("/home/clement/marmiton.html", "w") as f:
-                            #     f.write(html)
 
                             nb_results = soup.find(class_="recipe-search__nb-results").string.strip()
                             nb_results = int(re.search(r"\d+", nb_results)[0])
