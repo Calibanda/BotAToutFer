@@ -274,7 +274,10 @@ class Utilitaire(commands.Cog):
                 async with session.get(f"https://api.dicolink.com/v1/mot/{word}/definitions?limite=1&api_key={const.DICOLINK_TOKEN}") as r: # Retreve a definition
                     if r.status == 200:
                         definition = await r.json()
-                        response = f"Définition du mot \"{definition[0]['mot']}\" : {definition[0]['definition']}"
+                        try:
+                            response = f"Définition du mot \"{definition[0]['mot']}\" : {definition[0]['definition']}"
+                        except KeyError as e:
+                            response  = "Ce mot n'existe pas"
                         await ctx.send(response)
 
 
