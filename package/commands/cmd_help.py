@@ -8,6 +8,7 @@ class Help(commands.Cog):
         self.bot = bot
         self._last_member = None
 
+
     @commands.command(name="help", help="Affiche ce message", pass_context=True)
     async def help(self, ctx, command=""):
         response = f"```\n{self.bot.description}\n\n"
