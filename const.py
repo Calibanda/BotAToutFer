@@ -36,6 +36,7 @@ LAST_NEWS_URL_PATH = os.path.join(SCRIPT_DIR, "package", "last_news_url.json") #
 BIRTHDAYS_PATH = os.path.join(SCRIPT_DIR, "package", "birthdays.json") # The path of the json file containing the users birthdays
 
 BOT_DESCRIPTION = "BotAToutFer, le bot qui fait tout, même le café !" # The description of the bot
+BOT_ACTIVITY = "!help" # The Discord activity of the bot
 
 MUSIC_DIR = os.path.join(Path.home(), "Music") # The user music directory
 RPG_COMBAT_DIR = os.path.join(MUSIC_DIR, "RPG_Combat")

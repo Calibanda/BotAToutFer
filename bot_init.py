@@ -30,8 +30,12 @@ def bot_init():
     Returns:
         discord.ext.commands.Bot: The Discord bot client ready to go
     """
-    bot = commands.Bot(command_prefix="!", description=const.BOT_DESCRIPTION, case_insensitive=True)
-    bot.remove_command('help')
+    bot = commands.Bot(command_prefix="!",
+                       case_insensitive=True,
+                       description=const.BOT_DESCRIPTION,
+                       help_command=None,
+                       activity=const.BOT_ACTIVITY
+    )
 
     bot.log = logger_init.logger_init()
 
