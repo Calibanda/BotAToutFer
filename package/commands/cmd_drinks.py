@@ -14,14 +14,19 @@ class Drinks(commands.Cog):
     @commands.command(name="coffee", help="Fais le café")
     @commands.has_role("CoffeeMaker")
     async def coffee(self, ctx):
-        http = urllib3.PoolManager()
+        http = urllib3.PoolManager(retries=False)
         #http_response = http.request("GET", const.COFFEE_URL)
         #http_response = http.request("POST", const.COFFEE_URL, fields={"token": const.COFFEE_TOKEN})
-        http_response = http.request("BREW", const.COFFEE_URL, fields={"token": const.COFFEE_TOKEN}, headers={"Accept-Additions": "sweetener-type"})
-        if http_response.status == 200:
-            response = "Je lance le café :coffee:"
-        else:
-            response = "Ah, non, pas de café :cry:"
+        try:
+            http_response = http.request("BREW", const.COFFEE_URL, fields={"token": const.COFFEE_TOKEN}, headers={"Accept-Additions": "sweetener-type"})
+            if http_response.status == 200:
+                response = "Je lance le café :coffee:"
+            else:
+                response = "Ah, non, pas de café :cry:"
+        except Exception as e:
+            self.bot.log.exception(f"Unable to order a coffe: {channel.guild}, #{channel.name} ({channel.id})")
+            response = "https://tenor.com/view/still-waiting-for-reply-waiting-patience-bored-hurry-up-gif-10179642"
+
         await ctx.send(response)
 
 
