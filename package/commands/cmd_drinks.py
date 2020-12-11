@@ -14,7 +14,7 @@ class Drinks(commands.Cog):
     @commands.command(name="coffee", help="Fais le café")
     @commands.has_role("CoffeeMaker")
     async def coffee(self, ctx):
-        http = urllib3.PoolManager(retries=False)
+        http = urllib3.PoolManager(retries=False, timeout=3.0)
         #http_response = http.request("GET", const.COFFEE_URL)
         #http_response = http.request("POST", const.COFFEE_URL, fields={"token": const.COFFEE_TOKEN})
         try:
