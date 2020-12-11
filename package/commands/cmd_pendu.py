@@ -131,7 +131,8 @@ class Pendu(commands.Cog):
                         self.current_games[ctx.channel.id]["visible_word"] = self.current_games[ctx.channel.id]["visible_word"][:i] + option + self.current_games[ctx.channel.id]["visible_word"][i + 1:]
 
                 if self.current_games[ctx.channel.id]["visible_word"] == self.current_games[ctx.channel.id]["secret_word"]: #WIN
-                    response += f" C'est gagné ! Vous avez deviné le mot {self.current_games[ctx.channel.id]['secret_word']} ({self.current_games[ctx.channel.id]['definition']})\nDurée de la partie : {datetime.datetime.now() - self.current_games[ctx.channel.id]['starting_time']}"
+                    game_duration = datetime.timedelta(seconds=(datetime.datetime.now() - self.current_games[ctx.channel.id]['starting_time']).seconds) # Game duration in seconds
+                    response += f" C'est gagné ! Vous avez deviné le mot {self.current_games[ctx.channel.id]['secret_word']} ({self.current_games[ctx.channel.id]['definition']})\nDurée de la partie : {game_duration}"
                     del self.current_games[ctx.channel.id] # Delete the current game
                     await ctx.send(response)
                     return
