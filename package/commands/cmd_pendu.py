@@ -56,31 +56,36 @@ class Pendu(commands.Cog):
 
     async def start(self, ctx):
         if ctx.channel.id not in self.current_games: # If no game is currently running in this text channel
-            game = {} # Creating a new dictionary
-
-            with open(const.SCRABBLE_DICTIONARY_PATH, "r", encoding="utf-8") as scrabble_disctionary:
-                game["secret_word"] = random.choice(scrabble_disctionary.readlines()).casefold().strip() # Choosing a secret word in the french lexicon
-
-            game["visible_word"] = "*" * len(game["secret_word"]) # Creating a word with "*" that will be displayed to the players
-            game["number_stroke"] = 10 # Players have 10 strokes to find the word
-            game["gessed_letters"] = [] # Create the list to store all the guessed letters
-            game["definition"] = "Désolé, je n'ai pas trouvé cette définition..." # The definition of the word
-
             try:
-                async with aiohttp.ClientSession() as session:
-                    self.bot.log.warning(f"Asking for word definition")
-                    async with session.get(f"https://api.dicolink.com/v1/mot/{game['secret_word']}/definitions?limite=1&api_key={const.DICOLINK_TOKEN}") as r: # Retreve a definition
-                        if r.status == 200:
-                            definition = await r.json()
-                            game["definition"] = definition[0]["definition"]
+                game = {} # Creating a new dictionary
+
+                with open(const.SCRABBLE_DICTIONARY_PATH, "r", encoding="utf-8") as scrabble_disctionary:
+                    game["secret_word"] = random.choice(scrabble_disctionary.readlines()).casefold().strip() # Choosing a secret word in the french lexicon
+
+                game["visible_word"] = "*" * len(game["secret_word"]) # Creating a word with "*" that will be displayed to the players
+                game["number_stroke"] = 10 # Players have 10 strokes to find the word
+                game["gessed_letters"] = [] # Create the list to store all the guessed letters
+                game["definition"] = "Désolé, je n'ai pas trouvé cette définition..." # The definition of the word
+
+                try:
+                    async with aiohttp.ClientSession() as session:
+                        self.bot.log.warning(f"Asking for word definition")
+                        async with session.get(f"https://api.dicolink.com/v1/mot/{game['secret_word']}/definitions?limite=1&api_key={const.DICOLINK_TOKEN}") as r: # Retreve a definition
+                            if r.status == 200:
+                                definition = await r.json()
+                                game["definition"] = definition[0]["definition"]
+                except Exception as e:
+                    self.bot.log.exception(f"Unable to load a word definition in this channel: {channel.guild}, #{channel.name} ({channel.id})")
+
+                game["starting_time"] = datetime.datetime.now() # We save the datetime of the start of the game
+
+                self.current_games[ctx.channel.id] = game # We add the game dictionary in the class atribute "current_games" linked with the id of the text channel
+
+                response = f"Je lance une partie de pendu !\nVous avez {game['number_stroke']} coup(s) pour trouver le mot secret selon les règles du pendu !\nVoici le mot à deviner : " + game["visible_word"].replace("*", "\*")
+
             except Exception as e:
-                self.bot.log.exception(f"Unable to load a word definition in this channel: {channel.guild}, #{channel.name} ({channel.id})")
-
-            game["starting_time"] = datetime.datetime.now() # We save the datetime of the start of the game
-
-            self.current_games[ctx.channel.id] = game # We add the game dictionary in the class atribute "current_games" linked with the id of the text channel
-
-            response = f"Je lance une partie de pendu !\nVous avez {game['number_stroke']} coup(s) pour trouver le mot secret selon les règles du pendu !\nVoici le mot à deviner : " + game["visible_word"].replace("*", "\*")
+                self.bot.log.exception(f"Unable to launch a 'pendu' game in this channel: {channel.guild}, #{channel.name} ({channel.id})")
+                response = "Désolé, je n'ai pas réussi à lancer une partie. Veuillez réessayer."
 
         else: # A game is currently running in this text channel
             response = f"Une partie est déjà en cours !\nIl reste {self.current_games[ctx.channel.id]['number_stroke']} coup(s) et voici le mot à deviner : " + self.current_games[ctx.channel.id]["visible_word"].replace("*", "\*")
