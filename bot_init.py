@@ -34,7 +34,7 @@ def bot_init():
                        case_insensitive=True,
                        description=const.BOT_DESCRIPTION,
                        help_command=None,
-                       activity=const.BOT_ACTIVITY
+                       activity=discord.Game(name=const.BOT_ACTIVITY)
     )
 
     bot.log = logger_init.logger_init()
