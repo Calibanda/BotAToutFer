@@ -75,7 +75,7 @@ class Pendu(commands.Cog):
                                 definition = await r.json()
                                 game["definition"] = definition[0]["definition"]
                 except Exception as e:
-                    self.bot.log.exception(f"Unable to load a word definition in this channel: {channel.guild}, #{channel.name} ({channel.id})")
+                    self.bot.log.exception(f"Unable to load a word definition in this channel: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})")
 
                 game["starting_time"] = datetime.datetime.now() # We save the datetime of the start of the game
 
@@ -84,7 +84,7 @@ class Pendu(commands.Cog):
                 response = f"Je lance une partie de pendu !\nVous avez {game['number_stroke']} coup(s) pour trouver le mot secret selon les règles du pendu !\nVoici le mot à deviner : " + game["visible_word"].replace("*", "\*")
 
             except Exception as e:
-                self.bot.log.exception(f"Unable to launch a 'pendu' game in this channel: {channel.guild}, #{channel.name} ({channel.id})")
+                self.bot.log.exception(f"Unable to launch a 'pendu' game in this channel: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})")
                 response = "Désolé, je n'ai pas réussi à lancer une partie. Veuillez réessayer."
 
         else: # A game is currently running in this text channel
