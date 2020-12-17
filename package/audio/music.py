@@ -175,14 +175,14 @@ class Music(commands.Cog):
             await ctx.send("No next track")
 
 
-    @commands.command(name="previous", help="Joue le morceau précédent")
-    async def previous(self, ctx):
-        if self.queue_position[ctx.voice_client] > 0:
-            self.queue_position[ctx.voice_client] -= 1
-            ctx.voice_client.stop()
-            await self.play_queue(ctx)
-        else:
-            await ctx.send("No previous track")
+    # @commands.command(name="previous", help="Joue le morceau précédent")
+    # async def previous(self, ctx):
+    #     if self.queue_position[ctx.voice_client] > 0:
+    #         self.queue_position[ctx.voice_client] -= 1
+    #         ctx.voice_client.stop()
+    #         await self.play_queue(ctx)
+    #     else:
+    #         await ctx.send("No previous track")
 
 
     # @commands.command()
@@ -211,15 +211,15 @@ class Music(commands.Cog):
             await ctx.send(f"Something went wrong")
 
 
-    @commands.command(name="volume", help="Change le volume sonore du bot")
-    async def volume(self, ctx, volume: int):
-        """Changes the player's volume"""
+    # @commands.command(name="volume", help="Change le volume sonore du bot")
+    # async def volume(self, ctx, volume: int):
+    #     """Changes the player's volume"""
 
-        if ctx.voice_client is None:
-            return await ctx.send("Not connected to a voice channel.")
+    #     if ctx.voice_client is None:
+    #         return await ctx.send("Not connected to a voice channel.")
 
-        ctx.voice_client.source.volume = volume / 100
-        await ctx.send("Changed volume to {}%".format(volume))
+    #     ctx.voice_client.source.volume = volume / 100
+    #     await ctx.send("Changed volume to {}%".format(volume))
 
 
     @commands.command(name="quit", help="Déconnecte le bot du salon vocal")
