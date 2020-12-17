@@ -82,7 +82,7 @@ class Music(commands.Cog):
         self.queue_position = {}
 
 
-    @commands.command()
+    @commands.command(name="join", help="Connecte le bot dans un salon vocal")
     async def join(self, ctx, *, channel: discord.VoiceChannel=None):
         """Joins a voice channel"""
 
@@ -98,7 +98,7 @@ class Music(commands.Cog):
         await channel.connect()
 
 
-    @commands.command()
+    @commands.command(name="play", help="Joue la playlist ou le lien précisé en paramètre")
     async def play(self, ctx, *, query: str=""):
         """Plays a file from the local filesystem"""
 
@@ -165,7 +165,7 @@ class Music(commands.Cog):
             asyncio.run_coroutine_threadsafe(ctx.voice_client.disconnect(), self.bot.loop)
 
 
-    @commands.command()
+    @commands.command(name="next", help="Joue le morceau suivant")
     async def next(self, ctx):
         if self.queue_position[ctx.voice_client] < len(self.queue[ctx.voice_client]):
             self.queue_position[ctx.voice_client] += 1
@@ -175,7 +175,7 @@ class Music(commands.Cog):
             await ctx.send("No next track")
 
 
-    @commands.command()
+    @commands.command(name="previous", help="Joue le morceau précédent")
     async def previous(self, ctx):
         if self.queue_position[ctx.voice_client] > 0:
             self.queue_position[ctx.voice_client] -= 1
@@ -196,6 +196,7 @@ class Music(commands.Cog):
     #     await ctx.send('Now playing: {}'.format(player.title))
 
 
+    @commands.command(name="stream", help="Stream de la musique depuis un lien")
     async def stream(self, ctx, *, url):
         """Streams from a url (same as yt, but doesn't predownload)"""
 
@@ -206,7 +207,7 @@ class Music(commands.Cog):
         await ctx.send('Now playing: {}'.format(player.title))
 
 
-    @commands.command()
+    @commands.command(name="volume", help="Change le volume sonore du bot")
     async def volume(self, ctx, volume: int):
         """Changes the player's volume"""
 
@@ -217,7 +218,7 @@ class Music(commands.Cog):
         await ctx.send("Changed volume to {}%".format(volume))
 
 
-    @commands.command()
+    @commands.command(name="quit", help="Déconnecte le bot du salon vocal")
     async def quit(self, ctx):
         """Stops and disconnects the bot from voice"""
         self.queue_position[ctx.voice_client] = 0
@@ -239,14 +240,14 @@ class Music(commands.Cog):
             ctx.voice_client.stop()
 
 
-    @commands.command()
+    @commands.command(name="name", help="Demande au bot de dire son nom")
     async def name(self, ctx):
         await speak("Je suis le bot a tout faire")
         source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(os.path.join(const.SCRIPT_DIR, "package", "audio", "audio.mp3")))
         ctx.voice_client.play(source, after=lambda e: print('Player error: %s' % e) if e else None)
 
 
-    @commands.command()
+    @commands.command(name="hello", help="Demande au bot de dire 'Hello World'")
     async def hello(self, ctx):
         await speak("Hello world!")
         source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(os.path.join(const.SCRIPT_DIR, "package", "audio", "audio.mp3")))
