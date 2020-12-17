@@ -117,7 +117,7 @@ class Music(commands.Cog):
 
                 await ctx.send('Now playing: {}'.format(player.title))
             except Exception as e:
-                self.bot.log.error(f"{e.__class__.__name__}: {e}")
+                self.bot.log.exception(f"Audio exception in this channel: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})")
                 await ctx.send(f"Something went wrong")
 
         else:
@@ -133,7 +133,7 @@ class Music(commands.Cog):
                 list_of_files += [ os.path.join(dirpath, file_name) for file_name in filenames ]
             random.shuffle(list_of_files)
         except Exception as e:
-            self.bot.log.error(f"{e.__class__.__name__}: {e}")
+            self.bot.log.exception(f"Audio exception in this channel: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})")
 
         if not list_of_files:
             response = "No such file or directory"
@@ -151,7 +151,7 @@ class Music(commands.Cog):
             await ctx.send(f"Now playing: {self.queue[ctx.voice_client][self.queue_position[ctx.voice_client]]}")
 
         except Exception as e:
-            self.bot.log.error(f"{e.__class__.__name__}: {e}")
+            self.bot.log.exception(f"Audio exception in this channel: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})")
             await ctx.send(f"Something went wrong")
 
 
@@ -207,7 +207,7 @@ class Music(commands.Cog):
 
             await ctx.send('Now playing: {}'.format(player.title))
         except Exception as e:
-            self.bot.log.error(f"{e.__class__.__name__}: {e}")
+            self.bot.log.exception(f"Audio exception in this channel: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})")
             await ctx.send(f"Something went wrong")
 
 
@@ -232,7 +232,7 @@ class Music(commands.Cog):
 
     @play.before_invoke
     # @yt.before_invoke
-    # @stream.before_invoke
+    @stream.before_invoke
     async def ensure_voice(self, ctx):
         if ctx.voice_client is None:
             if ctx.author.voice:
