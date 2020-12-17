@@ -112,7 +112,7 @@ class Music(commands.Cog):
 
             try:
                 async with ctx.typing():
-                    player = await YTDLSource.from_url(query, loop=self.bot.loop, stream=True)
+                    player = await YTDLSource.from_url(query, loop=self.bot.loop, stream=False)
                     ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
 
                 await ctx.send('Now playing: {}'.format(player.title))
@@ -200,11 +200,15 @@ class Music(commands.Cog):
     async def stream(self, ctx, *, url):
         """Streams from a url (same as yt, but doesn't predownload)"""
 
-        async with ctx.typing():
-            player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
-            ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
+        try:
+            async with ctx.typing():
+                player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
+                ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
 
-        await ctx.send('Now playing: {}'.format(player.title))
+            await ctx.send('Now playing: {}'.format(player.title))
+        except Exception as e:
+            self.bot.log.error(f"{e.__class__.__name__}: {e}")
+            await ctx.send(f"Something went wrong")
 
 
     @commands.command(name="volume", help="Change le volume sonore du bot")
