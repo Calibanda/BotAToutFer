@@ -57,7 +57,7 @@ def bot_init():
         bot.add_cog(Anniversaire(bot))
         bot.add_cog(Discussion(bot))
         bot.add_cog(Drinks(bot))
-        bot.add_cog(Green(bot))
+        # bot.add_cog(Green(bot))
         bot.add_cog(Help(bot))
         bot.add_cog(Pendu(bot))
         bot.add_cog(Ping(bot))
