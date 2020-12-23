@@ -24,7 +24,7 @@ class Drinks(commands.Cog):
             else:
                 response = "Ah, non, pas de café :cry:"
         except Exception as e:
-            self.bot.log.exception(f"Unable to order a coffe: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})")
+            self.bot.log.exception(f"Unable to order a coffee: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})")
             response = "https://tenor.com/view/still-waiting-for-reply-waiting-patience-bored-hurry-up-gif-10179642"
 
         await ctx.send(response)
