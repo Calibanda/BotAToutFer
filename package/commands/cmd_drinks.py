@@ -1,4 +1,4 @@
-# drinks command for BotAToutFer
+# drinks commands for BotAToutFer
 import urllib3
 
 from discord.ext import commands
