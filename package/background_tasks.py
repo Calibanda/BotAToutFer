@@ -24,7 +24,7 @@ class Tasks(commands.Cog):
                 try:
                     async with aiohttp.ClientSession() as session:
 
-                        if random.choice(["cat", "red panda"]) == "cat":
+                        if secrets.choice(["cat", "red panda"]) == "cat":
                             self.bot.log.warning(f"Asking for a cat pic")
                             async with session.get(f"https://api.thecatapi.com/v1/images/search?api_key={const.CAT_TOKEN}") as r: # Retreve a cat json
                                 if r.status == 200:
