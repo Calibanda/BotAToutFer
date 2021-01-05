@@ -51,7 +51,7 @@ class Drinks(commands.Cog):
     async def coffee_when(self, ctx):
         try:
             http_response = self.http.request("WHEN", const.COFFEE_URL)
-            time = int(http_response.data)
+            time = float(http_response.data)
             if time > 0:
                 response = f"Un café est lancé depuis {round(time / 1000, 2)} secondes"
             else:
