@@ -9,7 +9,7 @@ class Drinks(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self._last_member = None
-        self.http = urllib3.PoolManager(retries=False, timeout=10.0)
+        self.http = urllib3.PoolManager(retries=False, timeout=20.0)
 
 
     @commands.command(name="coffee-start", help="Lance le café")
