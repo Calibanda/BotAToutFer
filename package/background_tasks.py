@@ -20,7 +20,7 @@ class Tasks(commands.Cog):
     @tasks.loop(minutes=6.0)
     async def cat(self):
         for channel in self.bot.autorized_channel:
-            if secrets.randbelow(160) < 1 and datetime.datetime.now().hour in range(7, 23): # Statisticly send 1 message per day (one chance on 160 every 6 minutes between 7AM and 11PM)
+            if secrets.randbelow(200) < 1 and datetime.datetime.now().hour in range(7, 23): # Statisticly send 1 message per day (one chance on 160 every 6 minutes between 7AM and 11PM)
                 try:
                     async with aiohttp.ClientSession() as session:
 
