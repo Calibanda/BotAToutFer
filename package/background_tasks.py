@@ -36,7 +36,7 @@ class Tasks(commands.Cog):
                             async with session.get("https://some-random-api.ml/img/red_panda") as r: # Retreve a red fox json
                                 if r.status == 200:
                                     red_panda = await r.json()
-                                    message = red_panda[0]["link"]
+                                    message = red_panda["link"]
 
                         await channel.send(message)
 
