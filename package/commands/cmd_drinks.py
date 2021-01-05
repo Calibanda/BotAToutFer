@@ -22,7 +22,7 @@ class Drinks(commands.Cog):
                 response = "Je lance le café :coffee:"
             else:
                 response = "Ah, non, pas de café :cry:"
-        except urllib3.exceptions.HTTPError as e:
+        except urllib3.exceptions.TimeoutError as e:
             self.bot.log.exception(f"HTCPCP timeout: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})")
             response = "https://tenor.com/view/still-waiting-for-reply-waiting-patience-bored-hurry-up-gif-10179642"
         except Exception as e:
@@ -42,7 +42,7 @@ class Drinks(commands.Cog):
                 response = "Je stope le café :coffee:"
             else:
                 response = "Ah, non, pas de café :cry:"
-        except urllib3.exceptions.HTTPError as e:
+        except urllib3.exceptions.TimeoutError as e:
             self.bot.log.exception(f"HTCPCP timeout: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})")
             response = "https://tenor.com/view/still-waiting-for-reply-waiting-patience-bored-hurry-up-gif-10179642"
         except Exception as e:
@@ -62,7 +62,7 @@ class Drinks(commands.Cog):
                 response = f"Un café est lancé depuis {round(time / 1000, 2)} secondes"
             else:
                 response = "Pas de café en cours !"
-        except urllib3.exceptions.HTTPError as e:
+        except urllib3.exceptions.TimeoutError as e:
             self.bot.log.exception(f"HTCPCP timeout: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})")
             response = "https://tenor.com/view/still-waiting-for-reply-waiting-patience-bored-hurry-up-gif-10179642"
         except Exception as e:
