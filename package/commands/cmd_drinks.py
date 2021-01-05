@@ -11,20 +11,58 @@ class Drinks(commands.Cog):
         self._last_member = None
 
 
-    @commands.command(name="coffee", help="Fais le café")
+    @commands.command(name="coffee-start", help="Fais le café")
     @commands.has_role("CoffeeMaker")
-    async def coffee(self, ctx):
+    async def coffee_start(self, ctx):
         http = urllib3.PoolManager(retries=False, timeout=5.0)
-        #http_response = http.request("GET", const.COFFEE_URL)
-        #http_response = http.request("POST", const.COFFEE_URL, fields={"token": const.COFFEE_TOKEN})
+
         try:
-            http_response = http.request("BREW", const.COFFEE_URL, fields={"token": const.COFFEE_TOKEN}, headers={"Accept-Additions": "sweetener-type"})
+            http_response = http.request("BREW", const.COFFEE_URL, fields={"passwd": const.COFFEE_PASSWORD, "action": "start"})
+            #http_response = http.request("BREW", const.COFFEE_URL, fields={"passwd": const.COFFEE_PASSWORD, "action": "start"}, headers={"Accept-Additions": "sweetener-type"})
             if http_response.status == 200:
                 response = "Je lance le café :coffee:"
             else:
                 response = "Ah, non, pas de café :cry:"
         except Exception as e:
             self.bot.log.exception(f"Unable to order a coffee: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})")
+            response = "https://tenor.com/view/still-waiting-for-reply-waiting-patience-bored-hurry-up-gif-10179642"
+
+        await ctx.send(response)
+
+
+    @commands.command(name="coffee-stop", help="Fais le café")
+    @commands.has_role("CoffeeMaker")
+    async def coffee_stop(self, ctx):
+        http = urllib3.PoolManager(retries=False, timeout=5.0)
+
+        try:
+            http_response = http.request("BREW", const.COFFEE_URL, fields={"passwd": const.COFFEE_PASSWORD, "action": "stop"})
+            #http_response = http.request("BREW", const.COFFEE_URL, fields={"passwd": const.COFFEE_PASSWORD, "action": "stop"}, headers={"Accept-Additions": "sweetener-type"})
+            if http_response.status == 200:
+                response = "Je stope le café :coffee:"
+            else:
+                response = "Ah, non, pas de café :cry:"
+        except Exception as e:
+            self.bot.log.exception(f"Unable to stop the coffee: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})")
+            response = "https://tenor.com/view/still-waiting-for-reply-waiting-patience-bored-hurry-up-gif-10179642"
+
+        await ctx.send(response)
+
+
+    @commands.command(name="coffee-when", help="Fais le café")
+    @commands.has_role("CoffeeMaker")
+    async def coffee_when(self, ctx):
+        http = urllib3.PoolManager(retries=False, timeout=5.0)
+
+        try:
+            http_response = http.request("WHEN", const.COFFEE_URL)
+            time = int(http_response.data)
+            if time > 0:
+                response = f"Un café est lancé depuis {time}"
+            else:
+                response = "Pas de café en cours !"
+        except Exception as e:
+            self.bot.log.exception(f"Unable to stop the coffee: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})")
             response = "https://tenor.com/view/still-waiting-for-reply-waiting-patience-bored-hurry-up-gif-10179642"
 
         await ctx.send(response)
