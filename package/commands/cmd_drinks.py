@@ -11,7 +11,7 @@ class Drinks(commands.Cog):
         self._last_member = None
 
 
-    @commands.command(name="coffee-start", help="Fais le café")
+    @commands.command(name="coffee-start", help="Lance le café")
     @commands.has_role("CoffeeMaker")
     async def coffee_start(self, ctx):
         http = urllib3.PoolManager(retries=False, timeout=5.0)
@@ -30,7 +30,7 @@ class Drinks(commands.Cog):
         await ctx.send(response)
 
 
-    @commands.command(name="coffee-stop", help="Fais le café")
+    @commands.command(name="coffee-stop", help="Stope le café")
     @commands.has_role("CoffeeMaker")
     async def coffee_stop(self, ctx):
         http = urllib3.PoolManager(retries=False, timeout=5.0)
@@ -49,7 +49,7 @@ class Drinks(commands.Cog):
         await ctx.send(response)
 
 
-    @commands.command(name="coffee-when", help="Fais le café")
+    @commands.command(name="coffee-when", help="Affiche depuis combien de temps le café a été lancé")
     @commands.has_role("CoffeeMaker")
     async def coffee_when(self, ctx):
         http = urllib3.PoolManager(retries=False, timeout=5.0)
