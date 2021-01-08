@@ -26,6 +26,7 @@ AUTORIZED_CHANNELS = [
     777839870252285982, # CEH > bot
     780142261694103563, # CO > bot
     768521143945920512, # CO > music
+    796687034206650370, # PA-Oral > général
     ]
 
 LOG_DIR = os.path.join(SCRIPT_DIR, "logs") # The directory containing logs
