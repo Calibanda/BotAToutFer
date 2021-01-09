@@ -46,6 +46,17 @@ COFFEE_PASSWORD= #Enter here the password needed to access to your coffee URL
 DICOLINK_TOKEN= #Enter here the token of the dicolink dictionnay API
 ```
 
+### Create json for declaring channels bot
+
+At the source of the directory, create a json file named "channels.json". In this file, enter channels'id in which the bot can respond to commands and send kitten picture:
+
+```
+[
+    "123456789012345678": "description of the channel (not used, optionnal)",
+    "876543210987654321": ""
+]
+```
+
 ## Running the bot
 
 Execute the following command to start the bot:

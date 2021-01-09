@@ -20,14 +20,8 @@ COFFEE_URL = os.getenv("COFFEE_URL")
 COFFEE_PASSWORD = os.getenv("COFFEE_PASSWORD")
 DICOLINK_TOKEN = os.getenv("DICOLINK_TOKEN")
 
-AUTORIZED_CHANNELS = [
-    763426416167485481, # La crème de la crème > bot-test
-    777200257992884230, # Test bot > général
-    777839870252285982, # CEH > bot
-    780142261694103563, # CO > bot
-    768521143945920512, # CO > music
-    796687034206650370, # PA-Oral > général
-    ]
+with open(os.path.join(SCRIPT_DIR, "channels.json"), "r") as f: # Loads authorized channels id from json
+    AUTORIZED_CHANNELS = [ int(channel_id) for channel_id in json.load(f).keys() ]
 
 LOG_DIR = os.path.join(SCRIPT_DIR, "logs") # The directory containing logs
 LOG_FILE_PATH = os.path.join(LOG_DIR, datetime.datetime.now().strftime("%Y-%m-%d") + ".log") # Absolute path of the new log file
