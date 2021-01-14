@@ -115,7 +115,7 @@ class Music(commands.Cog):
                     player = await YTDLSource.from_url(query, loop=self.bot.loop, stream=False)
                     ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
 
-                await ctx.send('Now playing: {}'.format(player.title))
+                await ctx.send(f'Now playing: {player.title}')
             except Exception as e:
                 self.bot.log.exception(f"Audio exception in this channel: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})")
                 await ctx.send(f"Something went wrong")
@@ -148,7 +148,10 @@ class Music(commands.Cog):
         try:
             source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(self.queue[ctx.voice_client][self.queue_position[ctx.voice_client]]))
             ctx.voice_client.play(source, after=lambda e: asyncio.run_coroutine_threadsafe(ctx.send('Player error: %s' % e), self.bot.loop) if e else self.next_audio(ctx))
-            await ctx.send(f"Now playing: {self.queue[ctx.voice_client][self.queue_position[ctx.voice_client]]}")
+            music_title = self.queue[ctx.voice_client][self.queue_position[ctx.voice_client]]
+            music_title = os.path.split(music_title)[-1]
+            music_title = os.path.splitext(music_title)[0]
+            await ctx.send(f"Now playing: {music_title}")
 
         except Exception as e:
             self.bot.log.exception(f"Audio exception in this channel: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})")
@@ -160,7 +163,10 @@ class Music(commands.Cog):
             self.queue_position[ctx.voice_client] += 1
             source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(self.queue[ctx.voice_client][self.queue_position[ctx.voice_client]]))
             ctx.voice_client.play(source, after=lambda e: asyncio.run_coroutine_threadsafe(ctx.send('Player error: %s' % e), self.bot.loop) if e else self.next_audio(ctx))
-            asyncio.run_coroutine_threadsafe(ctx.send(f"Now playing: {self.queue[ctx.voice_client][self.queue_position[ctx.voice_client]]}"), self.bot.loop)
+            music_title = self.queue[ctx.voice_client][self.queue_position[ctx.voice_client]]
+            music_title = os.path.split(music_title)[-1]
+            music_title = os.path.splitext(music_title)[0]
+            asyncio.run_coroutine_threadsafe(ctx.send(f"Now playing: {music_title}"), self.bot.loop)
         else:
             asyncio.run_coroutine_threadsafe(ctx.voice_client.disconnect(), self.bot.loop)
 
