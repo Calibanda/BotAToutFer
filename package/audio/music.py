@@ -8,33 +8,18 @@ import random
 
 import discord
 from discord.ext import commands
-#import pyttsx3
 import youtube_dl
-# import speech_recognition as sr
-# import webbrowser
 
 import const
 
+# TODO: For auto disconnection: see discord.on_voice_state_update(member, before, after)
 
 def setup(bot):
     bot.add_cog(Music(bot))
 
 
-
-
-async def speak(text):
-    engine = pyttsx3.init()
-    engine.save_to_file(text, os.path.join(const.SCRIPT_DIR, "package", "audio", "audio.mp3"))
-    engine.runAndWait()
-
-# import package.audio.audio_recognition
-
-
-
-
 # Suppress noise about console usage from errors
 youtube_dl.utils.bug_reports_message = lambda: ''
-
 
 ytdl_format_options = {
     'format': 'bestaudio/best',
