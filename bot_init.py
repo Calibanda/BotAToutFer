@@ -56,7 +56,10 @@ def bot_init():
     @bot.event
     async def on_command_error(ctx, error):
         """When a command error occures displays the reason in the gild chat"""
-        bot.log.error(f"Catched exeption:", exc_info=error.original)
+        if hasattr(error, "original")
+            bot.log.error(f"Catched exeption:", exc_info=error.original)
+        else:
+            bot.log.error(f"Catched exeption:", exc_info=error)
         if isinstance(error, commands.errors.CheckFailure):
             await ctx.send("Nope, t'as pas le droit :P")
         elif isinstance(error, commands.MissingRequiredArgument):
