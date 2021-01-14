@@ -27,15 +27,15 @@ class Roll_dice(commands.Cog):
 
 
     @commands.command(name="roll-sw", help="Simule un lancer de dés Star Wars au format xD<name>")
-    async def roll(self, ctx, dice: str=""):
+    async def roll_sw(self, ctx, dice: str=""):
         """Rolls a dice in xD<name> format."""
         try:
-            number_of_dice, dice_type = dice.lower().split('d')
-            int(number_of_dice)
+            number_of_dice, dice_type = dice.lower().split('d', maxsplit=1)
+            number_of_dice = int(number_of_dice)
             if number_of_dice > 200:
                 response = "Ohh la flemme de lancer tous ces dés !"
             else:
-                if dice_type == "fortune":
+                if dice_type == "fortune" or dice_type == "f":
                     sides = [
                         "Vierge :shrug:",
                         "Vierge :shrug:",
@@ -44,13 +44,13 @@ class Roll_dice(commands.Cog):
                         "Avantage :trident:",
                         "2 Avantages :trident: :trident:"
                     ]
-                elif dice_type == "infortune":
+                elif dice_type == "infortune" or dice_type == "i":
                     sides = [
                         "Vierge :shrug:",
                         "Échec :warning:",
                         "Menace :snowflake:"
                     ]
-                elif dice_type == "aptitude":
+                elif dice_type == "aptitude" or dice_type == "a":
                     sides = [
                         "Vierge :shrug:",
                         "Succès net :boom:",
@@ -61,7 +61,7 @@ class Roll_dice(commands.Cog):
                         "Avantage :trident:",
                         "2 Avantages :trident: :trident:"
                     ]
-                elif dice_type == "difficulte" or dice_type == "difficulté":
+                elif dice_type == "difficulte" or dice_type == "difficulté" or dice_type == "d":
                     sides = [
                         "Vierge :shrug:",
                         "Échec :warning:",
@@ -72,7 +72,7 @@ class Roll_dice(commands.Cog):
                         "Menace :snowflake:",
                         "2 Menaces :snowflake: :snowflake:"
                     ]
-                elif dice_type == "maitrise" or dice_type == "maîtrise":
+                elif dice_type == "maitrise" or dice_type == "maîtrise" or dice_type == "m":
                     sides = [
                         "Vierge :shrug:",
                         "Succès net :boom:",
@@ -118,7 +118,7 @@ class Roll_dice(commands.Cog):
                         "2 Côté lumineux :white_circle: :white_circle:",
                     ]
                 else:
-                    response = "Merci de choisir un dé parmi : fortune, infortune, aptitude, difficulte, maitrise, defi, force"
+                    response = "Merci de choisir un dé parmi : fortune (ou f), infortune (ou i), aptitude (ou a), difficulte (ou d), maitrise (ou m), defi, force"
                     await ctx.send(response)
                     return
 
@@ -126,5 +126,6 @@ class Roll_dice(commands.Cog):
                 response = " + ".join(str(d) for d in dices)
 
             await ctx.send(response)
-        except Exception:
-            await ctx.send('Format has to be in xD<name>!')
+        except Exception as e:
+            # await ctx.send('Format has to be in xD<name>!')
+            await ctx.send(str(e))
