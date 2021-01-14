@@ -18,7 +18,8 @@ def bot_init():
                        case_insensitive=True,
                        description=const.BOT_DESCRIPTION,
                        help_command=None,
-                       activity=discord.Game(name=const.BOT_ACTIVITY)
+                       activity=discord.Game(name=const.BOT_ACTIVITY),
+                       owner_id=const.OWNER_ID
     )
 
     bot.log = logger_init.logger_init()
@@ -90,6 +91,7 @@ def bot_init():
 
 
     @bot.command()
+    @commands.is_owner()
     async def load(ctx, name=None):
         if name:
             name = f"package.commands.cmd_{name}"
@@ -110,6 +112,7 @@ def bot_init():
 
 
     @bot.command()
+    @commands.is_owner()
     async def unload(ctx, name=None):
         if name:
             name = f"package.commands.cmd_{name}"
@@ -124,6 +127,7 @@ def bot_init():
 
 
     @bot.command()
+    @commands.is_owner()
     async def reload(ctx, name=None):
         if name:
             original_name = name
@@ -145,6 +149,7 @@ def bot_init():
 
 
     @bot.command()
+    @commands.is_owner()
     async def zero(ctx):
         19/0
 
