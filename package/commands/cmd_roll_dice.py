@@ -1,4 +1,4 @@
-# roll_dice command for BotAToutFer
+# roll_dice commands for BotAToutFer
 import random
 
 from discord.ext import commands
@@ -20,7 +20,111 @@ class Roll_dice(commands.Cog):
                 response = f"**{total}** (" + " + ".join(str(d) for d in dices) + f" = {total})"
             else:
                 response = "Ohh la flemme de lancer tous ces dés !"
-            
+
             await ctx.send(response)
         except Exception:
             await ctx.send('Format has to be in xDx!')
+
+
+    @commands.command(name="roll-sw", help="Simule un lancer de dés Star Wars au format xD<name>")
+    async def roll(self, ctx, dice: str=""):
+        """Rolls a dice in xD<name> format."""
+        try:
+            number_of_dice, dice_type = dice.lower().split('d')
+            int(number_of_dice)
+            if number_of_dice > 200:
+                response = "Ohh la flemme de lancer tous ces dés !"
+            else:
+                if dice_type == "fortune":
+                    sides = [
+                        "Vierge :shrug:",
+                        "Vierge :shrug:",
+                        "Succès net :boom:",
+                        "Succès net :boom: et Avantage :trident:",
+                        "Avantage :trident:",
+                        "2 Avantages :trident: :trident:"
+                    ]
+                elif dice_type == "infortune":
+                    sides = [
+                        "Vierge :shrug:",
+                        "Échec :warning:",
+                        "Menace :snowflake:"
+                    ]
+                elif dice_type == "aptitude":
+                    sides = [
+                        "Vierge :shrug:",
+                        "Succès net :boom:",
+                        "Succès net :boom:",
+                        "2 Succès net :boom: :boom:",
+                        "Succès net :boom: et Avantage :trident:",
+                        "Avantage :trident:",
+                        "Avantage :trident:",
+                        "2 Avantages :trident: :trident:"
+                    ]
+                elif dice_type == "difficulte" or dice_type == "difficulté":
+                    sides = [
+                        "Vierge :shrug:",
+                        "Échec :warning:",
+                        "2 Échecs :warning: :warning:",
+                        "Échec :warning: et Menace :snowflake:",
+                        "Menace :snowflake:",
+                        "Menace :snowflake:",
+                        "Menace :snowflake:",
+                        "2 Menaces :snowflake: :snowflake:"
+                    ]
+                elif dice_type == "maitrise" or dice_type == "maîtrise":
+                    sides = [
+                        "Vierge :shrug:",
+                        "Succès net :boom:",
+                        "Succès net :boom:",
+                        "2 Succès net :boom: :boom:",
+                        "2 Succès net :boom: :boom:",
+                        "Succès net :boom: et Avantage :trident:",
+                        "Succès net :boom: et Avantage :trident:",
+                        "Succès net :boom: et Avantage :trident:",
+                        "Avantage :trident:",
+                        "2 Avantages :trident: :trident:",
+                        "2 Avantages :trident: :trident:",
+                        "Triomphe :tada:"
+                    ]
+                elif dice_type == "defi" or dice_type == "défi":
+                    sides = [
+                        "Vierge :shrug:",
+                        "Échec :warning:",
+                        "Échec :warning:",
+                        "2 Échecs :warning: :warning:",
+                        "2 Échecs :warning: :warning:",
+                        "Échec :warning: et Menace :snowflake:",
+                        "Échec :warning: et Menace :snowflake:",
+                        "Menace :snowflake:",
+                        "Menace :snowflake:",
+                        "2 Menaces :snowflake: :snowflake:",
+                        "2 Menaces :snowflake: :snowflake:",
+                        "Désatre :rotating_light:"
+                    ]
+                elif dice_type == "force":
+                    sides = [
+                        "Côté obscur :black_circle:",
+                        "Côté obscur :black_circle:",
+                        "Côté obscur :black_circle:",
+                        "Côté obscur :black_circle:",
+                        "Côté obscur :black_circle:",
+                        "Côté obscur :black_circle:",
+                        "2 Côté obscur :black_circle: :black_circle:",
+                        "Côté lumineux :white_circle:",
+                        "Côté lumineux :white_circle:",
+                        "2 Côté lumineux :white_circle: :white_circle:",
+                        "2 Côté lumineux :white_circle: :white_circle:",
+                        "2 Côté lumineux :white_circle: :white_circle:",
+                    ]
+                else:
+                    response = "Merci de choisir un dé parmi : fortune, infortune, aptitude, difficulte, maitrise, defi, force"
+                    await ctx.send(response)
+                    return
+
+                dices = [ random.choice(sides) for r in range(number_of_dice) ]
+                response = " + ".join(str(d) for d in dices)
+
+            await ctx.send(response)
+        except Exception:
+            await ctx.send('Format has to be in xD<name>!')
