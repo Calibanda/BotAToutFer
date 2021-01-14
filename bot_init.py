@@ -56,7 +56,7 @@ def bot_init():
     @bot.event
     async def on_command_error(ctx, error):
         """When a command error occures displays the reason in the gild chat"""
-        if hasattr(error, "original")
+        if hasattr(error, "original"):
             bot.log.error(f"Catched exeption:", exc_info=error.original)
         else:
             bot.log.error(f"Catched exeption:", exc_info=error)
