@@ -49,7 +49,7 @@ DICOLINK_TOKEN= #Enter here the token of the dicolink dictionnay API
 
 ### Create json for declaring channels bot
 
-At the source of the directory, create a json file named "channels.json". In this file, enter channels'id in which the bot can respond to commands and send kitten picture:
+In the "package" directory, create a json file named "channels.json". In this file, enter channels'id in which the bot can respond to commands and send kitten picture:
 
 ```
 [

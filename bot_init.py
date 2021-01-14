@@ -36,22 +36,21 @@ def bot_init():
             bot.log.warning(f"{bot.user} is connected to the following guild: {guild.name} (id: {guild.id})")
 
         bot.autorized_channels = [ bot.get_channel(channel_id) for channel_id in const.AUTORIZED_CHANNELS ]
-        
-        bot.load_extension("package.background_tasks")
 
-        bot.load_extension("package.audio.music")
-        bot.load_extension("package.commands.cmd_anniv")
-        bot.load_extension("package.commands.cmd_discussion")
-        bot.load_extension("package.commands.cmd_drinks")
-        # bot.load_extension("package.commands.cmd_green")
-        bot.load_extension("package.commands.cmd_help")
-        bot.load_extension("package.commands.cmd_pendu")
-        bot.load_extension("package.commands.cmd_ping")
-        bot.load_extension("package.commands.cmd_quotes")
-        bot.load_extension("package.commands.cmd_roll_dice")
-        bot.load_extension("package.commands.cmd_santa")
-        bot.load_extension("package.commands.cmd_says")
-        bot.load_extension("package.commands.cmd_utilitaries")
+        bot.load_extension("extensions.anniv")
+        bot.load_extension("extensions.dice")
+        bot.load_extension("extensions.discussion")
+        bot.load_extension("extensions.drinks")
+        # bot.load_extension("extensions.green")
+        bot.load_extension("extensions.help")
+        bot.load_extension("extensions.music")
+        bot.load_extension("extensions.pendu")
+        bot.load_extension("extensions.pictures")
+        bot.load_extension("extensions.ping")
+        bot.load_extension("extensions.quotes")
+        bot.load_extension("extensions.santa")
+        bot.load_extension("extensions.says")
+        bot.load_extension("extensions.utilitaries")
 
 
     @bot.event
@@ -94,7 +93,7 @@ def bot_init():
     @commands.is_owner()
     async def load(ctx, name=None):
         if name:
-            name = f"package.commands.cmd_{name}"
+            name = f"extensions.{name}"
             try:
                 bot.load_extension(name)
             except commands.errors.ExtensionNotFound as e:
@@ -115,7 +114,7 @@ def bot_init():
     @commands.is_owner()
     async def unload(ctx, name=None):
         if name:
-            name = f"package.commands.cmd_{name}"
+            name = f"extensions.{name}"
             try:
                 bot.unload_extension(name)
             except commands.errors.ExtensionNotLoaded as e:
@@ -131,7 +130,7 @@ def bot_init():
     async def reload(ctx, name=None):
         if name:
             original_name = name
-            name = f"package.commands.cmd_{name}"
+            name = f"extensions.{name}"
             try:
                 bot.reload_extension(name)
             except commands.errors.ExtensionNotLoaded as e:
