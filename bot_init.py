@@ -50,7 +50,7 @@ def bot_init():
             print(f"{guild.name} (id: {guild.id})")
             bot.log.warning(f"{bot.user} is connected to the following guild: {guild.name} (id: {guild.id})")
 
-        bot.autorized_channel = [ bot.get_channel(channel_id) for channel_id in const.AUTORIZED_CHANNELS ]
+        bot.autorized_channels = [ bot.get_channel(channel_id) for channel_id in const.AUTORIZED_CHANNELS ]
 
         bot.add_cog(Tasks(bot))
         bot.add_cog(Music(bot))
@@ -72,17 +72,16 @@ def bot_init():
     async def on_command_error(ctx, error):
         """When a command error occures displays the reason in the gild chat"""
         bot.log.exception(f"Catched exeption:")
-        if ctx.channel in bot.autorized_channel:
-            if isinstance(error, commands.errors.CheckFailure):
-                await ctx.send("Nope, t'as pas le droit :P")
-            elif isinstance(error, commands.MissingRequiredArgument):
-                await ctx.send("https://tenor.com/bmqvT.gif") # Send a "Did you forget something?" gif
-            elif isinstance(error, discord.HTTPException):
-                await ctx.send("https://tenor.com/bmQvt.gif") # Send a "Far too long" gif
-            elif isinstance(error, commands.CommandNotFound):
-                await ctx.send("https://tenor.com/uqe8.gif") # Send a "C'est pas faux" gif
-            else:
-                await ctx.send("https://tenor.com/bj9EB.gif") # Send an error gif
+        if isinstance(error, commands.errors.CheckFailure):
+            await ctx.send("Nope, t'as pas le droit :P")
+        elif isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send("https://tenor.com/bmqvT.gif") # Send a "Did you forget something?" gif
+        elif isinstance(error, discord.HTTPException):
+            await ctx.send("https://tenor.com/bmQvt.gif") # Send a "Far too long" gif
+        elif isinstance(error, commands.CommandNotFound):
+            await ctx.send("https://tenor.com/uqe8.gif") # Send a "C'est pas faux" gif
+        else:
+            await ctx.send("https://tenor.com/bj9EB.gif") # Send an error gif
 
 
     @bot.event
@@ -95,7 +94,7 @@ def bot_init():
         if message.author == bot.user:
             return
 
-        if message.channel in bot.autorized_channel and message.content.startswith("!"):
+        if message.content.startswith("!"):
             await bot.process_commands(message)
             return
 
