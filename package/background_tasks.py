@@ -1,3 +1,4 @@
+#background tasks for BotÀToutFer (send cute animals pictures)
 import secrets
 import aiohttp
 import datetime
@@ -5,6 +6,11 @@ import datetime
 from discord.ext import tasks, commands
 
 import const
+
+
+def setup(bot):
+    bot.add_cog(Tasks(bot))
+
 
 class Tasks(commands.Cog):
     def __init__(self, bot):

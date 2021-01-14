@@ -1,7 +1,12 @@
-# roll_dice commands for BotAToutFer
+# dice commands for BotÀToutFer
 import random
 
 from discord.ext import commands
+
+
+def setup(bot):
+    bot.add_cog(Roll_dice(bot))
+
 
 class Roll_dice(commands.Cog):
     def __init__(self, bot):

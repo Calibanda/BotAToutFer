@@ -1,9 +1,14 @@
-# drinks commands for BotAToutFer
+# drinks commands for BotÀToutFer
 import urllib3
 
 from discord.ext import commands
 
 import const
+
+
+def setup(bot):
+    bot.add_cog(Drinks(bot))
+
 
 class Drinks(commands.Cog):
     def __init__(self, bot):

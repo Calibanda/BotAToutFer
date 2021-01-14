@@ -1,6 +1,4 @@
 # bot_init.py
-import traceback
-
 import discord
 from discord.ext import commands
 
@@ -8,20 +6,6 @@ import const
 import logger_init
 
 from package.on_message_jokes import on_message_jokes
-from package.background_tasks import Tasks
-from package.audio.music import Music
-from package.commands.cmd_anniv import Anniversaire
-from package.commands.cmd_discussion import Discussion
-from package.commands.cmd_drinks import Drinks
-from package.commands.cmd_green import Green
-from package.commands.cmd_help import Help
-from package.commands.cmd_pendu import Pendu
-from package.commands.cmd_ping import Ping
-from package.commands.cmd_quotes import Quotes
-from package.commands.cmd_roll_dice import Roll_dice
-from package.commands.cmd_santa import Santa
-from package.commands.cmd_says import Says
-from package.commands.cmd_utilitaries import Utilitaire
 
 
 def bot_init():
@@ -51,27 +35,28 @@ def bot_init():
             bot.log.warning(f"{bot.user} is connected to the following guild: {guild.name} (id: {guild.id})")
 
         bot.autorized_channels = [ bot.get_channel(channel_id) for channel_id in const.AUTORIZED_CHANNELS ]
+        
+        bot.load_extension("package.background_tasks")
 
-        bot.add_cog(Tasks(bot))
-        bot.add_cog(Music(bot))
-        bot.add_cog(Anniversaire(bot))
-        bot.add_cog(Discussion(bot))
-        bot.add_cog(Drinks(bot))
-        # bot.add_cog(Green(bot))
-        bot.add_cog(Help(bot))
-        bot.add_cog(Pendu(bot))
-        bot.add_cog(Ping(bot))
-        bot.add_cog(Quotes(bot))
-        bot.add_cog(Roll_dice(bot))
-        bot.add_cog(Santa(bot))
-        bot.add_cog(Says(bot))
-        bot.add_cog(Utilitaire(bot))
+        bot.load_extension("package.audio.music")
+        bot.load_extension("package.commands.cmd_anniv")
+        bot.load_extension("package.commands.cmd_discussion")
+        bot.load_extension("package.commands.cmd_drinks")
+        # bot.load_extension("package.commands.cmd_green")
+        bot.load_extension("package.commands.cmd_help")
+        bot.load_extension("package.commands.cmd_pendu")
+        bot.load_extension("package.commands.cmd_ping")
+        bot.load_extension("package.commands.cmd_quotes")
+        bot.load_extension("package.commands.cmd_roll_dice")
+        bot.load_extension("package.commands.cmd_santa")
+        bot.load_extension("package.commands.cmd_says")
+        bot.load_extension("package.commands.cmd_utilitaries")
 
 
     @bot.event
     async def on_command_error(ctx, error):
         """When a command error occures displays the reason in the gild chat"""
-        bot.log.exception(f"Catched exeption:")
+        bot.log.error(f"Catched exeption:", exc_info=error.original)
         if isinstance(error, commands.errors.CheckFailure):
             await ctx.send("Nope, t'as pas le droit :P")
         elif isinstance(error, commands.MissingRequiredArgument):
@@ -99,6 +84,66 @@ def bot_init():
             return
 
         await on_message_jokes(bot, message)
+
+
+    @bot.command()
+    async def load(ctx, name=None):
+        if name:
+            name = f"package.commands.cmd_{name}"
+            try:
+                bot.load_extension(name)
+            except commands.errors.ExtensionNotFound as e:
+                response = f"**L'extension *{name}* n'existe pas !**"
+                await ctx.send(response)
+            except commands.errors.ExtensionAlreadyLoaded as e:
+                pass
+            except commands.errors.ExtensionError as e:
+                bot.log.error(f"Erreur avec l'extension {e.name}", exc_info=e)
+                response = f"**Erreur avec l'extension {e.name}**"
+                await ctx.send(response)
+            else:
+                response = f"L'extension *{name}* a bien été chargée"
+                await ctx.send(response)
+
+
+    @bot.command()
+    async def unload(ctx, name=None):
+        if name:
+            name = f"package.commands.cmd_{name}"
+            try:
+                bot.unload_extension(name)
+            except commands.errors.ExtensionNotLoaded as e:
+                response = f"**L'extension *{name}* n'était pas chargée !**"
+                await ctx.send(response)
+            else:
+                response = f"L'extension *{name}* a bien été déchargée"
+                await ctx.send(response)
+
+
+    @bot.command()
+    async def reload(ctx, name=None):
+        if name:
+            original_name = name
+            name = f"package.commands.cmd_{name}"
+            try:
+                bot.reload_extension(name)
+            except commands.errors.ExtensionNotLoaded as e:
+                await load(ctx, original_name)
+            except commands.errors.ExtensionNotFound as e:
+                response = f"**L'extension *{name}* n'existe pas !**"
+                await ctx.send(response)
+            except commands.errors.ExtensionError as e:
+                bot.log.error(f"Erreur avec l'extension {e.name}", exc_info=e)
+                response = f"**Erreur avec l'extension {e.name}**"
+                await ctx.send(response)
+            else:
+                response = f"L'extension *{name}* a bien été rechargée"
+                await ctx.send(response)
+
+
+    @bot.command()
+    async def zero(ctx):
+        19/0
 
 
     return bot

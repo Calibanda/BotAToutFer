@@ -1,3 +1,4 @@
+# Music commands for BotÀToutFer
 import os
 import time
 import datetime
@@ -13,6 +14,10 @@ import youtube_dl
 # import webbrowser
 
 import const
+
+
+def setup(bot):
+    bot.add_cog(Music(bot))
 
 
 

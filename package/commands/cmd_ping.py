@@ -1,5 +1,10 @@
-# ping command for BotAToutFer
+# ping command for BotÀToutFer
 from discord.ext import commands
+
+
+def setup(bot):
+    bot.add_cog(Ping(bot))
+
 
 class Ping(commands.Cog):
     def __init__(self, bot):

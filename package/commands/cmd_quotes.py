@@ -1,9 +1,14 @@
-# quotes command for BotAToutFer
+# quotes command for BotÀToutFer
 import secrets
 
 from discord.ext import commands
 
 import const
+
+
+def setup(bot):
+    bot.add_cog(Quotes(bot))
+
 
 class Quotes(commands.Cog):
     def __init__(self, bot):

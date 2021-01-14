@@ -1,4 +1,4 @@
-# hanged commands for BotAToutFer
+# hanged commands for BotÀToutFer
 import os
 import random
 import json
@@ -9,6 +9,10 @@ import datetime
 from discord.ext import commands
 
 import const
+
+
+def setup(bot):
+    bot.add_cog(Pendu(bot))
 
 
 class Pendu(commands.Cog):

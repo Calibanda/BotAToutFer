@@ -1,5 +1,10 @@
-# says command for BotAToutFer
+# says command for BotÀToutFer
 from discord.ext import commands
+
+
+def setup(bot):
+    bot.add_cog(Says(bot))
+
 
 class Says(commands.Cog):
     def __init__(self, bot):

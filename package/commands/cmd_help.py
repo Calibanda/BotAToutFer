@@ -1,6 +1,10 @@
-# help command for BotAToutFer
+# help command for BotÀToutFer
 import discord
 from discord.ext import commands
+
+
+def setup(bot):
+    bot.add_cog(Help(bot))
 
 
 class Help(commands.Cog):

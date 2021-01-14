@@ -1,4 +1,4 @@
-# anniv commands for BotAToutFer
+# anniv commands for BotÀToutFer
 import datetime
 import json
 import re
@@ -7,6 +7,11 @@ import discord
 from discord.ext import commands
 
 import const
+
+
+def setup(bot):
+    bot.add_cog(Anniversaire(bot))
+
 
 class Anniversaire(commands.Cog):
     def __init__(self, bot):

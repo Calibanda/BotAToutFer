@@ -1,8 +1,13 @@
-# siscussion commands for BotAToutFer
+# Discussion commands for BotÀToutFer
 import datetime
 import random
 
 from discord.ext import commands
+
+
+def setup(bot):
+    bot.add_cog(Discussion(bot))
+
 
 class Discussion(commands.Cog):
     def __init__(self, bot):

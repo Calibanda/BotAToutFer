@@ -1,4 +1,4 @@
-# Utilitaries command for BotAToutFer
+# Utilitaries command for BotÀToutFer
 import os
 import random
 import json
@@ -10,6 +10,11 @@ import discord
 from discord.ext import commands
 
 import const
+
+
+def setup(bot):
+    bot.add_cog(Utilitaire(bot))
+
 
 class Utilitaire(commands.Cog):
     def __init__(self, bot):
