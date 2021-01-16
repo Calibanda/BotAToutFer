@@ -1,5 +1,5 @@
 # background pictures for for BotÀToutFer (send cute animals pictures)
-import secrets
+import random
 import aiohttp
 import datetime
 
@@ -26,11 +26,11 @@ class Pictures(commands.Cog):
     @tasks.loop(minutes=6.0)
     async def cat(self):
         for channel in self.bot.autorized_channels:
-            if secrets.randbelow(200) < 1 and datetime.datetime.now().hour in range(7, 23): # Statisticly send 1 message per day (one chance on 160 every 6 minutes between 7AM and 11PM)
+            if random.randbelow(200) < 1 and datetime.datetime.now().hour in range(7, 23): # Statisticly send 1 message per day (one chance on 160 every 6 minutes between 7AM and 11PM)
                 try:
                     async with aiohttp.ClientSession() as session:
 
-                        if secrets.choice(["cat", "red panda"]) == "cat":
+                        if random.choice(["cat", "red panda"]) == "cat":
                             self.bot.log.warning(f"Asking for a cat pic")
                             async with session.get(f"https://api.thecatapi.com/v1/images/search?api_key={const.CAT_TOKEN}") as r: # Retreve a cat json
                                 if r.status == 200:
