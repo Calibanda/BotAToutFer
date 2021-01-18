@@ -79,7 +79,10 @@ class YTDLSource(discord.PCMVolumeTransformer):
         self.title = data.get('title')
         self.thumbnail = data.get('thumbnail')
         self.description = data.get('description')
-        self.duration = self.parse_duration(int(data.get('duration')))
+        try:
+            self.duration = self.parse_duration(int(data.get('duration')))
+        except TypeError:
+            self.duration = 'Pas de durée'
         self.tags = data.get('tags')
         self.url = data.get('webpage_url')
         self.views = data.get('view_count')
