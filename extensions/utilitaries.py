@@ -265,9 +265,10 @@ class Utilitaire(commands.Cog):
                                 response += "```"
                                 await ctx.send(response) # We send the response
                                 response = "```\n" # We create a new response
+                                response += item # We add the programm of the channel to the new response
                         if len(response) > 3:# We exhaust all the dictionary, we send the last channels if any
                             response += "```"
-                            await ctx.send(response) 
+                            await ctx.send(response)
 
 
     @commands.command(name="dico", help="Donne la définition du mot demandé")
