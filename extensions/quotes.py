@@ -1,5 +1,5 @@
 # quotes command for BotÀToutFer
-import secrets
+import random
 
 from discord.ext import commands
 
@@ -138,28 +138,27 @@ class Quotes(commands.Cog):
         ]
 
 
-
     @commands.command(name="99", help="Répond une réplique de B99")
     async def nine_nine(self, ctx):
-        response = secrets.choice(self.brooklyn_99_quotes)
+        response = random.choice(self.brooklyn_99_quotes)
         await ctx.send(response)
 
 
     @commands.command(name="good_place", help="Répond une réplique de TGP")
     async def good_place(self, ctx):
-        response = secrets.choice(self.the_good_place_quotes)
+        response = random.choice(self.the_good_place_quotes)
         await ctx.send(response)
 
 
     @commands.command(name="sherlock", help="Répond une réplique de Sherlock")
     async def sherlock(self, ctx):
-        response = secrets.choice(self.sherlock_quotes)
+        response = random.choice(self.sherlock_quotes)
         await ctx.send(response)
 
 
     @commands.command(name="kaamelott", help="Répond une réplique de Kaamelott")
     async def kaamelott(self, ctx):
-        response = secrets.choice(self.kaamelott_quotes)
+        response = random.choice(self.kaamelott_quotes)
         if len(response) < 2000:
             await ctx.send(response)
         else:
