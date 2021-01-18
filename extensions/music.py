@@ -88,7 +88,7 @@ class Music(commands.Cog):
         await channel.connect()
 
 
-    @commands.command(name="play", help="Joue la playlist ou le lien précisé en paramètre")
+    @commands.command(name="play", help="Joue la playlist ou le lien précisé en paramètre", aliases=['p'])
     async def play(self, ctx, *, query: str=""):
         """Plays a file from the local filesystem"""
 
@@ -192,7 +192,7 @@ class Music(commands.Cog):
     #     await ctx.send('Now playing: {}'.format(player.title))
 
 
-    @commands.command(name="stream", help="Stream de la musique depuis un lien")
+    @commands.command(name="stream", help="Stream de la musique depuis un lien", aliases=['s'])
     async def stream(self, ctx, *, url):
         """Streams from a url (same as yt, but doesn't predownload)"""
 
