@@ -24,6 +24,7 @@ class Help(commands.Cog):
             cog_help = f"{cog} :\n" # We create the new cog hepl string
             for command in sorted(self.bot.get_cog(cog).get_commands(), key=lambda command: command.name):
                 cog_help += "  " + command.name.ljust(number_spaces, " ") + f"{command.help}\n"
+            cog_help += "\n"
 
             if len(response + cog_help) + 3 < 2000: # If next help can be added without exeed the Discord limit
                 response += cog_help # We add the cog help to the response
