@@ -93,9 +93,8 @@ def bot_init():
     @commands.is_owner()
     async def load(ctx, name=None):
         if name:
-            name = f"extensions.{name}"
             try:
-                bot.load_extension(name)
+                bot.load_extension(f"extensions.{name}")
             except commands.errors.ExtensionNotFound as e:
                 response = f"**L'extension *{name}* n'existe pas !**"
                 await ctx.send(response)
@@ -114,9 +113,8 @@ def bot_init():
     @commands.is_owner()
     async def unload(ctx, name=None):
         if name:
-            name = f"extensions.{name}"
             try:
-                bot.unload_extension(name)
+                bot.unload_extension(f"extensions.{name}")
             except commands.errors.ExtensionNotLoaded as e:
                 response = f"**L'extension *{name}* n'était pas chargée !**"
                 await ctx.send(response)
@@ -129,12 +127,10 @@ def bot_init():
     @commands.is_owner()
     async def reload(ctx, name=None):
         if name:
-            original_name = name
-            name = f"extensions.{name}"
             try:
-                bot.reload_extension(name)
+                bot.reload_extension(f"extensions.{name}")
             except commands.errors.ExtensionNotLoaded as e:
-                await load(ctx, original_name)
+                await load(ctx, name)
             except commands.errors.ExtensionNotFound as e:
                 response = f"**L'extension *{name}* n'existe pas !**"
                 await ctx.send(response)
