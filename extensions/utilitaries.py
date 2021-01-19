@@ -11,6 +11,9 @@ from discord.ext import commands
 
 import const
 
+# TODO:
+# last_news_url.json sensible to call channel
+
 
 def setup(bot):
     bot.add_cog(Utilitaire(bot))
