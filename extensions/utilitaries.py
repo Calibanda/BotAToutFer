@@ -29,14 +29,11 @@ class Utilitaire(commands.Cog):
                 if r.status == 200:
                     news = await r.json()
 
-                    old_news = []
-
-                    if os.path.isfile(const.LAST_NEWS_URL_PATH):
+                    try:
                         with open(const.LAST_NEWS_URL_PATH, "r") as f:
-                            try:
-                                old_news = json.load(f) # We try to load the news who have already been displayed by the bot
-                            except Exception:
-                                pass
+                            old_news = json.load(f) # We try to load the news who have already been displayed by the bot
+                    except Exception as e:
+                        old_news = []
 
                     today_news = [ article["url"] for article in news["articles"] if article["url"] not in old_news ] # We retreve all the url that hasn't been already displayed
                     news_to_display = today_news[:number_tiles] # We keep at most the number of articles asked from the user
