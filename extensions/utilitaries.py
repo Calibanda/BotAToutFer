@@ -20,6 +20,7 @@ class Utilitaire(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self._last_member = None
+        self.LAST_NEWS_URL_PATH = os.path.join(const.SCRIPT_DIR, "package", "last_news_url.json") # The path of the json file containing the lastest retrived news
 
     @commands.command(name="news", help="Donne le lien d'un ou plusieurs articles de presse du jour (par défaut 1)") # https://discordpy.readthedocs.io/en/latest/faq.html#how-do-i-make-a-web-request
     async def news(self, ctx, number_tiles: int=1):
@@ -30,7 +31,7 @@ class Utilitaire(commands.Cog):
                     news = await r.json()
 
                     try:
-                        with open(const.LAST_NEWS_URL_PATH, "r") as f:
+                        with open(self.LAST_NEWS_URL_PATH, "r") as f:
                             old_news = json.load(f) # We try to load the news who have already been displayed by the bot
                     except Exception as e:
                         old_news = []
@@ -47,7 +48,7 @@ class Utilitaire(commands.Cog):
 
                     old_news = old_news + news_to_display # We add the just displayed news to the old ones
 
-                    with open(const.LAST_NEWS_URL_PATH, "w") as f:
+                    with open(self.LAST_NEWS_URL_PATH, "w") as f:
                         json.dump(old_news[-25:], f, indent=4) # We store the 25 most recent displayed articles in a json file
 
 

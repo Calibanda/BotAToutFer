@@ -27,8 +27,6 @@ with open(os.path.join(SCRIPT_DIR, "package", "channels.json"), "r") as f: # Loa
 LOG_DIR = os.path.join(SCRIPT_DIR, "logs") # The directory containing logs
 LOG_FILE_PATH = os.path.join(LOG_DIR, datetime.datetime.now().strftime("%Y-%m-%d") + ".log") # Absolute path of the new log file
 
-LAST_NEWS_URL_PATH = os.path.join(SCRIPT_DIR, "package", "last_news_url.json") # The path of the json file containing the lastest retrived news
-
 BOT_DESCRIPTION = "BotAToutFer, le bot qui fait tout, même le café !" # The description of the bot
 BOT_ACTIVITY = "!help" # The Discord activity of the bot
 
