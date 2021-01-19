@@ -24,6 +24,12 @@ class Utilitaire(commands.Cog):
         self.bot = bot
         self._last_member = None
         self.LAST_NEWS_URL_PATH = os.path.join(const.SCRIPT_DIR, "package", "last_news_url.json") # The path of the json file containing the lastest retrived news
+        self.SCRABBLE_DICTIONARY_PATH = os.path.join(const.SCRIPT_DIR, "package", "ODS7.txt") # Path of the french scrabble dictionary
+        self.FRENCH_SCRABBLE_VALUES = {
+            "A": 1, "B": 3, "C": 3, "D": 2, "E": 1, "F": 4, "G": 2, "H": 4, "I": 1, "J": 8,
+            "K": 10, "L": 1, "M": 2, "N": 1, "O": 1, "P": 3, "Q": 8, "R": 1, "S": 1, "T": 1,
+            "U": 1, "V": 4, "W": 10, "X": 10, "Y": 10, "Z": 10}
+
 
     @commands.command(name="news", help="Donne le lien d'un ou plusieurs articles de presse du jour (par défaut 1)") # https://discordpy.readthedocs.io/en/latest/faq.html#how-do-i-make-a-web-request
     async def news(self, ctx, number_tiles: int=1):
@@ -130,7 +136,7 @@ class Utilitaire(commands.Cog):
 
             for lettre in word:
                 if lettre in trestle:
-                    value += const.FRENCH_SCRABBLE_VALUES[lettre]
+                    value += self.FRENCH_SCRABBLE_VALUES[lettre]
                     capitalized_word = capitalized_word + lettre
                     trestle = trestle.replace(lettre, '', 1)
                 else:
@@ -157,7 +163,7 @@ class Utilitaire(commands.Cog):
             return response
 
 
-        with open(const.SCRABBLE_DICTIONARY_PATH, "r", encoding="utf-8") as scrabble_disctionary:
+        with open(self.SCRABBLE_DICTIONARY_PATH, "r", encoding="utf-8") as scrabble_disctionary:
 
             dico_possible_words = {}
             trestle = convert_word(trestle)
