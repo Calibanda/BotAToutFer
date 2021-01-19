@@ -42,8 +42,11 @@ class Anniversaire(commands.Cog):
     async def mon_anniv(self, ctx, date:str=""):
         date = re.search(r"\d{2}\/\d{2}\/\d{4}", date)[0]
         if date:
-            with open(self.BIRTHDAYS_PATH, "r") as f:
-                birthdays = json.load(f)
+            try:
+                with open(self.BIRTHDAYS_PATH, "r") as f:
+                    birthdays = json.load(f)
+            except FileNotFoundError as e:
+                birthdays = {}
 
             birthdays[ctx.author.id] = date
 
