@@ -31,14 +31,14 @@ class Pictures(commands.Cog):
                     async with aiohttp.ClientSession() as session:
 
                         if random.choice(["cat", "red panda"]) == "cat":
-                            self.bot.log.warning(f"Asking for a cat pic")
+                            self.bot.log.warning(f"Asking for a cat pic in this channel: {channel.guild}, #{channel.name} ({channel.id})")
                             async with session.get(f"https://api.thecatapi.com/v1/images/search?api_key={const.CAT_TOKEN}") as r: # Retreve a cat json
                                 if r.status == 200:
                                     cat = await r.json()
                                     message = cat[0]["url"]
 
                         else:
-                            self.bot.log.warning(f"Asking a red fox pic")
+                            self.bot.log.warning(f"Asking a red fox pic in this channel: {channel.guild}, #{channel.name} ({channel.id})")
                             async with session.get("https://some-random-api.ml/img/red_panda") as r: # Retreve a red fox json
                                 if r.status == 200:
                                     red_panda = await r.json()
@@ -47,7 +47,7 @@ class Pictures(commands.Cog):
                         await channel.send(message)
 
                 except Exception as e:
-                    self.bot.log.exception(f"Unable to send a cat in this channel: {channel.guild}, #{channel.name} ({channel.id})")
+                    self.bot.log.exception(f"Unable to send a cute picture in this channel: {channel.guild}, #{channel.name} ({channel.id})")
 
 
     @cat.before_loop
