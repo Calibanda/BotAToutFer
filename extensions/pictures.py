@@ -38,8 +38,7 @@ class Pictures(commands.Cog):
                 try:
                     async with aiohttp.ClientSession() as session:
 
-                        if True:
-                        # if random.choice(["cat", "red panda"]) == "cat":
+                        if random.choice(["cat", "cat", "cat", "cat", "red panda"]) == "cat":
                             self.bot.log.warning(f"Asking for a cat pic in this channel: {channel.guild}, #{channel.name} ({channel.id})")
                             async with session.get(f"https://api.thecatapi.com/v1/images/search?api_key={const.CAT_TOKEN}") as r: # Retreve a cat json
                                 if r.status == 200:
