@@ -11,11 +11,13 @@ pip install -U discord.py pynacl youtube-dl
 You also need FFmpeg in your PATH environment variable or the FFmpeg.exe binary in your bot's directory on Windows.
 """
 
+import os
 import asyncio
 import functools
 import itertools
 import math
 import random
+from pathlib import Path
 
 import discord
 import youtube_dl
@@ -74,14 +76,14 @@ class YTDLSource(discord.PCMVolumeTransformer):
         try:
             date = data.get('upload_date')
             self.upload_date = date[6:8] + '.' + date[4:6] + '.' + date[0:4]
-        except TypeError:
+        except (TypeError, ValueError) as e:
             self.upload_date = None
         self.title = data.get('title')
         self.thumbnail = data.get('thumbnail')
         self.description = data.get('description')
         try:
             self.duration = self.parse_duration(int(data.get('duration')))
-        except TypeError:
+        except (TypeError, ValueError) as e:
             self.duration = 'Pas de durée'
         self.tags = data.get('tags')
         self.url = data.get('webpage_url')
@@ -133,6 +135,30 @@ class YTDLSource(discord.PCMVolumeTransformer):
                     raise YTDLError('Couldn\'t retrieve any matches for `{}`'.format(webpage_url))
 
         return cls(ctx, discord.FFmpegPCMAudio(info['url'], **cls.FFMPEG_OPTIONS), data=info)
+
+    @classmethod
+    async def create_source_from_local_file(cls, ctx: commands.Context, url: str, *, loop: asyncio.BaseEventLoop = None):
+        file_name = os.path.splitext(os.path.split(url)[-1])[0]
+        info = {
+            'url': url,
+            'uploader': None,
+            'uploader_url': None,
+            'upload_date': None,
+            'title': file_name,
+            'thumbnail': None,
+            'description': None,
+            'duration': 'Pas de durée',
+            'tags': None,
+            'webpage_url': url,
+            'view_count': None,
+            'like_count': None,
+            'dislike_count': None
+            }
+        ffmpeg_options = {
+            'options': '-vn'
+        }
+
+        return cls(ctx, discord.FFmpegPCMAudio(info['url'], **ffmpeg_options), data=info)
 
     @staticmethod
     def parse_duration(duration: int):
@@ -281,6 +307,7 @@ class Music(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.voice_states = {}
+        self.MUSIC_DIR = os.path.join(Path.home(), 'Music')
 
     def get_voice_state(self, ctx: commands.Context):
         state = self.voice_states.get(ctx.guild.id)
@@ -499,7 +526,44 @@ class Music(commands.Cog):
                 await ctx.voice_state.songs.put(song)
                 await ctx.send('Enqueued {}'.format(str(source)))
 
+    @commands.command(name='play-rp', aliases=['p-rp'], help='Joue les musiques d\'une playlist RPG')
+    async def _play_rp(self, ctx: commands.Context, *, category: str):
+        if category == 'combat':
+            music_directory = os.path.join(self.MUSIC_DIR, 'RPG_Combat')
+        elif category == 'exploration':
+            music_directory = os.path.join(self.MUSIC_DIR, 'RPG_Exploration')
+        elif category == 'tavern':
+            music_directory = os.path.join(self.MUSIC_DIR, 'RPG_Tavern')
+        else:
+            return await ctx.send('Unknow RPG category, please choose between \'combat\', \'exploration\' and \'tavern\'.')
+
+        if not ctx.voice_state.voice:
+            await ctx.invoke(self._summon)
+
+        try:
+            # Get the list of all files in directory tree at given path
+            list_of_files = []
+            for (dirpath, dirnames, filenames) in os.walk(music_directory):
+                list_of_files += [ os.path.join(dirpath, file_name) for file_name in filenames ]
+            random.shuffle(list_of_files)
+        except Exception as e:
+            self.bot.log.exception(f'Audio exception in this channel: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})')
+
+        if not list_of_files:
+            response = 'No such file or directory'
+            return await ctx.send(response)
+
+        async with ctx.typing():
+            for url in list_of_files:
+                source = await YTDLSource.create_source_from_local_file(ctx, url, loop=self.bot.loop)
+
+                song = Song(source)
+
+                await ctx.voice_state.songs.put(song)
+            await ctx.send(f'Enqueued {category} RPG songs')
+
     @_play.before_invoke
+    @_play_rp.before_invoke
     async def ensure_voice_state(self, ctx: commands.Context):
         if not ctx.author.voice or not ctx.author.voice.channel:
             raise commands.CommandError('You are not connected to any voice channel.')
