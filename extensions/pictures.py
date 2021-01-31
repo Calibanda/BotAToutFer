@@ -74,10 +74,10 @@ class Pictures(commands.Cog):
 
         if str(ctx.channel.id) in cat_json: # Channel id is in json so we remove it
             del cat_json[str(ctx.channel.id)]
-            response = "Disable cute animal picture in this channel"
+            response = "Disable cute animal pictures in this channel"
         else: # Channel id is NOT in json so we add it
             cat_json[str(ctx.channel.id)] = f"{ctx.channel.guild.name} > {ctx.channel.name}"
-            response = "Enable cute animal picture in this channel"
+            response = "Enable cute animal pictures in this channel"
 
         with open(self.CAT_CHANNELS_PATH, "w", encoding='utf8') as f:
             json.dump(cat_json, f, indent=4, ensure_ascii=False)
