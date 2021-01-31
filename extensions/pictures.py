@@ -2,6 +2,7 @@
 import random
 import aiohttp
 import datetime
+import os
 
 from discord.ext import tasks, commands
 
