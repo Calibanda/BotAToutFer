@@ -17,6 +17,12 @@ class Pictures(commands.Cog):
         self.bot = bot
         self.cat.start()
         self.hidden_cog = True
+        self.CAT_CHANNELS_PATH = os.path.join(const.SCRIPT_DIR, "package", "cat_channels.json")
+        try:
+            with open(self.CAT_CHANNELS_PATH, "r") as f: # Loads authorized channels id from json
+                self.cat_authorized_channels = [ int(channel_id) for channel_id in json.load(f).keys() ]
+        except FileNotFoundError, json.decoder.JSONDecodeError as e:
+            self.cat_authorized_channels = []
 
 
     def cog_unload(self):
@@ -25,7 +31,7 @@ class Pictures(commands.Cog):
 
     @tasks.loop(minutes=6.0)
     async def cat(self):
-        for channel in self.bot.autorized_channels:
+        for channel in self.cat_authorized_channels:
             if random.randrange(180) < 1 and datetime.datetime.now().hour in range(7, 23): # Statisticly send 1 message per day (one chance on 160 every 6 minutes between 7AM and 11PM)
                 try:
                     async with aiohttp.ClientSession() as session:
@@ -54,3 +60,26 @@ class Pictures(commands.Cog):
     @cat.before_loop
     async def before_cat(self):
         await self.bot.wait_until_ready()
+
+    @commands.command(name="pictures")
+    @commands.is_owner()
+    async def pictures(self, ctx):
+        try:
+            with open(self.CAT_CHANNELS_PATH, "r") as f: # Loads authorized channels id from json
+                cat_json = json.load(f)
+        except FileNotFoundError, json.decoder.JSONDecodeError as e:
+            cat_json = {}
+
+        if str(ctx.channel.id) in cat_json: # Channel id is in json so we remove it
+            del cat_json[str(ctx.channel.id)]
+            response = "Disable cute animal picture in this channel"
+        else: # Channel id is NOT in json so we add it
+            cat_json[str(ctx.channel.id)] = f"{ctx.channel.guild.name} > {ctx.channel.name}"
+            response = "Enable cute animal picture in this channel"
+
+        with open(self.CAT_CHANNELS_PATH, "w") as f:
+            json.dump(cat_json, f, indent=4)
+
+        self.cat_authorized_channels = [ int(channel_id) for channel_id in cat_json.keys() ] # We reload cat channels
+
+        await ctx.send(response)

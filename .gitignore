@@ -13,5 +13,5 @@ TNT.html
 dico_marseillais.txt
 create_dico_marsellais.py
 audio_recognition.py
-channels.json
+*channels.json
 birthdays.json
