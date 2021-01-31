@@ -79,8 +79,8 @@ class Pictures(commands.Cog):
             cat_json[str(ctx.channel.id)] = f"{ctx.channel.guild.name} > {ctx.channel.name}"
             response = "Enable cute animal picture in this channel"
 
-        with open(self.CAT_CHANNELS_PATH, "w") as f:
-            json.dump(cat_json, f, indent=4)
+        with open(self.CAT_CHANNELS_PATH, "w", encoding='utf8') as f:
+            json.dump(cat_json, f, indent=4, ensure_ascii=False)
 
         self.cat_authorized_channels = [ int(channel_id) for channel_id in cat_json.keys() ] # We reload cat channels
 
