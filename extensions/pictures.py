@@ -21,7 +21,7 @@ class Pictures(commands.Cog):
         try:
             with open(self.CAT_CHANNELS_PATH, "r") as f: # Loads authorized channels id from json
                 self.cat_authorized_channels = [ int(channel_id) for channel_id in json.load(f).keys() ]
-        except FileNotFoundError, json.decoder.JSONDecodeError as e:
+        except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
             self.cat_authorized_channels = []
 
 
@@ -67,7 +67,7 @@ class Pictures(commands.Cog):
         try:
             with open(self.CAT_CHANNELS_PATH, "r") as f: # Loads authorized channels id from json
                 cat_json = json.load(f)
-        except FileNotFoundError, json.decoder.JSONDecodeError as e:
+        except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
             cat_json = {}
 
         if str(ctx.channel.id) in cat_json: # Channel id is in json so we remove it
