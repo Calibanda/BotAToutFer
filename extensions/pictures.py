@@ -22,7 +22,7 @@ class Pictures(commands.Cog):
         self.CAT_CHANNELS_PATH = os.path.join(const.SCRIPT_DIR, "package", "cat_channels.json")
         try:
             with open(self.CAT_CHANNELS_PATH, "r") as f: # Loads authorized channels id from json
-                self.cat_authorized_channels = [ int(channel_id) for channel_id in json.load(f).keys() ]
+                self.cat_authorized_channels = [ self.bot.get_channel(int(channel_id)) for channel_id in json.load(f).keys() ] # bot.get_channel(channel_id)
         except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
             self.cat_authorized_channels = []
 
@@ -81,6 +81,6 @@ class Pictures(commands.Cog):
         with open(self.CAT_CHANNELS_PATH, "w", encoding='utf8') as f:
             json.dump(cat_json, f, indent=4, ensure_ascii=False)
 
-        self.cat_authorized_channels = [ int(channel_id) for channel_id in cat_json.keys() ] # We reload cat channels
+        self.cat_authorized_channels = [ self.bot.get_channel(int(channel_id)) for channel_id in cat_json.keys() ] # We reload cat channels
 
         await ctx.send(response)
