@@ -66,6 +66,12 @@ async def marseillais_word(message, words_in_message):
         await message.channel.send(response)
 
 
+async def respect(message, words_in_message):
+    if "respecter" in words_in_message or "respecte" in words_in_message: # If the words "respecter" or "respecte" in the original message
+        response ="https://tenor.com/view/master-spongebob-bowing-bow-yes-master-gif-5594685" # Send the "Yes master" gif
+        await message.channel.send(response)
+
+
 async def on_message_jokes(bot, message):
 
     words_in_message = [ word for word in re.split("\W", message.content.lower()) if word ] # We split the words in the message on any non word character (\W) and ignore empty words
@@ -77,4 +83,5 @@ async def on_message_jokes(bot, message):
     await cursed_words(message, words_in_message)
     await mousse(message, words_in_message)
     await projet(message, words_in_message)
+    await respect(message, words_in_message)
     # await marseillais_word(message, words_in_message)
