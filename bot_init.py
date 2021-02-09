@@ -35,8 +35,6 @@ def bot_init():
             print(f"{guild.name} (id: {guild.id})")
             bot.log.warning(f"{bot.user} is connected to the following guild: {guild.name} (id: {guild.id})")
 
-        bot.autorized_channels = [ bot.get_channel(channel_id) for channel_id in const.AUTORIZED_CHANNELS ]
-
         bot.load_extension("extensions.anniv")
         bot.load_extension("extensions.dice")
         bot.load_extension("extensions.discussion")
