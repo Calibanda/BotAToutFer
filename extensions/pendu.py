@@ -21,6 +21,7 @@ class Pendu(commands.Cog):
         self._last_member = None
 
         self.current_games = {} # {discord.TextChannel.id: {"secret_word": "", "visible_word": "", "number_stroke": 10, "gessed_letters": [], "definition": "", "starting_time": datetime.datetime}}
+        self.SCRABBLE_DICTIONARY_PATH = os.path.join(const.SCRIPT_DIR, "package", "ODS7.txt") # Path of the french scrabble dictionary
 
 
     @commands.command(name="pendu", help="Joue au pendu")
@@ -63,7 +64,7 @@ class Pendu(commands.Cog):
             try:
                 game = {} # Creating a new dictionary
 
-                with open(const.SCRABBLE_DICTIONARY_PATH, "r", encoding="utf-8") as scrabble_disctionary:
+                with open(self.SCRABBLE_DICTIONARY_PATH, "r", encoding="utf-8") as scrabble_disctionary:
                     game["secret_word"] = random.choice(scrabble_disctionary.readlines()).casefold().strip() # Choosing a secret word in the french lexicon
 
                 game["visible_word"] = "*" * len(game["secret_word"]) # Creating a word with "*" that will be displayed to the players
