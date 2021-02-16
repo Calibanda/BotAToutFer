@@ -62,7 +62,7 @@ class Jokes(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         ctx = await self.bot.get_context(message)
-        if ctx.valid:
+        if message.author == self.bot.user:
             # await self.bot.process_commands(message)
             return
         else: # This doesn't invoke a command!
