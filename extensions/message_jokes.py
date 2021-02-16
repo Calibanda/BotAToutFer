@@ -63,7 +63,8 @@ class Jokes(commands.Cog):
     async def on_message(self, message):
         ctx = await self.bot.get_context(message)
         if ctx.valid:
-            await self.bot.process_commands(message)
+            # await self.bot.process_commands(message)
+            return
         else: # This doesn't invoke a command!
             words_in_message = [ word for word in re.split("\W", message.content.lower()) if word ] # We split the words in the message on any non word character (\W) and ignore empty words
 
