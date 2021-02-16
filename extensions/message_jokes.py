@@ -67,15 +67,15 @@ class Jokes(commands.Cog):
         else: # This doesn't invoke a command!
             words_in_message = [ word for word in re.split("\W", message.content.lower()) if word ] # We split the words in the message on any non word character (\W) and ignore empty words
 
-            await joke_je_suis(message)
-            await joke_echec(message, words_in_message)
-            await joke_possible(message, words_in_message)
-            await joke_aled(message, words_in_message)
-            await cursed_words(message, words_in_message)
-            await mousse(message, words_in_message)
-            await projet(message, words_in_message)
-            await respect(message, words_in_message)
-            await what(message, words_in_message)
+            await self.joke_je_suis(message)
+            await self.joke_echec(message, words_in_message)
+            await self.joke_possible(message, words_in_message)
+            await self.joke_aled(message, words_in_message)
+            await self.cursed_words(message, words_in_message)
+            await self.mousse(message, words_in_message)
+            await self.projet(message, words_in_message)
+            await self.respect(message, words_in_message)
+            await self.what(message, words_in_message)
             # await marseillais_word(message, words_in_message)
 
 
