@@ -77,18 +77,6 @@ def bot_init():
         bot.log.exception(f"Catched exeption:")
 
 
-    # @bot.event
-    # async def on_message(message):
-    #     if message.author == bot.user:
-    #         return
-
-    #     if message.content.startswith("!"):
-    #         await bot.process_commands(message)
-    #         return
-
-    #     await on_message_jokes(bot, message)
-
-
     @bot.command()
     @commands.is_owner()
     async def load(ctx, name=None):
