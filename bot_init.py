@@ -41,6 +41,7 @@ def bot_init():
         bot.load_extension("extensions.drinks")
         # bot.load_extension("extensions.green")
         bot.load_extension("extensions.help")
+        bot.load_extension("extensions.message_jokes")
         # bot.load_extension("extensions.music")
         bot.load_extension("extensions.vbe_music")
         bot.load_extension("extensions.pendu")
@@ -76,16 +77,16 @@ def bot_init():
         bot.log.exception(f"Catched exeption:")
 
 
-    @bot.event
-    async def on_message(message):
-        if message.author == bot.user:
-            return
+    # @bot.event
+    # async def on_message(message):
+    #     if message.author == bot.user:
+    #         return
 
-        if message.content.startswith("!"):
-            await bot.process_commands(message)
-            return
+    #     if message.content.startswith("!"):
+    #         await bot.process_commands(message)
+    #         return
 
-        await on_message_jokes(bot, message)
+    #     await on_message_jokes(bot, message)
 
 
     @bot.command()
