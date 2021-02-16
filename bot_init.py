@@ -146,7 +146,7 @@ def bot_init():
     @bot.command()
     @commands.is_owner()
     async def zero(ctx):
-        19/0
+        1/0
 
 
     return bot
