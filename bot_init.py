@@ -99,7 +99,7 @@ def bot_init():
                 response = f"**L'extension *{name}* n'existe pas !**"
                 await ctx.send(response)
             except commands.errors.ExtensionAlreadyLoaded as e:
-                pass
+                await _reload(ctx, name)
             except commands.errors.ExtensionError as e:
                 bot.log.error(f"Erreur avec l'extension {e.name}", exc_info=e)
                 response = f"**Erreur avec l'extension {e.name}**"
@@ -125,7 +125,7 @@ def bot_init():
 
     @bot.command()
     @commands.is_owner()
-    async def reload(ctx, name=None):
+    async def _reload(ctx, name=None):
         if name:
             try:
                 bot.reload_extension(f"extensions.{name}")
