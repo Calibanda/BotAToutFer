@@ -1,4 +1,8 @@
 # jokes on messages for BotÀToutFer
+import os
+import json
+import re
+
 import discord
 from discord.ext import commands
 
