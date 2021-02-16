@@ -5,8 +5,6 @@ from discord.ext import commands
 import const
 import logger_init
 
-from package.on_message_jokes import on_message_jokes
-
 
 def bot_init():
     """Create the Discord bot object with all configuration
