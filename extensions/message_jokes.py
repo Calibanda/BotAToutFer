@@ -55,7 +55,7 @@ class Jokes(commands.Cog):
             self.DICO_MARSEILLAIS = []
 
 
-    @bot.event
+    @self.bot.event
     async def on_message(self, message):
         ctx = await self.bot.get_context(message)
         if ctx.valid:
