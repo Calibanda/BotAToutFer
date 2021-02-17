@@ -6,7 +6,6 @@ import re
 import discord
 from discord.ext import commands
 
-import const
 
 def setup(bot):
     bot.add_cog(Jokes(bot))
@@ -50,7 +49,7 @@ class Jokes(commands.Cog):
 
         ]
 
-        self.DICO_MARSEILLAIS_PATH = os.path.join(const.SCRIPT_DIR, "package", "dico_marseillais.json")
+        self.DICO_MARSEILLAIS_PATH = os.path.join(self.bot.SCRIPT_DIR, "package", "dico_marseillais.json")
 
         try:
             with open(self.DICO_MARSEILLAIS_PATH, "r") as f:
@@ -78,7 +77,6 @@ class Jokes(commands.Cog):
             await self.respect(message, words_in_message)
             await self.what(message, words_in_message)
             await self.rip(message, words_in_message)
-            # await marseillais_word(message, words_in_message)
 
 
     async def joke_je_suis(self, message):
@@ -128,18 +126,6 @@ class Jokes(commands.Cog):
             response = f"{message.author.mention} : {response}"
             await message.channel.send(response)
             await message.delete()
-
-
-    async def marseillais_word(self, message, words_in_message):
-        present_words = [ entry for entry in self.DICO_MARSEILLAIS for word in words_in_message if word == entry["word"].split(" ")[0].lower() ] # Catch all the marseillais words
-        if present_words: # If any marseillais word in the original message
-            response = f"Hey <@{const.ANTOINE_TAG}>, "
-            for entry in present_words:
-                word = entry["word"]
-                description = entry["description"]
-                response += f"\"{word}\" ça veut dire {description}\n"
-            response = response[:-1]
-            await message.channel.send(response)
 
 
     async def respect(self, message, words_in_message):

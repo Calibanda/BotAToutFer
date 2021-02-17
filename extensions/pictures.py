@@ -7,8 +7,6 @@ import json
 
 from discord.ext import tasks, commands
 
-import const
-
 
 def setup(bot):
     bot.add_cog(Pictures(bot))
@@ -19,7 +17,7 @@ class Pictures(commands.Cog):
         self.bot = bot
         self.cat.start()
         self.hidden_cog = True
-        self.CAT_CHANNELS_PATH = os.path.join(const.SCRIPT_DIR, "package", "cat_channels.json")
+        self.CAT_CHANNELS_PATH = os.path.join(self.bot.SCRIPT_DIR, "package", "cat_channels.json")
         try:
             with open(self.CAT_CHANNELS_PATH, "r") as f: # Loads authorized channels id from json
                 self.cat_authorized_channels = [ self.bot.get_channel(int(channel_id)) for channel_id in json.load(f).keys() ] # bot.get_channel(channel_id)
@@ -40,7 +38,7 @@ class Pictures(commands.Cog):
 
                         if random.choice(["cat", "cat", "cat", "cat", "red panda"]) == "cat":
                             self.bot.log.warning(f"Asking for a cat pic in this channel: {channel.guild}, #{channel.name} ({channel.id})")
-                            async with session.get(f"https://api.thecatapi.com/v1/images/search?api_key={const.CAT_TOKEN}") as r: # Retreve a cat json
+                            async with session.get(f"https://api.thecatapi.com/v1/images/search?api_key={self.bot.CAT_TOKEN}") as r: # Retreve a cat json
                                 if r.status == 200:
                                     cat = await r.json()
                                     message = cat[0]["url"]

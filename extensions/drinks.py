@@ -3,8 +3,6 @@ import urllib3
 
 from discord.ext import commands
 
-import const
-
 
 def setup(bot):
     bot.add_cog(Drinks(bot))
@@ -21,8 +19,8 @@ class Drinks(commands.Cog):
     @commands.has_role("CoffeeMaker")
     async def coffee_start(self, ctx):
         try:
-            http_response = self.http.request("BREW", const.COFFEE_URL, fields={"passwd": const.COFFEE_PASSWORD, "action": "start"})
-            #http_response = http.request("BREW", const.COFFEE_URL, fields={"passwd": const.COFFEE_PASSWORD, "action": "start"}, headers={"Accept-Additions": "sweetener-type"})
+            http_response = self.http.request("BREW", self.bot.COFFEE_URL, fields={"passwd": self.bot.COFFEE_PASSWORD, "action": "start"})
+            #http_response = http.request("BREW", self.bot.COFFEE_URL, fields={"passwd": self.bot.COFFEE_PASSWORD, "action": "start"}, headers={"Accept-Additions": "sweetener-type"})
             if http_response.status == 200:
                 response = "Je lance le café :coffee:"
             else:
@@ -41,8 +39,8 @@ class Drinks(commands.Cog):
     @commands.has_role("CoffeeMaker")
     async def coffee_stop(self, ctx):
         try:
-            http_response = self.http.request("BREW", const.COFFEE_URL, fields={"passwd": const.COFFEE_PASSWORD, "action": "stop"})
-            #http_response = http.request("BREW", const.COFFEE_URL, fields={"passwd": const.COFFEE_PASSWORD, "action": "stop"}, headers={"Accept-Additions": "sweetener-type"})
+            http_response = self.http.request("BREW", self.bot.COFFEE_URL, fields={"passwd": self.bot.COFFEE_PASSWORD, "action": "stop"})
+            #http_response = http.request("BREW", self.bot.COFFEE_URL, fields={"passwd": self.bot.COFFEE_PASSWORD, "action": "stop"}, headers={"Accept-Additions": "sweetener-type"})
             if http_response.status == 200:
                 response = "Je stope le café :coffee:"
             else:
@@ -61,7 +59,7 @@ class Drinks(commands.Cog):
     @commands.has_role("CoffeeMaker")
     async def coffee_when(self, ctx):
         try:
-            http_response = self.http.request("WHEN", const.COFFEE_URL)
+            http_response = self.http.request("WHEN", self.bot.COFFEE_URL)
             time = float(http_response.data)
             if time > 0:
                 response = f"Un café est lancé depuis {round(time / 1000, 2)} secondes"

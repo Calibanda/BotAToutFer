@@ -7,8 +7,6 @@ import re
 import discord
 from discord.ext import commands
 
-import const
-
 
 def setup(bot):
     bot.add_cog(Anniversaire(bot))
@@ -18,7 +16,7 @@ class Anniversaire(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self._last_member = None
-        self.BIRTHDAYS_PATH = os.path.join(const.SCRIPT_DIR, "package", "birthdays.json") # The path of the json file containing the users birthdays
+        self.BIRTHDAYS_PATH = os.path.join(self.bot.SCRIPT_DIR, "package", "birthdays.json") # The path of the json file containing the users birthdays
 
     @commands.command(name="anniv", help="Affiche l'anniversaire d'un utilisateur humain")
     async def anniv(self, ctx, user:discord.User):

@@ -5,8 +5,6 @@ import random
 import discord
 from discord.ext import commands
 
-import const
-
 
 def setup(bot):
     bot.add_cog(Santa(bot))

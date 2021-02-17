@@ -8,8 +8,6 @@ import datetime
 
 from discord.ext import commands
 
-import const
-
 
 def setup(bot):
     bot.add_cog(Pendu(bot))
@@ -21,7 +19,7 @@ class Pendu(commands.Cog):
         self._last_member = None
 
         self.current_games = {} # {discord.TextChannel.id: {"secret_word": "", "visible_word": "", "number_stroke": 10, "gessed_letters": [], "definition": "", "starting_time": datetime.datetime}}
-        self.SCRABBLE_DICTIONARY_PATH = os.path.join(const.SCRIPT_DIR, "package", "ODS7.txt") # Path of the french scrabble dictionary
+        self.SCRABBLE_DICTIONARY_PATH = os.path.join(self.bot.SCRIPT_DIR, "package", "ODS7.txt") # Path of the french scrabble dictionary
 
 
     @commands.command(name="pendu", help="Joue au pendu")
@@ -75,7 +73,7 @@ class Pendu(commands.Cog):
                 try:
                     async with aiohttp.ClientSession() as session:
                         self.bot.log.warning(f"Asking for word definition")
-                        async with session.get(f"https://api.dicolink.com/v1/mot/{game['secret_word']}/definitions?limite=1&api_key={const.DICOLINK_TOKEN}") as r: # Retreve a definition
+                        async with session.get(f"https://api.dicolink.com/v1/mot/{game['secret_word']}/definitions?limite=1&api_key={self.bot.DICOLINK_TOKEN}") as r: # Retreve a definition
                             if r.status == 200:
                                 definition = await r.json()
                                 game["definition"] = definition[0]["definition"]

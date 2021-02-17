@@ -9,7 +9,6 @@ from bs4 import BeautifulSoup
 import discord
 from discord.ext import commands
 
-import const
 
 # TODO:
 # last_news_url.json sensible to call channel
@@ -23,8 +22,8 @@ class Utilitaire(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self._last_member = None
-        self.LAST_NEWS_URL_PATH = os.path.join(const.SCRIPT_DIR, "package", "last_news_url.json") # The path of the json file containing the lastest retrived news
-        self.SCRABBLE_DICTIONARY_PATH = os.path.join(const.SCRIPT_DIR, "package", "ODS7.txt") # Path of the french scrabble dictionary
+        self.LAST_NEWS_URL_PATH = os.path.join(self.bot.SCRIPT_DIR, "package", "last_news_url.json") # The path of the json file containing the lastest retrived news
+        self.SCRABBLE_DICTIONARY_PATH = os.path.join(self.bot.SCRIPT_DIR, "package", "ODS7.txt") # Path of the french scrabble dictionary
         self.FRENCH_SCRABBLE_VALUES = {
             "A": 1, "B": 3, "C": 3, "D": 2, "E": 1, "F": 4, "G": 2, "H": 4, "I": 1, "J": 8,
             "K": 10, "L": 1, "M": 2, "N": 1, "O": 1, "P": 3, "Q": 8, "R": 1, "S": 1, "T": 1,
@@ -35,7 +34,7 @@ class Utilitaire(commands.Cog):
     async def news(self, ctx, number_tiles: int=1):
         async with aiohttp.ClientSession() as session:
             self.bot.log.warning(f"Asking for the local news")
-            async with session.get(f"http://newsapi.org/v2/top-headlines?country=fr&apiKey={const.NEWS_TOKEN}") as r: # Retreve last news
+            async with session.get(f"http://newsapi.org/v2/top-headlines?country=fr&apiKey={self.bot.NEWS_TOKEN}") as r: # Retreve last news
                 if r.status == 200:
                     news = await r.json()
 
@@ -63,13 +62,13 @@ class Utilitaire(commands.Cog):
 
     @commands.command(name="meteo", help="Donne la météo (d'une ville au hasard dans le monde)") # https://discordpy.readthedocs.io/en/latest/faq.html#how-do-i-make-a-web-request
     async def meteo(self, ctx):
-        with open(os.path.join(const.SCRIPT_DIR, "package", "list_city_id.json"), "r") as f:
+        with open(os.path.join(self.bot.SCRIPT_DIR, "package", "list_city_id.json"), "r") as f:
             list_city_id = json.load(f)
 
         random_city = random.choice(list_city_id)
 
         async with aiohttp.ClientSession() as session:
-            async with session.get(f"http://api.openweathermap.org/data/2.5/weather?id={random_city}&appid={const.WEATHER_TOKEN}&units=metric&lang=fr") as r:
+            async with session.get(f"http://api.openweathermap.org/data/2.5/weather?id={random_city}&appid={self.bot.WEATHER_TOKEN}&units=metric&lang=fr") as r:
                 if r.status == 200:
                     weather = await r.json()
 
@@ -284,7 +283,7 @@ class Utilitaire(commands.Cog):
             word = re.split("\W", word.lower())[0]
             async with aiohttp.ClientSession() as session:
                 self.bot.log.warning(f"Asking for word definition")
-                async with session.get(f"https://api.dicolink.com/v1/mot/{word}/definitions?limite=1&api_key={const.DICOLINK_TOKEN}") as r: # Retreve a definition
+                async with session.get(f"https://api.dicolink.com/v1/mot/{word}/definitions?limite=1&api_key={self.bot.DICOLINK_TOKEN}") as r: # Retreve a definition
                     if r.status == 200:
                         definition = await r.json()
                         try:

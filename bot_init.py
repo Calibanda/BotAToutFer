@@ -1,9 +1,10 @@
 # bot_init.py
+import datetime
+import json
+
+from dotenv import load_dotenv
 import discord
 from discord.ext import commands
-
-import const
-import logger_init
 
 
 def bot_init():
@@ -12,15 +13,30 @@ def bot_init():
     Returns:
         discord.ext.commands.Bot: The Discord bot client ready to go
     """
+
+    load_dotenv() # Loads sensitive constants form env
+
+    # Create bot
     bot = commands.Bot(command_prefix="!",
                        case_insensitive=True,
-                       description=const.BOT_DESCRIPTION,
+                       description="BotAToutFer, le bot qui fait tout, même le café !",
                        help_command=None,
-                       activity=discord.Game(name=const.BOT_ACTIVITY),
-                       owner_id=const.OWNER_ID
+                       activity=discord.Game(name="!help"),
+                       owner_id=int(os.getenv("OWNER_ID"))
     )
 
-    bot.log = logger_init.logger_init()
+    # Add constants as variables in bot object
+    bot.log = logger_init() # Add logger object to bot
+    bot.SCRIPT_DIR = os.path.split(os.path.abspath(__file__))[0] # Add the absolute path to repo directory
+    bot.TOKEN = os.getenv("DISCORD_TOKEN") # Add Discord bot token to bot
+
+    bot.COFFEE_URL = os.getenv("COFFEE_URL")
+    bot.COFFEE_PASSWORD = os.getenv("COFFEE_PASSWORD")
+
+    bot.WEATHER_TOKEN = os.getenv("WEATHER_TOKEN")
+    bot.NEWS_TOKEN = os.getenv("NEWS_TOKEN")
+    bot.CAT_TOKEN = os.getenv("CAT_TOKEN")
+    bot.DICOLINK_TOKEN = os.getenv("DICOLINK_TOKEN")
 
 
     @bot.event
@@ -136,3 +152,29 @@ def bot_init():
 
 
     return bot
+
+
+def logger_init():
+    """Create the logger object
+
+    Returns:
+        logging.Logger: The logger object ready to go
+    """
+    import logging
+
+    script_dir, script_filename = os.path.split(os.path.abspath(__file__)) # Retreve the directory path of the script
+
+    log_dir = os.path.join(script_dir, "logs") # The directory containing logs
+    log_file_path = os.path.join(log_dir, datetime.datetime.now().strftime("%Y-%m-%d") + ".log") # Absolute path of the new log file
+
+    if not os.path.exists(log_dir): # If the logs directory does not exist, we create it
+        os.makedirs(log_dir)
+
+    # Setting up the logging system
+    logger = logging.getLogger("discord")
+    logger.setLevel(logging.WARNING)
+    handler = logging.FileHandler(filename=log_file_path, encoding="utf-8", mode="a")
+    handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s"))
+    logger.addHandler(handler)
+
+    return logger
