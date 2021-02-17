@@ -109,7 +109,7 @@ def bot_init():
                 await ctx.send(response)
 
 
-    @bot.command(name="says")
+    @bot.command(name="reload")
     @commands.is_owner()
     async def _reload(ctx, name=None):
         if name:
