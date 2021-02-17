@@ -148,7 +148,7 @@ class Jokes(commands.Cog):
             await message.channel.send(response)
 
 
-    async def respect(self, message, words_in_message):
+    async def what(self, message, words_in_message):
         if "what" in words_in_message: # If the word "what" in the original message
             response ="https://tenor.com/view/minion-what-huh-gif-9361819" # Send a "WHHAAAATTT?!" minion gif
             await message.channel.send(response)
