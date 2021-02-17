@@ -77,6 +77,7 @@ class Jokes(commands.Cog):
             await self.projet(message, words_in_message)
             await self.respect(message, words_in_message)
             await self.what(message, words_in_message)
+            await self.rip(message, words_in_message)
             # await marseillais_word(message, words_in_message)
 
 
@@ -150,4 +151,10 @@ class Jokes(commands.Cog):
     async def respect(self, message, words_in_message):
         if "what" in words_in_message: # If the word "what" in the original message
             response ="https://tenor.com/view/minion-what-huh-gif-9361819" # Send a "WHHAAAATTT?!" minion gif
+            await message.channel.send(response)
+
+
+    async def rip(self, message, words_in_message):
+        if "rip" in words_in_message: # If the word "rip" in the original message
+            response ="https://tenor.com/view/rip-coffin-black-ghana-celebrating-gif-16743302" # Send a "RIP" minion gif
             await message.channel.send(response)
