@@ -50,22 +50,31 @@ def bot_init():
             print(f"{guild.name} (id: {guild.id})")
             bot.log.warning(f"{bot.user} is connected to the following guild: {guild.name} (id: {guild.id})")
 
-        bot.load_extension("extensions.anniv")
-        bot.load_extension("extensions.dice")
-        bot.load_extension("extensions.discussion")
-        bot.load_extension("extensions.drinks")
-        # bot.load_extension("extensions.green")
-        bot.load_extension("extensions.help")
-        bot.load_extension("extensions.message_jokes")
-        # bot.load_extension("extensions.music")
-        bot.load_extension("extensions.vbe_music")
-        bot.load_extension("extensions.pendu")
-        bot.load_extension("extensions.pictures")
-        bot.load_extension("extensions.ping")
-        bot.load_extension("extensions.quotes")
-        # bot.load_extension("extensions.santa")
-        bot.load_extension("extensions.says")
-        bot.load_extension("extensions.utilitaries")
+        extensions_to_load = [
+            "anniv",
+            "dice",
+            "discussion",
+            "drinks",
+            "green",
+            "help",
+            "message_jokes",
+            # "music",
+            "pendu",
+            "pictures",
+            "ping",
+            "quotes",
+            # "santa",
+            "says",
+            "utilitaries",
+            "vbe_music",
+        ]
+
+        for extension in extensions_to_load:
+            try:
+                bot.load_extension(f"extensions.{extension}")
+            except commands.errors.ExtensionError as e:
+                bot.log.error(f"Erreur avec l'extension {e.name}", exc_info=e)
+                print(f"Erreur avec l'extension {e.name}", exc_info=e)
 
 
     @bot.event
@@ -156,7 +165,7 @@ def bot_init():
 
 
 def logger_init():
-    """Create the logger object
+    """Create and return the logger object
 
     Returns:
         logging.Logger: The logger object ready to go
