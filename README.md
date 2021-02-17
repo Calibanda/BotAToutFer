@@ -22,7 +22,7 @@ Install needed packages with:
 ```
 pip3 install -r requirements.txt
 ```
-You can also manualy install them:
+OR manualy install them:
 
 ```
 pip3 install -U discord.py[voice]
@@ -45,17 +45,6 @@ OWNER_ID= #Enter here the ID of the bot owner
 COFFEE_URL= #Enter here the URL of your coffee pot
 COFFEE_PASSWORD= #Enter here the password needed to access to your coffee URL
 DICOLINK_TOKEN= #Enter here the token of the dicolink dictionnay API
-```
-
-### Create json for declaring channels bot
-
-In the "package" directory, create a json file named "channels.json". In this file, enter channels'id in which the bot can respond to commands and send kitten picture:
-
-```
-[
-    "123456789012345678": "description of the channel (not used, optionnal)",
-    "876543210987654321": ""
-]
 ```
 
 ## Running the bot
