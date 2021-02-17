@@ -74,7 +74,7 @@ def bot_init():
                 bot.load_extension(f"extensions.{extension}")
             except commands.errors.ExtensionError as e:
                 bot.log.error(f"Erreur avec l'extension {e.name}", exc_info=e)
-                print(f"Erreur avec l'extension {e.name}", exc_info=e)
+                print(f"Erreur avec l'extension {e.name}")
 
 
     @bot.event
