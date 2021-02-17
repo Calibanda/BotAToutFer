@@ -49,15 +49,6 @@ class Jokes(commands.Cog):
 
         ]
 
-        self.DICO_MARSEILLAIS_PATH = os.path.join(self.bot.SCRIPT_DIR, "package", "dico_marseillais.json")
-
-        try:
-            with open(self.DICO_MARSEILLAIS_PATH, "r") as f:
-                self.DICO_MARSEILLAIS = json.load(f)
-        except Exception as e:
-            self.bot.log.error(f"Catched exeption:", exc_info=e)
-            self.DICO_MARSEILLAIS = []
-
 
     @commands.Cog.listener()
     async def on_message(self, message):
