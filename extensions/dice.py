@@ -27,7 +27,8 @@ class Roll_dice(commands.Cog):
                 response = "Ohh la flemme de lancer tous ces dés !"
 
             await ctx.send(response)
-        except Exception:
+        except Exception as e:
+            self.bot.log.error(f"Catched exeption:", exc_info=e)
             await ctx.send('Format has to be in xDx!')
 
 
@@ -132,5 +133,5 @@ class Roll_dice(commands.Cog):
 
             await ctx.send(response)
         except Exception as e:
-            # await ctx.send('Format has to be in xD<name>!')
-            await ctx.send(str(e))
+            self.bot.log.error(f"Catched exeption:", exc_info=e)
+            await ctx.send('Format has to be in xD<name>!')

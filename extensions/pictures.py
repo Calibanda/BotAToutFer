@@ -22,6 +22,7 @@ class Pictures(commands.Cog):
             with open(self.CAT_CHANNELS_PATH, "r") as f: # Loads authorized channels id from json
                 self.cat_authorized_channels = [ self.bot.get_channel(int(channel_id)) for channel_id in json.load(f).keys() ] # bot.get_channel(channel_id)
         except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
+            self.bot.log.error(f"Catched exeption:", exc_info=e)
             self.cat_authorized_channels = []
 
 
@@ -53,7 +54,7 @@ class Pictures(commands.Cog):
                         await channel.send(message)
 
                 except Exception as e:
-                    self.bot.log.exception(f"Unable to send a cute picture in this channel: {channel.guild}, #{channel.name} ({channel.id})")
+                    self.bot.log.exception(f"Unable to send a cute picture in this channel: {channel.guild}, #{channel.name} ({channel.id})", exc_info=e)
 
 
     @cat.before_loop

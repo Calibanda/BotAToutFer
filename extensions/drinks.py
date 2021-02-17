@@ -26,10 +26,10 @@ class Drinks(commands.Cog):
             else:
                 response = "Ah, non, pas de café :cry:"
         except urllib3.exceptions.TimeoutError as e:
-            self.bot.log.exception(f"HTCPCP timeout: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})")
+            self.bot.log.exception(f"HTCPCP timeout: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})", exc_info=e)
             response = "https://tenor.com/view/still-waiting-for-reply-waiting-patience-bored-hurry-up-gif-10179642"
         except Exception as e:
-            self.bot.log.exception(f"An exception occured during HTCPCP START : {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})")
+            self.bot.log.exception(f"An exception occured during HTCPCP START : {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})", exc_info=e)
             response = "Une erreur inconnue est apparue"
 
         await ctx.send(response)
@@ -46,10 +46,10 @@ class Drinks(commands.Cog):
             else:
                 response = "Ah, non, pas de café :cry:"
         except urllib3.exceptions.TimeoutError as e:
-            self.bot.log.exception(f"HTCPCP timeout: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})")
+            self.bot.log.exception(f"HTCPCP timeout: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})", exc_info=e)
             response = "https://tenor.com/view/still-waiting-for-reply-waiting-patience-bored-hurry-up-gif-10179642"
         except Exception as e:
-            self.bot.log.exception(f"An exception occured during HTCPCP STOP : {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})")
+            self.bot.log.exception(f"An exception occured during HTCPCP STOP : {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})", exc_info=e)
             response = "Une erreur inconnue est apparue"
 
         await ctx.send(response)
@@ -66,10 +66,10 @@ class Drinks(commands.Cog):
             else:
                 response = "Pas de café en cours !"
         except urllib3.exceptions.TimeoutError as e:
-            self.bot.log.exception(f"HTCPCP timeout: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})")
+            self.bot.log.exception(f"HTCPCP timeout: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})", exc_info=e)
             response = "https://tenor.com/view/still-waiting-for-reply-waiting-patience-bored-hurry-up-gif-10179642"
         except Exception as e:
-            self.bot.log.exception(f"An exception occured during HTCPCP WHEN : {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})")
+            self.bot.log.exception(f"An exception occured during HTCPCP WHEN : {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})", exc_info=e)
             response = "Une erreur inconnue est apparue"
 
 

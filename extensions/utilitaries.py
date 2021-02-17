@@ -41,7 +41,8 @@ class Utilitaire(commands.Cog):
                     try:
                         with open(self.LAST_NEWS_URL_PATH, "r") as f:
                             old_news = json.load(f) # We try to load the news who have already been displayed by the bot
-                    except Exception as e:
+                    except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
+                        self.bot.log.error(f"Catched exeption:", exc_info=e)
                         old_news = []
 
                     today_news = [ article["url"] for article in news["articles"] if article["url"] not in old_news ] # We retreve all the url that hasn't been already displayed
@@ -257,7 +258,7 @@ class Utilitaire(commands.Cog):
                         try: # We try to send the programm of the channel if any
                             response = f"```Programme de ce {date} soir :\n" + channels[channel_number] + "```"
                             await ctx.send(response)
-                        except Exception:
+                        except Exception as e:
                             await ctx.send("Je ne connais pas cette chaîne.")
                         finally:
                             return
@@ -463,5 +464,5 @@ class Utilitaire(commands.Cog):
                 await ctx.send(response)
 
         except Exception as e:
-            self.bot.log.exception(f"Unable to send a marmiton recipe in this channel: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})")
+            self.bot.log.exception(f"Unable to send a marmiton recipe in this channel: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})", exc_info=e)
             await ctx.send("Something went wrong https://tenor.com/s8CP.gif")

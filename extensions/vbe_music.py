@@ -519,6 +519,7 @@ class Music(commands.Cog):
             try:
                 source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop)
             except YTDLError as e:
+                self.bot.log.error(f"Catched exeption:", exc_info=e)
                 await ctx.send('An error occurred while processing this request: {}'.format(str(e)))
             else:
                 song = Song(source)
@@ -547,7 +548,7 @@ class Music(commands.Cog):
                 list_of_files += [ os.path.join(dirpath, file_name) for file_name in filenames ]
             random.shuffle(list_of_files)
         except Exception as e:
-            self.bot.log.exception(f'Audio exception in this channel: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})')
+            self.bot.log.exception(f'Audio exception in this channel: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})', exc_info=e)
 
         if not list_of_files:
             response = 'No such file or directory'

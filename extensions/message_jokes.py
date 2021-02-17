@@ -55,6 +55,7 @@ class Jokes(commands.Cog):
             with open(self.DICO_MARSEILLAIS_PATH, "r") as f:
                 self.DICO_MARSEILLAIS = json.load(f)
         except Exception as e:
+            self.bot.log.error(f"Catched exeption:", exc_info=e)
             self.DICO_MARSEILLAIS = []
 
 

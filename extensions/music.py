@@ -112,7 +112,7 @@ class Music(commands.Cog):
 
                 await ctx.send(f'Now playing: {player.title}')
             except Exception as e:
-                self.bot.log.exception(f"Audio exception in this channel: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})")
+                self.bot.log.exception(f"Audio exception in this channel: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})", exc_info=e)
                 await ctx.send(f"Something went wrong")
 
         else:
@@ -128,7 +128,7 @@ class Music(commands.Cog):
                 list_of_files += [ os.path.join(dirpath, file_name) for file_name in filenames ]
             random.shuffle(list_of_files)
         except Exception as e:
-            self.bot.log.exception(f"Audio exception in this channel: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})")
+            self.bot.log.exception(f"Audio exception in this channel: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})", exc_info=e)
 
         if not list_of_files:
             response = "No such file or directory"
@@ -149,7 +149,7 @@ class Music(commands.Cog):
             await ctx.send(f"Now playing: {music_title}")
 
         except Exception as e:
-            self.bot.log.exception(f"Audio exception in this channel: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})")
+            self.bot.log.exception(f"Audio exception in this channel: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})", exc_info=e)
             await ctx.send(f"Something went wrong")
 
 
@@ -208,7 +208,7 @@ class Music(commands.Cog):
 
             await ctx.send('Now playing: {}'.format(player.title))
         except Exception as e:
-            self.bot.log.exception(f"Audio exception in this channel: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})")
+            self.bot.log.exception(f"Audio exception in this channel: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})", exc_info=e)
             await ctx.send(f"Something went wrong")
 
 

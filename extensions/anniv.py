@@ -25,6 +25,7 @@ class Anniversaire(commands.Cog):
                 with open(self.BIRTHDAYS_PATH, "r") as f:
                     birthdays = json.load(f)
             except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
+                self.bot.log.error(f"Catched exeption:", exc_info=e)
                 birthdays = {}
 
             if str(user.id) in birthdays:
@@ -44,6 +45,7 @@ class Anniversaire(commands.Cog):
                 with open(self.BIRTHDAYS_PATH, "r") as f:
                     birthdays = json.load(f)
             except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
+                self.bot.log.error(f"Catched exeption:", exc_info=e)
                 birthdays = {}
 
             birthdays[ctx.author.id] = date
