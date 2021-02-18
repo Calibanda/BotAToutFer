@@ -15,21 +15,24 @@ def bot_init():
         discord.ext.commands.Bot: The Discord bot client ready to go
     """
 
-    load_dotenv() # Loads sensitive constants form env
+    load_dotenv()  # Loads sensitive constants form env
 
     # Create bot
     bot = commands.Bot(command_prefix="!",
                        case_insensitive=True,
-                       description="BotAToutFer, le bot qui fait tout, même le café !",
+                       description="BotAToutFer, le bot qui fait tout, \
+                       même le café !",
                        help_command=None,
                        activity=discord.Game(name="!help"),
                        owner_id=int(os.getenv("OWNER_ID"))
-    )
+                       )
 
     # Add constants as variables in bot object
-    bot.log = logger_init() # Add logger object to bot
-    bot.SCRIPT_DIR = os.path.split(os.path.abspath(__file__))[0] # Add the absolute path to repo directory
-    bot.TOKEN = os.getenv("DISCORD_TOKEN") # Add Discord bot token to bot
+
+    bot.log = logger_init()  # Add logger object to bot
+    # Add the absolute path to repo directory
+    bot.SCRIPT_DIR = os.path.split(os.path.abspath(__file__))[0]
+    bot.TOKEN = os.getenv("DISCORD_TOKEN")  # Add Discord bot token to bot
 
     bot.COFFEE_URL = os.getenv("COFFEE_URL")
     bot.COFFEE_PASSWORD = os.getenv("COFFEE_PASSWORD")
@@ -39,7 +42,6 @@ def bot_init():
     bot.CAT_TOKEN = os.getenv("CAT_TOKEN")
     bot.DICOLINK_TOKEN = os.getenv("DICOLINK_TOKEN")
 
-
     @bot.event
     async def on_ready():
         """When the bot is connected to the guild, print guild informations"""
@@ -48,7 +50,8 @@ def bot_init():
         print(f"{bot.user} is connected to the following guild(s):")
         for guild in bot.guilds:
             print(f"{guild.name} (id: {guild.id})")
-            bot.log.warning(f"{bot.user} is connected to the following guild: {guild.name} (id: {guild.id})")
+            bot.log.warning(f"{bot.user} is connected to the following guild: \
+            {guild.name} (id: {guild.id})")
 
         extensions_to_load = [
             "anniv",
@@ -76,10 +79,9 @@ def bot_init():
                 bot.log.error(f"Erreur avec l'extension {e.name}", exc_info=e)
                 print(f"Erreur avec l'extension {e.name}")
 
-
     @bot.event
     async def on_command_error(ctx, error):
-        """When a command error occures displays the reason in the gild chat"""
+        """When a command error occures displays the reason in gild chat"""
         if hasattr(error, "original"):
             bot.log.error(f"Catched exeption:", exc_info=error.original)
         else:
@@ -87,19 +89,21 @@ def bot_init():
         if isinstance(error, commands.errors.CheckFailure):
             await ctx.send("Nope, t'as pas le droit :P")
         elif isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send("https://tenor.com/bmqvT.gif") # Send a "Did you forget something?" gif
+            # Send a "Did you forget something?" gif
+            await ctx.send("https://tenor.com/bmqvT.gif")
         elif isinstance(error, discord.HTTPException):
-            await ctx.send("https://tenor.com/bmQvt.gif") # Send a "Far too long" gif
+            # Send a "Far too long" gif
+            await ctx.send("https://tenor.com/bmQvt.gif")
         elif isinstance(error, commands.CommandNotFound):
-            await ctx.send("https://tenor.com/uqe8.gif") # Send a "C'est pas faux" gif
+            # Send a "C'est pas faux" gif
+            await ctx.send("https://tenor.com/uqe8.gif")
         else:
-            await ctx.send("https://tenor.com/bj9EB.gif") # Send an error gif
-
+            # Send an error gif
+            await ctx.send("https://tenor.com/bj9EB.gif")
 
     @bot.event
     async def on_error(event, *args, **kwargs):
         bot.log.exception(f"Catched exeption:")
-
 
     @bot.command()
     @commands.is_owner()
@@ -120,7 +124,6 @@ def bot_init():
                 response = f"L'extension *{name}* a bien été chargée"
                 await ctx.send(response)
 
-
     @bot.command()
     @commands.is_owner()
     async def unload(ctx, name=None):
@@ -133,7 +136,6 @@ def bot_init():
             else:
                 response = f"L'extension *{name}* a bien été déchargée"
                 await ctx.send(response)
-
 
     @bot.command(name="reload")
     @commands.is_owner()
@@ -154,12 +156,10 @@ def bot_init():
                 response = f"L'extension *{name}* a bien été rechargée"
                 await ctx.send(response)
 
-
     @bot.command()
     @commands.is_owner()
     async def zero(ctx):
         1/0
-
 
     return bot
 
@@ -172,19 +172,31 @@ def logger_init():
     """
     import logging
 
-    script_dir, script_filename = os.path.split(os.path.abspath(__file__)) # Retreve the directory path of the script
+    # Retreve the directory path of the script
+    script_dir, script_filename = os.path.split(os.path.abspath(__file__))
 
-    log_dir = os.path.join(script_dir, "logs") # The directory containing logs
-    log_file_path = os.path.join(log_dir, datetime.datetime.now().strftime("%Y-%m-%d") + ".log") # Absolute path of the new log file
+    # The directory containing logs
+    log_dir = os.path.join(script_dir, "logs")
+    # Absolute path of the new log file
+    log_file_path = os.path.join(
+        log_dir,
+        datetime.datetime.now().strftime("%Y-%m-%d") + ".log"
+        )
 
-    if not os.path.exists(log_dir): # If the logs directory does not exist, we create it
+    if not os.path.exists(log_dir):
         os.makedirs(log_dir)
 
     # Setting up the logging system
     logger = logging.getLogger("discord")
     logger.setLevel(logging.WARNING)
-    handler = logging.FileHandler(filename=log_file_path, encoding="utf-8", mode="a")
-    handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s"))
+    handler = logging.FileHandler(
+        filename=log_file_path,
+        encoding="utf-8",
+        mode="a"
+        )
+    handler.setFormatter(
+        logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s")
+        )
     logger.addHandler(handler)
 
     return logger
