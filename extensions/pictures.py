@@ -37,19 +37,42 @@ class Pictures(commands.Cog):
                 try:
                     async with aiohttp.ClientSession() as session:
 
-                        if random.choice(["cat", "cat", "cat", "cat", "red panda"]) == "cat":
+                        choice = random.choice(["cat", "cat", "cat", "otter", "red panda"])
+                        if choice == "cat":
                             self.bot.log.warning(f"Asking for a cat pic in this channel: {channel.guild}, #{channel.name} ({channel.id})")
                             async with session.get(f"https://api.thecatapi.com/v1/images/search?api_key={self.bot.CAT_TOKEN}") as r: # Retreve a cat json
                                 if r.status == 200:
                                     cat = await r.json()
                                     message = cat[0]["url"]
 
-                        else:
+                        elif choice == "red panda":
                             self.bot.log.warning(f"Asking a red fox pic in this channel: {channel.guild}, #{channel.name} ({channel.id})")
                             async with session.get("https://some-random-api.ml/img/red_panda") as r: # Retreve a red fox json
                                 if r.status == 200:
                                     red_panda = await r.json()
                                     message = red_panda["link"]
+
+                        else:
+                            subreddit = "Otters"
+                            limit = 50
+                            timeframe = "day" #hour, day, week, month, year, all
+                            listing = "hot" # controversial, best, hot, new, random, rising, top
+
+                            self.bot.log.warning(f"Asking an otter pic in this channel: {channel.guild}, #{channel.name} ({channel.id})")
+                            async with session.get(f"https://www.reddit.com/r/{subreddit}/{listing}.json?limit={limit}&t={timeframe}") as r:
+                                if r.status == 200:
+                                    otter_data = await r.json()
+
+                                    urls = []
+                                    for post in otter_data["data"]["children"]:
+                                        try:
+                                            if post["data"]["post_hint"] == "image" and post["data"]["url"].startswith("https://i.redd.it/"):
+                                                urls.append(post["data"]["url"])
+                                        except Exception as e:
+                                            pass
+
+                                    random.shuffle(urls)
+                                    message = urls[0]
 
                         await channel.send(message)
 
