@@ -21,7 +21,9 @@ class Boules(commands.Cog):
             "boules.json"
             )
 
-    @commands.command(name="boules", help="Envie de vous tabasser les boules ?")
+    @commands.command(
+        name="boules",
+        help="Envie de vous tabasser les boules ?")
     async def boules(self, ctx):
         try:
             with open(self.BOULES_PATH, "r") as f:
@@ -45,7 +47,9 @@ class Boules(commands.Cog):
 
         channel_balls = boules[str(ctx.channel.id)]
 
-        response = f"{ctx.author.mention} a envie de se tabasser les boules "
-        response += f"({channel_balls} paires de boules tabassées dans ce salon, "
-        response += f"{boules['total']} au total)."
+        response = (
+            f"{ctx.author.mention} a envie de se tabasser les boules "
+            + f"({channel_balls} paires de boules tabassées dans ce salon, "
+            + f"{boules['total']} au total).")
+
         await ctx.send(response)
