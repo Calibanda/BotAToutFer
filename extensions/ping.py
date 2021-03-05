@@ -12,7 +12,6 @@ class Ping(commands.Cog):
         self._last_member = None
         self.hidden_cog = True
 
-
     @commands.command(name="ping", help="Répond pong")
     async def ping(self, ctx):
         response = f"pong (latency: {round(self.bot.latency * 1000)}ms)"
