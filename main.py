@@ -1,6 +1,5 @@
 # main.py
 import os
-import datetime
 import json
 
 from dotenv import load_dotenv
@@ -159,6 +158,23 @@ def bot_init():
                 response = f"L'extension *{name}* a bien été rechargée"
                 await ctx.send(response)
 
+    @bot.command(name="reload-all")
+    @commands.is_owner()
+    async def reload_all(ctx):
+        for extension in self.bot.extensions:
+            try:
+                bot.reload_extension(f"extensions.{extension}")
+            except commands.errors.ExtensionNotFound as e:
+                response = f"**L'extension *{e.name}* n'existe pas !**"
+                await ctx.send(response)
+            except commands.errors.ExtensionError as e:
+                bot.log.error(f"Erreur avec l'extension {e.name}", exc_info=e)
+                response = f"**Erreur avec l'extension {e.name}**"
+                await ctx.send(response)
+
+        response = "Extensions rechargées"
+        await ctx.send(response)
+
     @bot.command()
     @commands.is_owner()
     async def zero(ctx):
@@ -174,6 +190,7 @@ def logger_init():
         logging.Logger: The logger object ready to go
     """
     import logging
+    from logging.handlers import TimedRotatingFileHandler
 
     # Retreve the directory path of the script
     script_dir, script_filename = os.path.split(os.path.abspath(__file__))
@@ -181,10 +198,7 @@ def logger_init():
     # The directory containing logs
     log_dir = os.path.join(script_dir, "logs")
     # Absolute path of the new log file
-    log_file_path = os.path.join(
-        log_dir,
-        datetime.datetime.now().strftime("%Y-%m-%d") + ".log"
-        )
+    log_file_path = os.path.join(log_dir, "botatoutfer.log")
 
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
@@ -192,14 +206,16 @@ def logger_init():
     # Setting up the logging system
     logger = logging.getLogger("discord")
     logger.setLevel(logging.WARNING)
-    handler = logging.FileHandler(
+    handler = TimedRotatingFileHandler(
         filename=log_file_path,
-        encoding="utf-8",
-        mode="a"
-        )
+        when='midnight',
+        interval=1,
+        encoding="utf-8"
+    )
+    handler.suffix = "%Y-%m-%d"
     handler.setFormatter(
         logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s")
-        )
+    )
     logger.addHandler(handler)
 
     return logger
