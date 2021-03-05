@@ -8,7 +8,7 @@ def setup(bot):
     bot.add_cog(Roll_dice(bot))
 
 
-class Roll_dice(commands.Cog):
+class Roll_dice(commands.Cog, name='Jets de dés'):
     def __init__(self, bot):
         self.bot = bot
         self._last_member = None
