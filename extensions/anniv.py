@@ -45,7 +45,7 @@ class Anniversaire(commands.Cog):
         await ctx.send(response)
 
     @commands.command(
-        name="mon_anniv",
+        name="mon-anniv",
         help=("Permet d'enregistrer sa date de naissance "
         + "sous la forme DD/MM/YYYY"))
     async def mon_anniv(self, ctx, date: str=""):
