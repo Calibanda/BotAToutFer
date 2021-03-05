@@ -14,7 +14,6 @@ class Boules(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self._last_member = None
-        self.hidden_cog = True
         # Path of the json file containing the balls counter
         self.BOULES_PATH = os.path.join(
             self.bot.SCRIPT_DIR,
@@ -22,7 +21,7 @@ class Boules(commands.Cog):
             "boules.json"
             )
 
-    @commands.command()
+    @commands.command(name="boules", help="Envie de vous tabasser les boules ?")
     async def boules(self, ctx):
         try:
             with open(self.BOULES_PATH, "r") as f:
