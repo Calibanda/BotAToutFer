@@ -55,6 +55,7 @@ def bot_init():
 
         extensions_to_load = [
             "anniv",
+            "boules",
             "dice",
             "discussion",
             "drinks",
