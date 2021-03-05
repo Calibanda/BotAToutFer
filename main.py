@@ -20,8 +20,8 @@ def bot_init():
     # Create bot
     bot = commands.Bot(command_prefix="!",
                        case_insensitive=True,
-                       description="BotAToutFer, le bot qui fait tout, \
-                       même le café !",
+                       description=("BotAToutFer, le bot qui fait tout, "
+                       + "même le café !"),
                        help_command=None,
                        activity=discord.Game(name="!help"),
                        owner_id=int(os.getenv("OWNER_ID"))
@@ -50,8 +50,10 @@ def bot_init():
         print(f"{bot.user} is connected to the following guild(s):")
         for guild in bot.guilds:
             print(f"{guild.name} (id: {guild.id})")
-            bot.log.warning(f"{bot.user} is connected to the following guild: \
-            {guild.name} (id: {guild.id})")
+            bot.log.warning(
+                f"{bot.user} is connected to the following guild: "
+                + f"{guild.name} (id: {guild.id})"
+                )
 
         extensions_to_load = [
             "anniv",

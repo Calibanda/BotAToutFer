@@ -54,8 +54,9 @@ class Discussion(commands.Cog):
             + "avant Noël ! :christmas_tree:")
         await ctx.send(response)
 
-        response = f"Un peu de patience {ctx.author.mention}, \
-        je sais que tu veux tes cadeaux petit vénal :gift:"
+        response = (
+            f"Un peu de patience {ctx.author.mention}, "
+            + "je sais que tu veux tes cadeaux petit vénal :gift:")
         await ctx.send(response)
 
     @commands.command(name="crepes", help="Et pas galette hein ?")

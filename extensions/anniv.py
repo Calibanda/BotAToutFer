@@ -36,8 +36,8 @@ class Anniversaire(commands.Cog):
                 birthdays = {}
 
             if str(user.id) in birthdays:
-                response = f"L'anniv de cette chouette personne est le \
-                {birthdays[str(user.id)][:-5]}"
+                response = ("L'anniv de cette chouette personne est le "
+                    + f"{birthdays[str(user.id)][:-5]}")
             else:
                 response = f"Jamais entendu parler de cette personne"
         else:
@@ -46,8 +46,8 @@ class Anniversaire(commands.Cog):
 
     @commands.command(
         name="mon_anniv",
-        help="Permet d'enregistrer sa date de naissance \
-        sous la forme DD/MM/YYYY")
+        help=("Permet d'enregistrer sa date de naissance "
+        + "sous la forme DD/MM/YYYY"))
     async def mon_anniv(self, ctx, date: str=""):
         date = re.search(r"\d{2}\/\d{2}\/\d{4}", date)[0]
         if date:
@@ -63,8 +63,8 @@ class Anniversaire(commands.Cog):
             with open(self.BIRTHDAYS_PATH, "w") as f:
                 json.dump(birthdays, f, indent=4)
 
-            response = f"C'est bon ! \
-            Je me souvendrai de ta date de naissance !"
+            response = ("C'est bon ! "
+                + "Je me souvendrai de ta date de naissance !")
         else:
-            response = f"Euhhh, c'est quoi cette date bourrée ?"
+            response = "Euhhh, c'est quoi cette date bourrée ?"
         await ctx.send(response)

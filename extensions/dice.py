@@ -136,9 +136,10 @@ class Roll_dice(commands.Cog):
                         "2 Côté lumineux :white_circle: :white_circle:",
                     ]
                 else:
-                    response = "Merci de choisir un dé parmi : \
-                    fortune (ou f), infortune (ou i), aptitude (ou a), \
-                    difficulte (ou d), maitrise (ou m), defi, force"
+                    response = (
+                        "Merci de choisir un dé parmi : "
+                        + "fortune (ou f), infortune (ou i), aptitude (ou a)"
+                        + ", difficulte (ou d), maitrise (ou m), defi, force")
                     await ctx.send(response)
                     return
 
