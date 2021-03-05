@@ -161,7 +161,7 @@ def bot_init():
     @bot.command(name="reload-all")
     @commands.is_owner()
     async def reload_all(ctx):
-        for extension in self.bot.extensions:
+        for extension in bot.extensions:
             try:
                 bot.reload_extension(f"extensions.{extension}")
             except commands.errors.ExtensionNotFound as e:
