@@ -31,7 +31,10 @@ class Boules(commands.Cog):
             self.bot.log.error(f"Catched exeption:", exc_info=e)
             boules = {}
 
-        boules["total"] += 1
+        try:
+            boules["total"] += 1
+        except KeyError:
+            boules["total"] = 1
 
         if str(ctx.channel.id) in boules:
             boules[str(ctx.channel.id)] += 1
