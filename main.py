@@ -17,14 +17,17 @@ def bot_init():
     load_dotenv()  # Loads sensitive constants form env
 
     # Create bot
-    bot = commands.Bot(command_prefix="!",
-                       case_insensitive=True,
-                       description=("BotAToutFer, le bot qui fait tout, "
-                       + "même le café !"),
-                       help_command=None,
-                       activity=discord.Game(name="!help"),
-                       owner_id=int(os.getenv("OWNER_ID"))
-                       )
+    bot = commands.Bot(
+        command_prefix="!",
+        case_insensitive=True,
+        description=(
+            "BotAToutFer, le bot qui fait tout, "
+            + "même le café !"
+        ),
+        help_command=None,
+        activity=discord.Game(name="!help"),
+        owner_id=int(os.getenv("OWNER_ID"))
+    )
 
     # Add constants as variables in bot object
 
@@ -52,7 +55,7 @@ def bot_init():
             bot.log.warning(
                 f"{bot.user} is connected to the following guild: "
                 + f"{guild.name} (id: {guild.id})"
-                )
+            )
 
         extensions_to_load = [
             "anniv",
