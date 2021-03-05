@@ -144,7 +144,7 @@ class Quotes(commands.Cog):
         await ctx.send(response)
 
 
-    @commands.command(name="good_place", help="Répond une réplique de TGP")
+    @commands.command(name="good-place", help="Répond une réplique de TGP")
     async def good_place(self, ctx):
         response = random.choice(self.the_good_place_quotes)
         await ctx.send(response)
