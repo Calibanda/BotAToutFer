@@ -163,7 +163,7 @@ def bot_init():
     async def reload_all(ctx):
         for extension in bot.extensions:
             try:
-                bot.reload_extension(extension})
+                bot.reload_extension(extension)
             except commands.errors.ExtensionNotFound as e:
                 response = f"**L'extension *{e.name}* n'existe pas !**"
                 await ctx.send(response)
