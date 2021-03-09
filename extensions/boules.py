@@ -25,10 +25,17 @@ class Boules(commands.Cog):
             "J'aurais pas aimé...",
             "Sans rancune hein ?",
             (
-                "Ouch alors ça, qu'on soit de cet univers ou d'un autre,"
-                + " ça doit faire très très mal !"
+                "Ouch alors ça, qu'on soit de cet univers ou d'un autre, "
+                + "ça doit faire très très mal !"
             ),
-            "Ah, ça a fait un sale bruit."
+            "Ah, ça a fait un sale bruit.",
+            "À force, elles seront comme du fer.",
+            "La prochaine fois je lui ferai pas confiance...",
+            "Je peux même fournir le bâton :innocent:",
+            (
+                "Je comprendrai jamais le goût qu'ont les humains "
+                + "pour le masochisme..."
+            )
         ]
 
     @commands.command(
