@@ -35,48 +35,51 @@ class Boules(commands.Cog):
         name="boules",
         help="Envie de vous tabasser les boules ?")
     async def boules(self, ctx, *, user=None):
-        try:
+        try:  # Try to retrieve the balls history from file
             with open(self.BOULES_PATH, "r") as f:
                 boules = json.load(f)
         except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
+            # boules.json does not exist, we create a empty dictionary
             self.bot.log.error(f"Catched exeption:", exc_info=e)
-            boules = {}
-
-        try:
-            boules["total"] += 1
-        except KeyError:
-            boules["total"] = 1
+            boules = {
+                'total': 0
+            }
 
         if str(ctx.channel.id) in boules:
             boules[str(ctx.channel.id)] += 1
         else:
             boules[str(ctx.channel.id)] = 1
 
-        with open(self.BOULES_PATH, "w") as f:
-            json.dump(boules, f, indent=4)
+        boules["total"] += 1
 
         channel_balls = boules[str(ctx.channel.id)]
+
+        with open(self.BOULES_PATH, "w") as f:
+            # Save dictionary in boules.json
+            json.dump(boules, f, indent=4)
 
         try:
             converter = UserConverter()
             user = await converter.convert(ctx, user)
             mention = user.mention
-        except commands.BadArgument as e:
+        except Exception as e:
             mention = user
 
         if user:
             response = (
-                f"{ctx.author.mention} a envie de tabasser les boules de "
-                + f"{mention} ({channel_balls} paires de boules "
-                + f"tabassées dans ce salon, {boules['total']} au total).\n"
-                + random.choice(self.messages)
+                f"{ctx.author.mention} a envie de tabasser "
+                + f"les boules de {mention} "
             )
 
         else:
             response = (
                 f"{ctx.author.mention} a envie de se tabasser les boules "
-                + f"({channel_balls} paires de boules "
-                + f"tabassées dans ce salon, {boules['total']} au total)."
             )
+
+        response += (
+            f"({channel_balls} paires de boules tabassées "
+            + f"dans ce salon, {boules['total']} au total).\n"
+            + random.choice(self.messages)
+        )
 
         await ctx.send(response)
