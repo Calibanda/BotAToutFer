@@ -23,7 +23,7 @@ class Boules(commands.Cog):
             )
         self.messages = [
             "J'aurais pas aimé...",
-            "Sans racune hein ?",
+            "Sans rancune hein ?",
             (
                 "Ouch alors ça, qu'on soit de cet univers ou d'un autre,"
                 + " ça doit faire très très mal !"
