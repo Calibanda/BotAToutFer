@@ -1,6 +1,7 @@
 # boules commands for BotÀToutFer
 import os
 import json
+import random
 
 import discord
 from discord.ext import commands
@@ -20,11 +21,20 @@ class Boules(commands.Cog):
             "package",
             "boules.json"
             )
+        self.messages = [
+            "J'aurais pas aimé...",
+            "Sans racune hein ?",
+            (
+                "Ouch alors ça, qu'on soit de cet univers ou d'un autre,"
+                + " ça doit faire très très mal !"
+            ),
+            "Ah, ça a fait un sale bruit."
+        ]
 
     @commands.command(
         name="boules",
         help="Envie de vous tabasser les boules ?")
-    async def boules(self, ctx):
+    async def boules(self, ctx, user: discord.User = None):
         try:
             with open(self.BOULES_PATH, "r") as f:
                 boules = json.load(f)
@@ -47,9 +57,24 @@ class Boules(commands.Cog):
 
         channel_balls = boules[str(ctx.channel.id)]
 
-        response = (
-            f"{ctx.author.mention} a envie de se tabasser les boules "
-            + f"({channel_balls} paires de boules tabassées dans ce salon, "
-            + f"{boules['total']} au total).")
+        try:
+            mention = user.mention
+        except Exception
+            mention = user
+
+        if user:
+            response = (
+                f"{ctx.author.mention} a envie de tabasser les boules de"
+                + f"{mention} ({channel_balls} paires de boules "
+                + f"tabassées dans ce salon, {boules['total']} au total).\n"
+                + random.choice(self.messages)
+            )
+
+        else:
+            response = (
+                f"{ctx.author.mention} a envie de se tabasser les boules "
+                + f"({channel_balls} paires de boules "
+                + f"tabassées dans ce salon, {boules['total']} au total)."
+            )
 
         await ctx.send(response)
