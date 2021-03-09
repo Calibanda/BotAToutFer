@@ -5,7 +5,7 @@ import random
 
 import discord
 from discord.ext import commands
-
+from discord.ext.commands import UserConverter
 
 def setup(bot):
     bot.add_cog(Boules(bot))
@@ -34,7 +34,7 @@ class Boules(commands.Cog):
     @commands.command(
         name="boules",
         help="Envie de vous tabasser les boules ?")
-    async def boules(self, ctx, user: discord.User = None):
+    async def boules(self, ctx, *, user=None):
         try:
             with open(self.BOULES_PATH, "r") as f:
                 boules = json.load(f)
@@ -58,13 +58,15 @@ class Boules(commands.Cog):
         channel_balls = boules[str(ctx.channel.id)]
 
         try:
+            converter = UserConverter()
+            user = await converter.convert(ctx, user)
             mention = user.mention
-        except Exception as e:
+        except commands.BadArgument as e:
             mention = user
 
         if user:
             response = (
-                f"{ctx.author.mention} a envie de tabasser les boules de"
+                f"{ctx.author.mention} a envie de tabasser les boules de "
                 + f"{mention} ({channel_balls} paires de boules "
                 + f"tabassées dans ce salon, {boules['total']} au total).\n"
                 + random.choice(self.messages)
