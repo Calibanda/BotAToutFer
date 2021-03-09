@@ -55,6 +55,7 @@ class Jokes(commands.Cog):
             # await self.bot.process_commands(message)
             return
         else:  # This doesn't invoke a command!
+            words_in_message = []
             for word in re.split("\W", message.content.lower()):
                 # We split the words in the message
                 # on any non word character (\W)
