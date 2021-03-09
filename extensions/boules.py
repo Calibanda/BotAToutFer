@@ -59,7 +59,7 @@ class Boules(commands.Cog):
 
         try:
             mention = user.mention
-        except Exception
+        except Exception as e:
             mention = user
 
         if user:
