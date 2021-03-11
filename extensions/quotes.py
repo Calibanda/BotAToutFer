@@ -137,26 +137,25 @@ class Quotes(commands.Cog):
             "Ces conneries de gauche et de droite ! Ça veut rien dire ces machins ! Selon comme on est tourné ça change tout !",
         ]
 
-
     @commands.command(name="99", help="Répond une réplique de B99")
     async def nine_nine(self, ctx):
         response = random.choice(self.brooklyn_99_quotes)
         await ctx.send(response)
-
 
     @commands.command(name="good-place", help="Répond une réplique de TGP")
     async def good_place(self, ctx):
         response = random.choice(self.the_good_place_quotes)
         await ctx.send(response)
 
-
     @commands.command(name="sherlock", help="Répond une réplique de Sherlock")
     async def sherlock(self, ctx):
         response = random.choice(self.sherlock_quotes)
         await ctx.send(response)
 
-
-    @commands.command(name="kaamelott", help="Répond une réplique de Kaamelott")
+    @commands.command(
+        name="kaamelott",
+        help="Répond une réplique de Kaamelott"
+    )
     async def kaamelott(self, ctx):
         response = random.choice(self.kaamelott_quotes)
         if len(response) < 2000:

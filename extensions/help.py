@@ -54,10 +54,10 @@ class Help(commands.Cog):
             cog_help += "\n"
 
             if len(response + cog_help) + 3 < 2000:
-                # If next help can be added without exeed the Discord limit
+                # If next help can be added without exceed the Discord limit
                 response += cog_help  # We add the cog help to the response
             else:
-                # If cog help CANNOT be added without exeed the Discord limit
+                # If cog help CANNOT be added without exceed the Discord limit
                 response += "```"
                 await ctx.send(response)  # We send the response
                 response = "```\n"  # We create a new response

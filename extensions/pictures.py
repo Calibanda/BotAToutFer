@@ -31,7 +31,7 @@ class Pictures(commands.Cog):
                         self.bot.get_channel(int(channel_id))
                     )
         except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
-            self.bot.log.error(f"Catched exeption:", exc_info=e)
+            self.bot.log.error(f"Caught exception:", exc_info=e)
 
     def cog_unload(self):
         self.cat.cancel()
@@ -41,7 +41,7 @@ class Pictures(commands.Cog):
         for channel in self.cat_authorized_channels:
             if (random.randrange(180) < 1
                     and datetime.datetime.now().hour in range(7, 23)):
-                # Statisticly send 1 message per day
+                # Statistically send 1 message per day
                 # (one chance on 160 every 6 minutes between 7AM and 11PM)
                 try:
                     async with aiohttp.ClientSession() as session:
@@ -62,7 +62,7 @@ class Pictures(commands.Cog):
                                 + f"api_key={self.bot.CAT_TOKEN}"
                             )
                             async with session.get(url) as r:
-                                # Retreve a cat json
+                                # Retrieve a cat json
                                 if r.status == 200:
                                     cat = await r.json()
                                     message = cat[0]["url"]
@@ -77,7 +77,7 @@ class Pictures(commands.Cog):
                             )
                             url = "https://some-random-api.ml/img/red_panda"
                             async with session.get(url) as r:
-                                # Retreve a red fox json
+                                # Retrieve a red fox json
                                 if r.status == 200:
                                     red_panda = await r.json()
                                     message = red_panda["link"]

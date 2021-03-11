@@ -21,22 +21,27 @@ class Discussion(commands.Cog):
             + "Ensuite tu sais pas qui je suis ? Sérieux ?\n"
             + "Alors pour ta culture je suis le grand "
             + f"{self.bot.user.mention}, le bot Discord qui fait tout, "
-            + "même le café !")
+            + "même le café !"
+        )
         await ctx.send(response)
 
     @commands.command(
         name="noel",
-        help="Donne le nombre de jours restants avant Noël")
+        help="Donne le nombre de jours restants avant Noël"
+    )
     async def noel(self, ctx):
         time_delta = (
             datetime.datetime(
                 datetime.datetime.today().year, 12, 25, 0, 0, 0)
-            - datetime.datetime.now())
+            - datetime.datetime.now()
+        )
         if time_delta.days < 0:
             time_delta = (
                 datetime.datetime(
-                    datetime.datetime.today().year + 1, 12, 25, 0, 0, 0)
-                - datetime.date.now())
+                    datetime.datetime.today().year + 1, 12, 25, 0, 0, 0
+                )
+                - datetime.date.now()
+            )
 
         seconds = int(round(time_delta.total_seconds(), 0))
         days = seconds // 86400
@@ -51,12 +56,14 @@ class Discussion(commands.Cog):
         response = (
             f"Il reste {days} jour(s), {hours} heure(s), "
             + f"{minutes} minute(s) et {seconds} seconde(s) "
-            + "avant Noël ! :christmas_tree:")
+            + "avant Noël ! :christmas_tree:"
+        )
         await ctx.send(response)
 
         response = (
             f"Un peu de patience {ctx.author.mention}, "
-            + "je sais que tu veux tes cadeaux petit vénal :gift:")
+            + "je sais que tu veux tes cadeaux petit vénal :gift:"
+        )
         await ctx.send(response)
 
     @commands.command(name="crepes", help="Et pas galette hein ?")
@@ -80,5 +87,6 @@ class Discussion(commands.Cog):
             + "6/ Ajoutez le beurre fondu.\n"
             + "7/ Huilez une crêpière très chaude "
             + "et formez des crêpes à l'aide d'une petite louche.\n"
-            + "8/ Ajoutez le beurre fondu.\n")
+            + "8/ Ajoutez le beurre fondu.\n"
+        )
         await ctx.send(response)

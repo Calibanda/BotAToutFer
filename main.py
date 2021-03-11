@@ -1,6 +1,5 @@
 # main.py
 import os
-import json
 
 from dotenv import load_dotenv
 import discord
@@ -46,7 +45,7 @@ def bot_init():
 
     @bot.event
     async def on_ready():
-        """When the bot is connected to the guild, print guild informations"""
+        """When the bot is connected to the guild, print guild information"""
         print(f"Logged in as {bot.user} (user ID: {bot.user.id})")
         bot.log.warning(f"Logged in as {bot.user} (user ID: {bot.user.id})")
         print(f"{bot.user} is connected to the following guild(s):")
@@ -73,7 +72,7 @@ def bot_init():
             "quotes",
             # "santa",
             "says",
-            "utilitaries",
+            "utilities",
             "vbe_music",
         ]
 
@@ -86,11 +85,11 @@ def bot_init():
 
     @bot.event
     async def on_command_error(ctx, error):
-        """When a command error occures displays the reason in gild chat"""
+        """When a command error occurs, displays the reason in gild chat"""
         if hasattr(error, "original"):
-            bot.log.error(f"Catched exeption:", exc_info=error.original)
+            bot.log.error(f"Caught exception:", exc_info=error.original)
         else:
-            bot.log.error(f"Catched exeption:", exc_info=error)
+            bot.log.error(f"Caught exception:", exc_info=error)
         if isinstance(error, commands.errors.CheckFailure):
             await ctx.send("Nope, t'as pas le droit :P")
         elif isinstance(error, commands.MissingRequiredArgument):
@@ -108,7 +107,7 @@ def bot_init():
 
     @bot.event
     async def on_error(event, *args, **kwargs):
-        bot.log.exception(f"Catched exeption:")
+        bot.log.exception(f"Caught exception:")
 
     @bot.command()
     @commands.is_owner()
@@ -195,7 +194,7 @@ def logger_init():
     import logging
     from logging.handlers import TimedRotatingFileHandler
 
-    # Retreve the directory path of the script
+    # Retrieve the directory path of the script
     script_dir, script_filename = os.path.split(os.path.abspath(__file__))
 
     # The directory containing logs

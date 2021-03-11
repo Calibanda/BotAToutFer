@@ -40,12 +40,12 @@ class Drinks(commands.Cog):
             response = (
                 "https://tenor.com/view/still-waiting-for-reply-waiting-"
                 + "patience-bored-hurry-up-gif-10179642"
-                )
+            )
 
         except Exception as e:
             self.bot.log.exception(
                 (
-                    f"An exception occured during HTCPCP START : "
+                    f"An exception occurred during HTCPCP START : "
                     + f"{ctx.channel.guild}, "
                     + f"#{ctx.channel.name} ({ctx.channel.id})"
                 ),
@@ -82,12 +82,12 @@ class Drinks(commands.Cog):
             response = (
                 "https://tenor.com/view/still-waiting-for-reply-waiting-"
                 + "patience-bored-hurry-up-gif-10179642"
-                )
+            )
 
         except Exception as e:
             self.bot.log.exception(
                 (
-                    "An exception occured during HTCPCP STOP : "
+                    "An exception occurred during HTCPCP STOP : "
                     + f"{ctx.channel.guild}, "
                     + f"#{ctx.channel.name} ({ctx.channel.id})"
                 ),
@@ -100,7 +100,8 @@ class Drinks(commands.Cog):
 
     @commands.command(
         name="coffee-when",
-        help="Affiche depuis combien de temps le café a été lancé")
+        help="Affiche depuis combien de temps le café a été lancé"
+    )
     @commands.has_role("CoffeeMaker")
     async def coffee_when(self, ctx):
         try:

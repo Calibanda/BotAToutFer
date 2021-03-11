@@ -23,7 +23,7 @@ class Pendu(commands.Cog):
         #     "secret_word": "",
         #     "visible_word": "",
         #     "number_stroke": 10,
-        #     "gessed_letters": [],
+        #     "guessed_letters": [],
         #     "definition": "",
         #     "starting_time": datetime.datetime
         # }}
@@ -78,7 +78,7 @@ class Pendu(commands.Cog):
                 + visible_word.replace("*", "\*")
                 + "\nLes lettres déjà proposées : "
             )
-            for letter in self.games[ctx.channel.id]["gessed_letters"]:
+            for letter in self.games[ctx.channel.id]["guessed_letters"]:
                 response += f"{letter} "
             response += (
                 "\nLe pendu :\n```\n"
@@ -107,7 +107,7 @@ class Pendu(commands.Cog):
                 # Players have 10 strokes to find the word
                 game["number_stroke"] = 10
                 # Create the list to store all the guessed letters
-                game["gessed_letters"] = []
+                game["guessed_letters"] = []
                 # The definition of the word
                 game["definition"] = (
                     "Désolé, je n'ai pas trouvé cette définition..."
@@ -122,7 +122,7 @@ class Pendu(commands.Cog):
                             + f"?limite=1&api_key={self.bot.DICOLINK_TOKEN}"
                         )
                         async with session.get(url) as r:
-                            # Retreve a definition
+                            # Retrieve a definition
                             if r.status == 200:
                                 definit = await r.json()
                                 game["definition"] = definit[0]["definition"]
@@ -214,20 +214,20 @@ class Pendu(commands.Cog):
             # If a game is currently running in this text channel
             response = ""
             guessed_letters = []  # Clean list of guessed letters
-            for letters in self.games[ctx.channel.id]["gessed_letters"]:
+            for letters in self.games[ctx.channel.id]["guessed_letters"]:
                 guessed_letters.append(
-                    re.findall(r"[a-z]", element, flags=re.IGNORECASE)[0]
+                    re.findall(r"[a-z]", letters, flags=re.IGNORECASE)[0]
                 )
 
             if option in guessed_letters:
-                # If the gessed letter has already been guessed
+                # If the guessed letter has already been guessed
                 response = f"Vous avez déjà demandé la lettre {option} !"
 
             elif option in self.games[ctx.channel.id]["secret_word"]:
-                # If the gessed letter is in the secret word
+                # If the guessed letter is in the secret word
                 response = "Oui !"
-                # Add the letter to the gessed letters list
-                self.games[ctx.channel.id]["gessed_letters"].append(option)
+                # Add the letter to the guessed letters list
+                self.games[ctx.channel.id]["guessed_letters"].append(option)
 
                 length_secret_word = len(
                     self.games[ctx.channel.id]["secret_word"]
@@ -263,8 +263,8 @@ class Pendu(commands.Cog):
             else:  # If the guessed letter is not in the secret word
                 response = "Non !"
 
-                # Add the letter to the gessed letters list
-                self.games[ctx.channel.id]["gessed_letters"].append(
+                # Add the letter to the guessed letters list
+                self.games[ctx.channel.id]["guessed_letters"].append(
                     f"~~{option}~~"
                 )
                 # Decrement the stroke number

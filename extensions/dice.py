@@ -5,17 +5,18 @@ from discord.ext import commands
 
 
 def setup(bot):
-    bot.add_cog(Roll_dice(bot))
+    bot.add_cog(RollDice(bot))
 
 
-class Roll_dice(commands.Cog, name='Jets de dés'):
+class RollDice(commands.Cog, name='Jets de dés'):
     def __init__(self, bot):
         self.bot = bot
         self._last_member = None
 
     @commands.command(
         name="roll",
-        help="Simule un lancer de dés au format xDx")
+        help="Simule un lancer de dés au format xDx"
+    )
     async def roll(self, ctx, dice: str=""):
         """Rolls a dice in xDx format."""
         try:
@@ -29,18 +30,20 @@ class Roll_dice(commands.Cog, name='Jets de dés'):
                 response = (
                     f"**{total}** ("
                     + " + ".join(str(d) for d in dices)
-                    + f" = {total})")
+                    + f" = {total})"
+                )
             else:
                 response = "Ohh la flemme de lancer tous ces dés !"
 
             await ctx.send(response)
         except Exception as e:
-            self.bot.log.error(f"Catched exeption:", exc_info=e)
+            self.bot.log.error(f"Caught exception:", exc_info=e)
             await ctx.send('Format has to be in xDx!')
 
     @commands.command(
         name="roll-sw",
-        help="Simule un lancer de dés Star Wars au format xD<name>")
+        help="Simule un lancer de dés Star Wars au format xD<name>"
+    )
     async def roll_sw(self, ctx, dice: str=""):
         """Rolls a dice in xD<name> format."""
         try:
@@ -118,7 +121,7 @@ class Roll_dice(commands.Cog, name='Jets de dés'):
                         "Menace :snowflake:",
                         "2 Menaces :snowflake: :snowflake:",
                         "2 Menaces :snowflake: :snowflake:",
-                        "Désatre :rotating_light:"
+                        "Désastre :rotating_light:"
                     ]
                 elif dice_type == "force":
                     sides = [
@@ -139,14 +142,15 @@ class Roll_dice(commands.Cog, name='Jets de dés'):
                     response = (
                         "Merci de choisir un dé parmi : fortune (ou f), "
                         + "infortune (ou i), aptitude (ou a), "
-                        + "maitrise (ou m), defi, force")
+                        + "maitrise (ou m), defi, force"
+                    )
                     await ctx.send(response)
                     return
 
-                dices = [random.choice(sides) for r in range(number_of_dice)]
+                dices = [random.choice(sides) for _ in range(number_of_dice)]
                 response = " + ".join(str(d) for d in dices)
 
             await ctx.send(response)
         except Exception as e:
-            self.bot.log.error(f"Catched exeption:", exc_info=e)
+            self.bot.log.error(f"Caught exception:", exc_info=e)
             await ctx.send('Format has to be in xD<name>!')

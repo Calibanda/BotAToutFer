@@ -20,7 +20,7 @@ class Boules(commands.Cog):
             self.bot.SCRIPT_DIR,
             "package",
             "boules.json"
-            )
+        )
         self.messages = [
             "J'aurais pas aimé...",
             "Sans rancune hein ?",
@@ -40,14 +40,15 @@ class Boules(commands.Cog):
 
     @commands.command(
         name="boules",
-        help="Envie de vous tabasser les boules ?")
+        help="Envie de vous tabasser les boules ?"
+    )
     async def boules(self, ctx, *, user=None):
         try:  # Try to retrieve the balls history from file
             with open(self.BOULES_PATH, "r") as f:
                 boules = json.load(f)
         except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
             # boules.json does not exist, we create a empty dictionary
-            self.bot.log.error(f"Catched exeption:", exc_info=e)
+            self.bot.log.error(f"Caught exception:", exc_info=e)
             boules = {
                 'total': 0
             }
