@@ -91,3 +91,8 @@ class Boules(commands.Cog):
         )
 
         await ctx.send(response)
+
+    @commands.command(name="boule", hidden=True)
+    async def boule(self, ctx):
+        response = f"Ah, {ctx.author.mention} est monoboule ?"
+        await ctx.send(response)
