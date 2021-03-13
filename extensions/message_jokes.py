@@ -73,6 +73,7 @@ class Jokes(commands.Cog):
             await self.respect(message, words_in_message)
             await self.what(message, words_in_message)
             await self.rip(message, words_in_message)
+            await self.alerte(message, words_in_message)
 
     async def joke_je_suis(self, message):
         has_suis = False
@@ -179,5 +180,14 @@ class Jokes(commands.Cog):
             response = (  # Send a "RIP" gif
                 "https://tenor.com/view/rip-coffin-black-ghana-"
                 + "celebrating-gif-16743302"
+            )
+            await message.channel.send(response)
+
+    async def alerte(self, message, words_in_message):
+        if "alerte" in words_in_message:
+            # If the word "alerte" in the original message
+            response = (  # Send a "ALERTE GÉNÉRALE !" gif
+                "https://tenor.com/view/shout-yell-alerte-generale-alert-"
+                + "alerted-general-gif-17332933"
             )
             await message.channel.send(response)
