@@ -1,4 +1,4 @@
-# Utilitaries command for BotÀToutFer
+# Utilities command for BotÀToutFer
 import os
 import random
 import json
@@ -67,7 +67,9 @@ class Utilitaire(commands.Cog):
                         # been displayed by the bot
                         with open(self.LAST_NEWS_URL_PATH, "r") as f:
                             old_news = json.load(f)
-                    except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
+                    except (
+                            FileNotFoundError, json.decoder.JSONDecodeError
+                    ) as e:
                         self.bot.log.error(f"Caught exception:", exc_info=e)
                         old_news = []
 
@@ -331,7 +333,6 @@ class Utilitaire(commands.Cog):
                         program_infos = channel.findAll(
                             class_="doubleBroadcastCard-infos"
                         )
-                        program = []
 
                         channel_response = (
                             f"\n  Sur la chaîne {channel_name} "
@@ -448,9 +449,17 @@ class Utilitaire(commands.Cog):
                             response = "Ce mot n'existe pas"
                         await ctx.send(response)
 
-    @commands.command(name="marmiton", help="Retourne des recettes liées à un thème donné sur marmiton")
+    @commands.command(
+        name="marmiton",
+        help="Retourne des recettes liées à un thème donné sur marmiton"
+    )
     async def marmiton(self, ctx, *, options:str=""):
-        # marmiton_regex = r"^(\w+ ?)+(((-n|--nombre) \d+ ?)|((-p|--plat) (accompagnement ?|amusegueule ?|boisson ?|confiserie ?|conseil ?|dessert ?|entree ?|platprincipal ?|sauce ?)+)|((-d|--difficulte) (1 ?|2 ?|3 ?|4 ?)+)|((-c|--cout) (1 ?|2 ?|3 ?)+)|((-r|--restriction) (1 ?|2 ?|3 ?|4 ?)+)|((-t|--temps) (15 ?|30 ?|45 ?))|(--cuisson (1 ?|2 ?|3 ?)+)|((-s|-saison) ?))*$"
+        # marmiton_regex = r"^(\w+ ?)+(((-n|--nombre) \d+ ?)|((-p|--plat)
+        # (accompagnement ?|amusegueule ?|boisson ?|confiserie ?|conseil
+        # ?|dessert ?|entree ?|platprincipal ?|sauce ?)+)|((-d|--difficulte)
+        # (1 ?|2 ?|3 ?|4 ?)+)|((-c|--cout) (1 ?|2 ?|3 ?)+)|((-r|--restriction)
+        # (1 ?|2 ?|3 ?|4 ?)+)|((-t|--temps) (15 ?|30 ?|45 ?))|(--cuisson
+        # (1 ?|2 ?|3 ?)+)|((-s|-saison) ?))*$"
         try:
             options = options.strip()
             research = options.split(" -")[0]
@@ -458,31 +467,55 @@ class Utilitaire(commands.Cog):
             if research:
 
                 try:
-                    nb_recepies = int(re.search(r"((?<=-n )\d+|(?<=--nombre )\d+)", options)[0])
+                    nb_recipes = int(re.search(
+                        r"((?<=-n )\d+|(?<=--nombre )\d+)", options
+                    )[0])
                 except TypeError:
-                    nb_recepies = 2
+                    nb_recipes = 2
 
                 try:
-                    re_plats = r"((?<=-p )(accompagnement ?|amusegueule ?|boisson ?|confiserie ?|conseil ?|dessert ?|entree ?|platprincipal ?|sauce ?)+|(?<=--plat )(accompagnement ?|amusegueule ?|boisson ?|confiserie ?|conseil ?|dessert ?|entree ?|platprincipal ?|sauce ?)+)"
+                    re_plats = (
+                        r"((?<=-p )(accompagnement ?|amusegueule ?|boisson "
+                        + r"?|confiserie ?|conseil ?|dessert ?|entree "
+                        + r"?|platprincipal ?|sauce ?)+|(?<=--plat )"
+                        + r"(accompagnement ?|amusegueule ?|boisson "
+                        + r"?|confiserie ?|conseil ?|dessert ?|entree "
+                        + r"?|platprincipal ?|sauce ?)+)"
+                    )
                     plats = re.search(re_plats, options)[0].split()
                 except TypeError:
                     plats = []
 
                 try:
-                    re_difficulties = r"((?<=-d )(1 ?|2 ?|3 ?|4 ?)+|(?<=--difficulte )(1 ?|2 ?|3 ?|4 ?)+)"
-                    difficulties = re.search(re_difficulties, options)[0].split()
+                    re_difficulties = (
+                        r"((?<=-d )(1 ?|2 ?|3 ?|4 ?)+|(?<=--difficulte )"
+                        + r"(1 ?|2 ?|3 ?|4 ?)+)"
+                    )
+                    difficulties = re.search(
+                        re_difficulties,
+                        options
+                    )[0].split()
                 except TypeError:
                     difficulties = []
 
                 try:
-                    re_costs = r"((?<=-c )(1 ?|2 ?|3 ?)+|(?<=--cout )(1 ?|2 ?|3 ?)+)"
+                    re_costs = (
+                        r"((?<=-c )(1 ?|2 ?|3 ?)+|(?<=--cout )"
+                        + r"(1 ?|2 ?|3 ?)+)"
+                    )
                     costs = re.search(re_costs, options)[0].split()
                 except TypeError:
                     costs = []
 
                 try:
-                    re_restrictions = r"((?<=-r )(1 ?|2 ?|3 ?|4 ?)+|(?<=--restriction )(1 ?|2 ?|3 ?|4 ?)+)"
-                    restrictions = re.search(re_restrictions, options)[0].split()
+                    re_restrictions = (
+                        r"((?<=-r )(1 ?|2 ?|3 ?|4 ?)+|(?<=--restriction )"
+                        + "(1 ?|2 ?|3 ?|4 ?)+)"
+                    )
+                    restrictions = re.search(
+                        re_restrictions,
+                        options
+                    )[0].split()
                 except TypeError:
                     restrictions = []
 
@@ -498,11 +531,12 @@ class Utilitaire(commands.Cog):
                 except TypeError:
                     cuissons = []
 
-                saisonal = True if re.search(r"-s|--saison", options) else False
+                if re.search(r"-s|--saison", options):
+                    seasonal = True
+                else:
+                    seasonal = False
 
-                http_params = []
-
-                http_params.append(("aqt", research))
+                http_params = [("aqt", research)]
 
                 for plat in plats:
                     http_params.append(("dt", plat))
@@ -522,50 +556,86 @@ class Utilitaire(commands.Cog):
                 for cuisson in cuissons:
                     http_params.append(("rct", cuisson))
 
-                if saisonal:
+                if seasonal:
                     http_params.append(("type", "season"))
 
                 async with aiohttp.ClientSession() as session:
-                    self.bot.log.warning(f"Asking recepies on marmiton")
-                    async with session.get("https://www.marmiton.org/recettes/recherche.aspx", params=http_params) as r: # Retreve a marmiton page
+                    self.bot.log.warning(f"Asking recipes on marmiton")
+                    url = "https://www.marmiton.org/recettes/recherche.aspx"
+                    async with session.get(url, params=http_params) as r:
+                        # Retrieve a marmiton page
                         if r.status == 200:
                             html = await r.text("utf-8")
                             soup = BeautifulSoup(html, "html.parser")
 
-                            nb_results = soup.find(class_="recipe-search__nb-results").string.strip()
+                            nb_results = soup.find(
+                                class_="recipe-search__nb-results"
+                            ).string.strip()
                             nb_results = int(re.search(r"\d+", nb_results)[0])
 
                             if nb_results:
-                                div_results = soup.find("div", class_="recipe-results")
-                                list_recipes = div_results.find_all(class_="recipe-card")
-                                nb_recepies = min(nb_recepies, len(list_recipes))
+                                div_results = soup.find(
+                                    "div",
+                                    class_="recipe-results"
+                                )
+                                list_recipes = div_results.find_all(
+                                    class_="recipe-card"
+                                )
+                                nb_recipes = min(nb_recipes, len(list_recipes))
 
-                                response = f"{nb_results} résultat(s) trouvé sur Marmiton ! J'en affiche {nb_recepies}"
+                                response = (
+                                    f"{nb_results} résultat(s) trouvé sur "
+                                    + f"Marmiton ! J'en affiche {nb_recipes}"
+                                )
                                 await ctx.send(response)
 
-                                for i in range(nb_recepies):
+                                for i in range(nb_recipes):
                                     div_recipe = list_recipes[i]
 
-                                    element_description = div_recipe.find(class_="recipe-card__description").contents
+                                    element_description = div_recipe.find(
+                                        class_="recipe-card__description"
+                                    ).contents
                                     description = ""
                                     for element in element_description:
                                         if element == "\n":
                                             continue
                                         try:
-                                            description += str(element.contents[0])
-                                        except Exception:
+                                            description += str(
+                                                element.contents[0]
+                                            )
+                                        except Exception as e:
                                             description += str(element)
-                                    description = description.replace("<br/>", "\n")
+                                    description = description.replace(
+                                        "<br/>",
+                                        "\n"
+                                    )
 
-                                    div_rating = div_recipe.find(class_="recipe-card__rating")
-                                    rating = div_rating.find(class_="recipe-card__rating__value").string.strip()
-                                    rating += " " + div_rating.find(class_="recipe-card__rating__value__fract").string.strip()
-                                    rating += " " + div_rating.find(class_="mrtn-font-discret").string.strip()
+                                    div_rating = div_recipe.find(
+                                        class_="recipe-card__rating"
+                                    )
+                                    rating = div_rating.find(
+                                        class_="recipe-card__rating__value"
+                                    ).string.strip()
+                                    rating += " " + div_rating.find(
+                                        class_=(
+                                            "recipe-card__"
+                                            + "rating__value__fract"
+                                        )
+                                    ).string.strip()
+                                    rating += " " + div_rating.find(
+                                        class_="mrtn-font-discret"
+                                    ).string.strip()
 
                                     embed = discord.Embed(
                                         title=div_recipe.find("h4").string.strip(),
                                         description=description,
-                                        url="https://www.marmiton.org" + div_recipe.find("a", class_="recipe-card-link")["href"],
+                                        url=(
+                                            "https://www.marmiton.org"
+                                            + div_recipe.find(
+                                                "a",
+                                                class_="recipe-card-link"
+                                            )["href"]
+                                        ),
                                         color=0xFF9B90
                                     )
                                     embed.set_thumbnail(
@@ -577,7 +647,11 @@ class Utilitaire(commands.Cog):
                                     )
                                     embed.add_field(
                                         name="Durée",
-                                        value=div_recipe.find(class_="recipe-card__duration__value").string.strip(),
+                                        value=div_recipe.find(
+                                            class_=(
+                                                "recipe-card__duration__value"
+                                            )
+                                        ).string.strip(),
                                         inline=True
                                     )
                                     embed.add_field(
@@ -586,8 +660,14 @@ class Utilitaire(commands.Cog):
                                         inline=True
                                     )
 
-                                    if div_recipe.find(class_="recipe-card__sponsored"):
-                                        sponsor = re.search(r"(?<=\[).+(?=\])", div_recipe.find(class_="recipe-card-link")["onclick"], re.IGNORECASE)[0]
+                                    if div_recipe.find(
+                                            class_="recipe-card__sponsored"):
+                                        sponsor = re.search(
+                                            r"(?<=\[).+(?=\])",
+                                            div_recipe.find(
+                                                class_="recipe-card-link"
+                                            )["onclick"],
+                                            re.IGNORECASE)[0]
                                         embed.add_field(
                                             name="Contenu sponsorisé",
                                             value=sponsor,
@@ -597,26 +677,56 @@ class Utilitaire(commands.Cog):
                                     await ctx.send(embed=embed)
 
                             else:
-                                response = "Désolé, je n'ai pas trouvé de résultats..."
+                                response = (
+                                    "Désolé, je n'ai pas trouvé "
+                                    + "de résultats..."
+                                )
                                 return await ctx.send(response)
 
-            else: # Display help
-                response = ("```\n" +
-                            "Usage :\n" +
-                            "  !marmiton <nom de la recherche> [--options <arguments>...]\n" +
-                            "\n" +
-                            "Options :\n" +
-                            "  -n <argument>, --nombre <argument>             Précise le nombre de recettes à retourner [défaut : 2]\n" +
-                            "  -p <argument>..., --plat <argument>...         Précise un ou plusieurs types de plats parmi : accompagnement, amusegueule, boisson, confiserie, conseil, dessert, entree, platprincipal, sauce\n" +
-                            "  -d <argument>..., --difficulte <argument>...   Précise un ou plusieurs niveau de difficulté parmi : 1 (très facile), 2 (facile), 3 (moyen), 4 (difficile)\n" +
-                            "  -c <argument>..., --cout <argument>...         Précise un ou plusieurs coût de recette parmi : 1 (bon marché), 2 (coût moyen), 3 (assez cher)\n" +
-                            "  -r <argument>..., --restriction <argument>...  Précise une ou plusieurs restriction alimentaire parmi : 1 (végétarien), 2 (sans gluten), 3 (végan), 4 (sans lactose)\n" +
-                            "  -t <argument>, --temps <argument>              Précise le temps maximum de la recette parmi : 15, 30, 45\n" +
-                            "  --cuisson <argument>...                        Précise un ou plusieurs type de cuisson parmi : 1 (four), 2 (micro-ondes), 3 (aucun)\n" +
-                            "  -s, --saison                                   Précise si la recette doit être de saison\n" +
-                            "```\n")
+            else:  # Display help
+                response = (
+                    "```\n"
+                    + "Usage :\n"
+                    + "  !marmiton <nom de la recherche> [--options "
+                    + "<arguments>...]\n"
+                    + "\n"
+                    + "Options :\n"
+                    + "  -n <argument>, --nombre <argument>             "
+                    + "Précise le nombre de recettes à retourner "
+                    + "[défaut : 2]\n"
+                    + "  -p <argument>..., --plat <argument>...         "
+                    + "Précise un ou plusieurs types de plats parmi : "
+                    + "accompagnement, amusegueule, boisson, confiserie, "
+                    + "conseil, dessert, entree, platprincipal, sauce\n"
+                    + "  -d <argument>..., --difficulte <argument>...   "
+                    + "Précise un ou plusieurs niveau de difficulté parmi : "
+                    + "1 (très facile), 2 (facile), 3 (moyen), 4 (difficile)\n"
+                    + "  -c <argument>..., --cout <argument>...         "
+                    + "Précise un ou plusieurs coût de recette parmi : "
+                    + "1 (bon marché), 2 (coût moyen), 3 (assez cher)\n"
+                    + "  -r <argument>..., --restriction <argument>...  "
+                    + "Précise une ou plusieurs restriction alimentaire "
+                    + "parmi : 1 (végétarien), 2 (sans gluten), 3 (végan), "
+                    + "4 (sans lactose)\n"
+                    + "  -t <argument>, --temps <argument>              "
+                    + "Précise le temps maximum de la recette parmi : "
+                    + "15, 30, 45\n"
+                    + "  --cuisson <argument>...                        "
+                    + "Précise un ou plusieurs type de cuisson parmi : "
+                    + "1 (four), 2 (micro-ondes), 3 (aucun)\n"
+                    + "  -s, --saison                                   "
+                    + "Précise si la recette doit être de saison\n"
+                    + "```\n"
+                )
                 await ctx.send(response)
 
         except Exception as e:
-            self.bot.log.exception(f"Unable to send a marmiton recipe in this channel: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})", exc_info=e)
+            self.bot.log.exception(
+                (
+                    f"Unable to send a marmiton recipe in this channel: "
+                    + f"{ctx.channel.guild}, #{ctx.channel.name} "
+                    + f"({ctx.channel.id})"
+                 ),
+                exc_info=e
+            )
             await ctx.send("Something went wrong https://tenor.com/s8CP.gif")
