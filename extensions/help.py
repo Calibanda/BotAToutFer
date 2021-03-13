@@ -46,11 +46,12 @@ class Help(commands.Cog):
             )
 
             for command in alphabetical_cogs:
-                cog_help += (
-                    "  "
-                    + command.name.ljust(number_spaces, " ")
-                    + f"{command.help}\n"
-                )
+                if not command.hidden:
+                    cog_help += (
+                        "  "
+                        + command.name.ljust(number_spaces, " ")
+                        + f"{command.help}\n"
+                    )
             cog_help += "\n"
 
             if len(response + cog_help) + 3 < 2000:
