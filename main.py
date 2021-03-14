@@ -45,6 +45,7 @@ def bot_init():
     bot.NEWS_TOKEN = os.getenv("NEWS_TOKEN")
     bot.CAT_TOKEN = os.getenv("CAT_TOKEN")
     bot.DICOLINK_TOKEN = os.getenv("DICOLINK_TOKEN")
+    bot.OPENQUIZZDB_TOKEN = os.getenv("OPENQUIZZDB_TOKEN")
 
     @bot.event
     async def on_ready():
@@ -72,6 +73,7 @@ def bot_init():
             "pendu",
             "pictures",
             "ping",
+            "quiz",
             "quotes",
             # "santa",
             "says",
