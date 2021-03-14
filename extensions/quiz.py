@@ -160,5 +160,5 @@ class Quiz(commands.Cog):
             value=self.games[message.guild.id]["wikipedia"],
             inline=True
         )
-        await message.send(embed=embed)
+        await message.channel.send(embed=embed)
         del self.games[message.channel.id]
