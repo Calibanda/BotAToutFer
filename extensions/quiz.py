@@ -72,7 +72,7 @@ class Quiz(commands.Cog):
 
     @commands.Cog.listener('on_message')
     async def process_game(self, message):
-        if message.guild.id in self.games:
+        if message.guild.id in self.games and hasattr(self.games[message.guild.id], "question"):
             if self.games[message.guild.id]["reponse_correcte"].casefold().strip() in message.content.casefold().strip():
                 await self.win(message)
 
