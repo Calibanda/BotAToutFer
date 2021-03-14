@@ -48,32 +48,30 @@ class Jokes(commands.Cog):
             {"curse_word": "dick", "traduction": "deck"},
         ]
 
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        ctx = await self.bot.get_context(message)
+    @commands.Cog.listener('on_message')
+    async def message_jokes(self, message):
         if message.author == self.bot.user:
-            # await self.bot.process_commands(message)
             return
-        else:  # This doesn't invoke a command!
-            words_in_message = []
-            for word in re.split("\W", message.content.lower()):
-                # We split the words in the message
-                # on any non word character (\W)
-                if word:
-                    # We ignore empty words
-                    words_in_message.append(word)
 
-            await self.joke_je_suis(message)
-            await self.joke_echec(message, words_in_message)
-            await self.joke_possible(message, words_in_message)
-            await self.joke_aled(message, words_in_message)
-            await self.cursed_words(message, words_in_message)
-            await self.mousse(message, words_in_message)
-            await self.projet(message, words_in_message)
-            await self.respect(message, words_in_message)
-            await self.what(message, words_in_message)
-            await self.rip(message, words_in_message)
-            await self.alerte(message, words_in_message)
+        words_in_message = []
+        for word in re.split("\W", message.content.lower()):
+            # We split the words in the message
+            # on any non word character (\W)
+            if word:
+                # We ignore empty words
+                words_in_message.append(word)
+
+        await self.joke_je_suis(message)
+        await self.joke_echec(message, words_in_message)
+        await self.joke_possible(message, words_in_message)
+        await self.joke_aled(message, words_in_message)
+        await self.cursed_words(message, words_in_message)
+        await self.mousse(message, words_in_message)
+        await self.projet(message, words_in_message)
+        await self.respect(message, words_in_message)
+        await self.what(message, words_in_message)
+        await self.rip(message, words_in_message)
+        await self.alerte(message, words_in_message)
 
     async def joke_je_suis(self, message):
         has_suis = False
@@ -118,22 +116,6 @@ class Jokes(commands.Cog):
             )
             await message.channel.send(response)
 
-    async def mousse(self, message, words_in_message):
-        if "attention" in words_in_message or "mousse" in words_in_message:
-            # If the words "attention" or "mousse" in the original message
-            response = (  # Send the "ATTENTION À LA MOUSSE !!" gif
-                "https://media1.tenor.com/images/"
-                + "ef6a3c5ba7cbdc4b0140d7363dbc841f/tenor.gif"
-            )
-            await message.channel.send(response)
-
-    async def projet(self, message, words_in_message):
-        if "projet" in words_in_message:
-            # If the words "projet" in the original message
-            response = "https://tenor.com/RGiO.gif"
-            # Send the "CAR C'EST NOTRE PROJEEEEET !!" gif
-            await message.channel.send(response)
-
     async def cursed_words(self, message, words_in_message):
         has_curse_word = False
         for word in words_in_message:
@@ -156,6 +138,22 @@ class Jokes(commands.Cog):
             response = f"{message.author.mention} : {response}"
             await message.channel.send(response)
             await message.delete()
+
+    async def mousse(self, message, words_in_message):
+        if "attention" in words_in_message or "mousse" in words_in_message:
+            # If the words "attention" or "mousse" in the original message
+            response = (  # Send the "ATTENTION À LA MOUSSE !!" gif
+                "https://media1.tenor.com/images/"
+                + "ef6a3c5ba7cbdc4b0140d7363dbc841f/tenor.gif"
+            )
+            await message.channel.send(response)
+
+    async def projet(self, message, words_in_message):
+        if "projet" in words_in_message:
+            # If the words "projet" in the original message
+            response = "https://tenor.com/RGiO.gif"
+            # Send the "CAR C'EST NOTRE PROJEEEEET !!" gif
+            await message.channel.send(response)
 
     async def respect(self, message, words_in_message):
         if "respecter" in words_in_message or "respecte" in words_in_message:
