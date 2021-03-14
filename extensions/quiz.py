@@ -87,7 +87,7 @@ class Quiz(commands.Cog):
                     self.api_last_call = datetime.datetime.now()
                     question = await r.json()
                     if question["response_code"] == 0:  # Succès
-                        self.games[ctx.guild.id] = question["results"]
+                        self.games[ctx.guild.id] = question["results"][0]
                         self.games[ctx.guild.id]["starting_time"] = datetime.datetime.now()
                         random.shuffle(self.games[ctx.guild.id]["autres_choix"])
                         self.games[ctx.guild.id]["indice"] = False
