@@ -98,9 +98,18 @@ class Quiz(commands.Cog):
                         await ctx.send(response)
 
     async def send_question(self, ctx):
-        title = "Quiz - Catégorie " + self.games[ctx.guild.id]["categorie"]
+        title = "Quiz - Catégorie " + self.games[ctx.guild.id]["categorie"] + " - Difficulté " + self.games[ctx.guild.id]["difficulte"]
+        colors = {
+            "débutant": 0x00ff00,
+            "confirmé": 0xffcc00,
+            "expert": 0xff0000
+        }
         description = self.games[ctx.guild.id]["question"]
-        embed = discord.Embed(title=title, description=description)
+        embed = discord.Embed(
+            title=title,
+            description=description,
+            color=colors[self.games[ctx.guild.id]["difficulte"]]
+        )
         if self.games[ctx.guild.id]["indice"]:
             for autre_choix in self.games[ctx.guild.id]["autres_choix"]:
                 embed.add_field(
@@ -142,7 +151,7 @@ class Quiz(commands.Cog):
             points = 6
 
         if self.games[message.guild.id]["indice"]:
-            points /= 2
+            points = int(points/2)
 
         description = f"Bravo {message.author.name}. La réponse était " + self.games[message.guild.id]["reponse_correcte"] + f". {points} point(s) !"
         embed = discord.Embed(title=title, description=description)
@@ -155,10 +164,8 @@ class Quiz(commands.Cog):
             value=self.games[message.guild.id]["anecdote"],
             inline=True
         )
-        embed.add_field(
-            name="Un peu de culture",
-            value=self.games[message.guild.id]["wikipedia"],
-            inline=True
+        embed.set_footer(
+            text=self.games[message.guild.id]["wikipedia"],
         )
         await message.channel.send(embed=embed)
         del self.games[message.channel.id]
