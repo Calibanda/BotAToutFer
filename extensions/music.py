@@ -12,8 +12,6 @@ from discord.ext import commands
 import youtube_dl
 
 
-# TODO: For auto disconnection: see discord.on_voice_state_update(member, before, after)
-
 def setup(bot):
     bot.add_cog(Music(bot))
 

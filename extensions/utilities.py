@@ -10,10 +10,6 @@ import discord
 from discord.ext import commands
 
 
-# TODO:
-# last_news_url.json sensible to call channel
-
-
 def setup(bot):
     bot.add_cog(Utilitaire(bot))
 
