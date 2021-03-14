@@ -24,7 +24,10 @@ def bot_init():
             + "même le café !"
         ),
         help_command=None,
-        activity=discord.Game(name="!help"),
+        activity=discord.Activity(
+            name="!help",
+            type=discord.ActivityType.custom
+        ),
         owner_id=int(os.getenv("OWNER_ID"))
     )
 
