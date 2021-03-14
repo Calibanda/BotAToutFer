@@ -77,7 +77,7 @@ class Quiz(commands.Cog):
                 await self.win(message)
 
     async def launch_game(self, ctx):
-        self.games[ctx.guild.id] = True
+        self.games[ctx.guild.id] = {}
         if Quiz.api_last_call:
             delta = (datetime.datetime.now() - Quiz.api_last_call).seconds
             if delta < 60:
