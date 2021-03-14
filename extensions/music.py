@@ -72,10 +72,9 @@ class Music(commands.Cog):
         self.queue_position = {}
 
         self.MUSIC_DIR = os.path.join(Path.home(), 'Music')
-        self.RPG_COMBAT_DIR = os.path.join(MUSIC_DIR, "RPG_Combat")
-        self.RPG_EXPLORATION_DIR = os.path.join(MUSIC_DIR, "RPG_Exploration")
-        self.RPG_TAVERN_DIR = os.path.join(MUSIC_DIR, "RPG_TAVERN")
-
+        self.RPG_COMBAT_DIR = os.path.join(self.MUSIC_DIR, "RPG_Combat")
+        self.RPG_EXPLORATION_DIR = os.path.join(self.MUSIC_DIR, "RPG_Exploration")
+        self.RPG_TAVERN_DIR = os.path.join(self.MUSIC_DIR, "RPG_TAVERN")
 
     @commands.command(name="join", help="Connecte le bot dans un salon vocal")
     async def join(self, ctx, *, channel: discord.VoiceChannel=None):
@@ -247,13 +246,13 @@ class Music(commands.Cog):
 
     @commands.command(name="name", help="Demande au bot de dire son nom")
     async def name(self, ctx):
-        await speak("Je suis le bot a tout faire")
+        #  await speak("Je suis le bot a tout faire")
         source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(os.path.join(self.bot.SCRIPT_DIR, "package", "audio", "audio.mp3")))
         ctx.voice_client.play(source, after=lambda e: print('Player error: %s' % e) if e else None)
 
 
     @commands.command(name="hello", help="Demande au bot de dire 'Hello World'")
     async def hello(self, ctx):
-        await speak("Hello world!")
+        #  await speak("Hello world!")
         source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(os.path.join(self.bot.SCRIPT_DIR, "package", "audio", "audio.mp3")))
         ctx.voice_client.play(source, after=lambda e: print('Player error: %s' % e) if e else None)
