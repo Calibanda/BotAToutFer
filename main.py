@@ -75,6 +75,7 @@ def bot_init():
             "quotes",
             # "santa",
             "says",
+            "scheduled",
             "utilities",
             "vbe_music",
         ]
