@@ -26,7 +26,7 @@ def bot_init():
         help_command=None,
         activity=discord.Activity(
             name="!help",
-            type=discord.ActivityType.custom
+            type=discord.ActivityType.playing
         ),
         owner_id=int(os.getenv("OWNER_ID"))
     )
