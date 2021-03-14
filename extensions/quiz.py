@@ -98,7 +98,7 @@ class Quiz(commands.Cog):
                         await ctx.send(response)
 
     async def send_question(self, ctx):
-        title = "Quiz - Catégorie " + self.games[ctx.guild.id]["categorie"] + " - Difficulté " + self.games[ctx.guild.id]["difficulte"]
+        title = "Quiz - Catégorie " + self.games[ctx.guild.id]["categorie"] + "(" + self.games[ctx.guild.id]["difficulte"] + ")"
         colors = {
             "débutant": 0x00ff00,
             "confirmé": 0xffcc00,
@@ -138,7 +138,7 @@ class Quiz(commands.Cog):
             inline=True
         )
         await ctx.send(embed=embed)
-        del self.games[ctx.channel.id]
+        del self.games[ctx.guild.id]
 
     async def win(self, message):
         title = "Quiz - Fin de la question"
@@ -154,7 +154,16 @@ class Quiz(commands.Cog):
             points = int(points/2)
 
         description = f"Bravo {message.author.name}. La réponse était " + self.games[message.guild.id]["reponse_correcte"] + f". {points} point(s) !"
-        embed = discord.Embed(title=title, description=description)
+        colors = {
+            "débutant": 0x00ff00,
+            "confirmé": 0xffcc00,
+            "expert": 0xff0000
+        }
+        embed = discord.Embed(
+            title=title,
+            description=description,
+            color=colors[self.games[message.guild.id]["difficulte"]]
+        )
         embed.set_author(
             name=message.author.name,
             icon_url=message.author.avatar_url
@@ -168,4 +177,4 @@ class Quiz(commands.Cog):
             text=self.games[message.guild.id]["wikipedia"],
         )
         await message.channel.send(embed=embed)
-        del self.games[message.channel.id]
+        del self.games[message.guild.id]
