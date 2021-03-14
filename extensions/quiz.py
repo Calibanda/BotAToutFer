@@ -51,28 +51,28 @@ class Quiz(commands.Cog):
 
         if option == "":
             if ctx.guild.id in self.games:
-                if hasattr(self.games[ctx.guild.id], "question"):
+                if "question" in self.games[ctx.guild.id]:
                     await self.send_question(ctx)
             else:
                 await self.launch_game(ctx)
 
         elif option == "indice":
             if ctx.guild.id in self.games:
-                if hasattr(self.games[ctx.guild.id], "question"):
+                if "question" in self.games[ctx.guild.id]:
                     await self.indice(ctx)
             else:
                 await ctx.send("Il n'y a pas de quiz en cours dans ce serveur !")
 
         elif option == "stop":
             if ctx.guild.id in self.games:
-                if hasattr(self.games[ctx.guild.id], "question"):
+                if "question" in self.games[ctx.guild.id]:
                     await self.stop(ctx)
             else:
                 await ctx.send("Il n'y a pas de quiz en cours dans ce serveur !")
 
     @commands.Cog.listener('on_message')
     async def process_game(self, message):
-        if message.guild.id in self.games and hasattr(self.games[message.guild.id], "question"):
+        if message.guild.id in self.games and "question" in self.games[message.guild.id]:
             if self.games[message.guild.id]["reponse_correcte"].casefold().strip() in message.content.casefold().strip():
                 await self.win(message)
 
