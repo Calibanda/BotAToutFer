@@ -69,7 +69,7 @@ class Quiz(commands.Cog):
     @commands.Cog.listener('on_message')
     async def process_game(self, message):
         if message.guild.id in self.games:
-            if self.games[message.guild.id]["reponse_correcte"].casefold().strip() in message.content:
+            if self.games[message.guild.id]["reponse_correcte"].casefold().strip() in message.content.casefold().strip():
                 await self.win(message)
 
     async def launch_game(self, ctx):
@@ -98,7 +98,7 @@ class Quiz(commands.Cog):
                         await ctx.send(response)
 
     async def send_question(self, ctx):
-        title = "Quiz - Catégorie " + self.games[ctx.guild.id]["categorie"] + "(" + self.games[ctx.guild.id]["difficulte"] + ")"
+        title = "Quiz - Catégorie " + self.games[ctx.guild.id]["categorie"] + " (" + self.games[ctx.guild.id]["difficulte"] + ")"
         colors = {
             "débutant": 0x00ff00,
             "confirmé": 0xffcc00,
@@ -132,10 +132,8 @@ class Quiz(commands.Cog):
             value=self.games[ctx.guild.id]["anecdote"],
             inline=True
         )
-        embed.add_field(
-            name="Un peu de culture",
-            value=self.games[ctx.guild.id]["wikipedia"],
-            inline=True
+        embed.set_footer(
+            text=self.games[ctx.guild.id]["wikipedia"],
         )
         await ctx.send(embed=embed)
         del self.games[ctx.guild.id]
