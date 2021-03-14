@@ -81,9 +81,9 @@ class Quiz(commands.Cog):
         if Quiz.api_last_call:
             delta = (datetime.datetime.now() - Quiz.api_last_call).seconds
             if delta < 60:
-                response = f"J'envoie une question dans {delta} seconde(s) !"
+                response = f"J'envoie une question dans {60 - delta} seconde(s) !"
                 await ctx.send(response)
-                await asyncio.sleep(delta)
+                await asyncio.sleep(60 - delta)
 
         async with aiohttp.ClientSession() as session:
             self.bot.log.warning(f"Asking for a quiz question")
