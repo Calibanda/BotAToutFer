@@ -16,6 +16,8 @@ def setup(bot):
 
 
 class Quiz(commands.Cog):
+    api_last_call = None
+
     def __init__(self, bot):
         self.bot = bot
 
@@ -42,7 +44,6 @@ class Quiz(commands.Cog):
             "anec": "1",
             "wiki": "1"
         }
-        self.api_last_call = None
 
     @commands.command(name="quiz", help="Demande une question du quiz")
     async def quiz(self, ctx, option=""):
@@ -50,19 +51,22 @@ class Quiz(commands.Cog):
 
         if option == "":
             if ctx.guild.id in self.games:
-                await self.send_question(ctx)
+                if hasattr(self.games[ctx.guild.id], "question"):
+                    await self.send_question(ctx)
             else:
                 await self.launch_game(ctx)
 
         elif option == "indice":
             if ctx.guild.id in self.games:
-                await self.indice(ctx)
+                if hasattr(self.games[ctx.guild.id], "question"):
+                    await self.indice(ctx)
             else:
                 await ctx.send("Il n'y a pas de quiz en cours dans ce serveur !")
 
         elif option == "stop":
             if ctx.guild.id in self.games:
-                await self.stop(ctx)
+                if hasattr(self.games[ctx.guild.id], "question"):
+                    await self.stop(ctx)
             else:
                 await ctx.send("Il n'y a pas de quiz en cours dans ce serveur !")
 
@@ -73,8 +77,9 @@ class Quiz(commands.Cog):
                 await self.win(message)
 
     async def launch_game(self, ctx):
-        if self.api_last_call:
-            delta = (datetime.datetime.now() - self.api_last_call).seconds
+        self.games[ctx.guild.id] = True
+        if Quiz.api_last_call:
+            delta = (datetime.datetime.now() - Quiz.api_last_call).seconds
             if delta < 60:
                 response = f"J'envoie une question dans {delta} seconde(s) !"
                 await ctx.send(response)
@@ -84,7 +89,7 @@ class Quiz(commands.Cog):
             self.bot.log.warning(f"Asking for a quiz question")
             async with session.get(self.API_URL, params=self.API_PARAMETERS) as r:
                 if r.status == 200:
-                    self.api_last_call = datetime.datetime.now()
+                    Quiz.api_last_call = datetime.datetime.now()
                     question = await r.json()
                     if question["response_code"] == 0:  # Succès
                         self.games[ctx.guild.id] = question["results"][0]
