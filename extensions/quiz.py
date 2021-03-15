@@ -73,8 +73,7 @@ class Quiz(commands.Cog):
     @commands.Cog.listener('on_message')
     async def process_game(self, message):
         if message.guild.id in self.games and "question" in self.games[message.guild.id]:
-            response = self.clean_response(self.games[message.guild.id]["reponse_correcte"])
-            if response in message.content.casefold().strip():
+            if self.games[message.guild.id]["clean_response"] in message.content.casefold().strip():
                 await self.win(message)
 
     async def launch_game(self, ctx):
@@ -96,6 +95,7 @@ class Quiz(commands.Cog):
                         self.games[ctx.guild.id] = question["results"][0]
                         self.games[ctx.guild.id]["starting_time"] = datetime.datetime.now()
                         random.shuffle(self.games[ctx.guild.id]["autres_choix"])
+                        self.games[ctx.guil.id]["clean_response"] = self.clean_response(self.games[ctx.guild.id]["reponse_correcte"])
                         self.games[ctx.guild.id]["indice"] = False
                         await self.send_question(ctx)
                     else:
@@ -120,6 +120,24 @@ class Quiz(commands.Cog):
             "des"
         ]
         response = " ".join([word for word in response.split(" ") if word not in stop_words])
+
+        response = response.replace('à', 'a')
+        response = response.replace('â', 'a')
+        response = response.replace('ä', 'a')
+        response = response.replace('ç', 'c')
+        response = response.replace('é', 'e')
+        response = response.replace('è', 'e')
+        response = response.replace('ê', 'e')
+        response = response.replace('ë', 'e')
+        response = response.replace('î', 'i')
+        response = response.replace('ï', 'i')
+        response = response.replace('ô', 'o')
+        response = response.replace('ö', 'o')
+        response = response.replace('ù', 'u')
+        response = response.replace('û', 'u')
+        response = response.replace('ü', 'u')
+        response = response.replace('ÿ', 'y')
+        response = response.replace('œ', 'oe')
 
         return response
 
