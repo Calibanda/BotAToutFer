@@ -73,7 +73,7 @@ class Quiz(commands.Cog):
     @commands.Cog.listener('on_message')
     async def process_game(self, message):
         if message.guild.id in self.games and "question" in self.games[message.guild.id]:
-            if self.games[message.guild.id]["clean_response"] in message.content.casefold().strip():
+            if self.games[message.guild.id]["clean_response"] in self.remove_accents(message.content.casefold().strip()):
                 await self.win(message)
 
     async def launch_game(self, ctx):
@@ -121,26 +121,29 @@ class Quiz(commands.Cog):
         ]
         response = " ".join([word for word in response.split(" ") if word not in stop_words])
 
-        response = response.replace("à", "a")
-        response = response.replace("â", "a")
-        response = response.replace("ä", "a")
-        response = response.replace("ç", "c")
-        response = response.replace("é", "e")
-        response = response.replace("è", "e")
-        response = response.replace("ê", "e")
-        response = response.replace("ë", "e")
-        response = response.replace("î", "i")
-        response = response.replace("ï", "i")
-        response = response.replace("ô", "o")
-        response = response.replace("ö", "o")
-        response = response.replace("ù", "u")
-        response = response.replace("û", "u")
-        response = response.replace("ü", "u")
-        response = response.replace("ÿ", "y")
-        response = response.replace("œ", "oe")
-        response = response.replace("’", "'")
+        response = self.remove_accents(response)
 
         return response
+
+    def remove_accents(self, text):
+        return text.replace("à", "a")\
+            .replace("â", "a")\
+            .replace("ä", "a")\
+            .replace("ç", "c")\
+            .replace("é", "e")\
+            .replace("è", "e")\
+            .replace("ê", "e")\
+            .replace("ë", "e")\
+            .replace("î", "i")\
+            .replace("ï", "i")\
+            .replace("ô", "o")\
+            .replace("ö", "o")\
+            .replace("ù", "u")\
+            .replace("û", "u")\
+            .replace("ü", "u")\
+            .replace("ÿ", "y")\
+            .replace("œ", "oe")\
+            .replace("’", "'")
 
     async def send_question(self, ctx):
         title = "Quiz - Catégorie " + self.games[ctx.guild.id]["categorie"] + " (" + self.games[ctx.guild.id]["difficulte"] + ")"
