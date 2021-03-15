@@ -95,7 +95,7 @@ class Quiz(commands.Cog):
                         self.games[ctx.guild.id] = question["results"][0]
                         self.games[ctx.guild.id]["starting_time"] = datetime.datetime.now()
                         random.shuffle(self.games[ctx.guild.id]["autres_choix"])
-                        self.games[ctx.guil.id]["clean_response"] = self.clean_response(self.games[ctx.guild.id]["reponse_correcte"])
+                        self.games[ctx.guild.id]["clean_response"] = self.clean_response(self.games[ctx.guild.id]["reponse_correcte"])
                         self.games[ctx.guild.id]["indice"] = False
                         await self.send_question(ctx)
                     else:
