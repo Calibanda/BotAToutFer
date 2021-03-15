@@ -73,7 +73,8 @@ class Quiz(commands.Cog):
     @commands.Cog.listener('on_message')
     async def process_game(self, message):
         if message.guild.id in self.games and "question" in self.games[message.guild.id]:
-            if self.games[message.guild.id]["reponse_correcte"].casefold().strip() in message.content.casefold().strip():
+            response = self.clean_response(self.games[message.guild.id]["reponse_correcte"])
+            if response in message.content.casefold().strip():
                 await self.win(message)
 
     async def launch_game(self, ctx):
@@ -95,7 +96,6 @@ class Quiz(commands.Cog):
                         self.games[ctx.guild.id] = question["results"][0]
                         self.games[ctx.guild.id]["starting_time"] = datetime.datetime.now()
                         random.shuffle(self.games[ctx.guild.id]["autres_choix"])
-                        self.games[ctx.guild.id]["reponse_correcte"] = self.clean_response(self.games[ctx.guild.id]["reponse_correcte"])
                         self.games[ctx.guild.id]["indice"] = False
                         await self.send_question(ctx)
                     else:
@@ -104,6 +104,13 @@ class Quiz(commands.Cog):
                         await ctx.send(response)
 
     def clean_response(self, response):
+        response = response.casefold().strip()
+
+        if response[0] == "'":
+            response = response[1:]
+        if response[-1] == "'":
+            response = response[:-1]
+
         stop_words = [
             "le",
             "la",
@@ -112,11 +119,7 @@ class Quiz(commands.Cog):
             "une",
             "des"
         ]
-        if response[0] == "'":
-            response = response[1:]
-        if response[-1] == "'":
-            response = response[:-1]
-        response = " ".join([word for word in response.split(" ") if word.lower() not in stop_words])
+        response = " ".join([word for word in response.split(" ") if word not in stop_words])
 
         return response
 
