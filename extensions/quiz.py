@@ -95,12 +95,30 @@ class Quiz(commands.Cog):
                         self.games[ctx.guild.id] = question["results"][0]
                         self.games[ctx.guild.id]["starting_time"] = datetime.datetime.now()
                         random.shuffle(self.games[ctx.guild.id]["autres_choix"])
+                        self.games[ctx.guild.id]["reponse_correcte"] = self.clean_response(self.games[ctx.guild.id]["reponse_correcte"])
                         self.games[ctx.guild.id]["indice"] = False
                         await self.send_question(ctx)
                     else:
                         self.bot.log.error(f"Problem with the API key, code: {question['response_code']}")
                         response = "Désolé, je n'ai pas réussi à trouver une question de quiz..."
                         await ctx.send(response)
+
+    def clean_response(self, response):
+        stop_words = [
+            "le",
+            "la",
+            "les",
+            "un",
+            "une",
+            "des"
+        ]
+        if response[0] == "'":
+            response = response[1:]
+        if response[-1] == "'":
+            response = response[:-1]
+        response = " ".join([word for word in response.split(" ") if word.lower() not in stop_words])
+
+        return response
 
     async def send_question(self, ctx):
         title = "Quiz - Catégorie " + self.games[ctx.guild.id]["categorie"] + " (" + self.games[ctx.guild.id]["difficulte"] + ")"
