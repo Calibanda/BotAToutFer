@@ -46,29 +46,29 @@ class Quiz(commands.Cog):
         }
 
     @commands.command(name="quiz", help="Demande une question du quiz")
-    async def quiz(self, ctx, option=""):
-        option = option.casefold().strip()
+    async def quiz(self, ctx):
+        if ctx.guild.id in self.games:
+            if "question" in self.games[ctx.guild.id]:
+                await self.send_question(ctx)
+        else:
+            await self.launch_game(ctx)
 
-        if option == "":
-            if ctx.guild.id in self.games:
-                if "question" in self.games[ctx.guild.id]:
-                    await self.send_question(ctx)
-            else:
-                await self.launch_game(ctx)
+    @commands.command(name="quiz-indice", help="Demander les 4 propositions de réponse à la question en cours")
+    async def quiz_indice(self, ctx):
+        if ctx.guild.id in self.games:
+            if "question" in self.games[ctx.guild.id]:
+                self.games[ctx.guild.id]["indice"] = True
+                await self.send_question(ctx)
+        else:
+            await ctx.send("Il n'y a pas de quiz en cours dans ce serveur !")
 
-        elif option == "indice":
-            if ctx.guild.id in self.games:
-                if "question" in self.games[ctx.guild.id]:
-                    await self.indice(ctx)
-            else:
-                await ctx.send("Il n'y a pas de quiz en cours dans ce serveur !")
-
-        elif option == "stop":
-            if ctx.guild.id in self.games:
-                if "question" in self.games[ctx.guild.id]:
-                    await self.stop(ctx)
-            else:
-                await ctx.send("Il n'y a pas de quiz en cours dans ce serveur !")
+    @commands.command(name="quiz-stop", help="Annule la question de quiz en cours")
+    async def quiz_stop(self, ctx):
+        if ctx.guild.id in self.games:
+            if "question" in self.games[ctx.guild.id]:
+                await self.stop(ctx)
+        else:
+            await ctx.send("Il n'y a pas de quiz en cours dans ce serveur !")
 
     @commands.Cog.listener('on_message')
     async def process_game(self, message):
@@ -166,10 +166,6 @@ class Quiz(commands.Cog):
                     inline=True
                 )
         await ctx.send(embed=embed)
-
-    async def indice(self, ctx):
-        self.games[ctx.guild.id]["indice"] = True
-        await self.send_question(ctx)
 
     async def stop(self, ctx):
         title = "Quiz - Fin de la question"
