@@ -16,8 +16,6 @@ def setup(bot):
 
 
 class Quiz(commands.Cog):
-    api_last_call = None
-
     def __init__(self, bot):
         self.bot = bot
 
@@ -44,6 +42,7 @@ class Quiz(commands.Cog):
             "anec": "1",
             "wiki": "1"
         }
+        self.api_last_call = None
 
     @commands.command(name="quiz", help="Demande une question du quiz")
     async def quiz(self, ctx):
@@ -78,8 +77,8 @@ class Quiz(commands.Cog):
 
     async def launch_game(self, ctx):
         self.games[ctx.guild.id] = {}
-        if Quiz.api_last_call:
-            delta = (datetime.datetime.now() - Quiz.api_last_call).seconds
+        if self.api_last_call:
+            delta = (datetime.datetime.now() - self.api_last_call).seconds
             if delta < 65:
                 response = f"J'envoie une question dans {65 - delta} seconde(s) !"
                 await ctx.send(response)
@@ -89,7 +88,7 @@ class Quiz(commands.Cog):
             self.bot.log.warning(f"Asking for a quiz question")
             async with session.get(self.API_URL, params=self.API_PARAMETERS) as r:
                 if r.status == 200:
-                    Quiz.api_last_call = datetime.datetime.now()
+                    self.api_last_call = datetime.datetime.now()
                     question = await r.json()
                     if question["response_code"] == 0:  # Succès
                         self.games[ctx.guild.id] = question["results"][0]
