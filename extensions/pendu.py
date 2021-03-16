@@ -35,63 +35,8 @@ class Pendu(commands.Cog):
             "ODS7.txt"
         )
 
-    @commands.command(name="pendu", help="Joue au pendu")
-    async def pendu(self, ctx, option: str="help"):
-        option = option.casefold().strip()
-
-        if option == "status":
-            await self.status(ctx)
-
-        elif option == "start":
-            await self.start(ctx)
-
-        elif option == "stop":
-            await self.stop(ctx)
-
-        elif option == "restart" or option == "reboot":
-            await self.restart(ctx)
-
-        elif re.match(r"^[a-z]$", option):
-            await self.guess(ctx, option)
-
-        else:  # Display help
-            response = (
-                "Les commandes du jeu du pendu :\n```\n"
-                + "!pendu start                       "
-                + "Lance une partie\n"
-                + "!pendu stop                        "
-                + "Arrête la partie en cours\n"
-                + "!pendu restart (ou !pendu reboot)  "
-                + "Arrête la partie en cours et en relance une\n"
-                + "!pendu status                      "
-                + "Affiche le status de la partie en cours\n"
-                + "!pendu <lettre>                    "
-                + "Proposer une lettre\n```"
-            )
-            await ctx.send(response)
-
-    async def status(self, ctx):
-        if ctx.channel.id in self.games:
-            visible_word = self.games[ctx.channel.id]["visible_word"]
-            response = (
-                "Le mot à deviner : "
-                + visible_word.replace("*", "\*")
-                + "\nLes lettres déjà proposées : "
-            )
-            for letter in self.games[ctx.channel.id]["guessed_letters"]:
-                response += f"{letter} "
-            response += (
-                "\nLe pendu :\n```\n"
-                + self.hanged_drawing(
-                    self.games[ctx.channel.id]["number_stroke"]
-                )
-                + "\n```"
-            )
-            await ctx.send(response)
-        else:
-            await self.no_game(ctx)
-
-    async def start(self, ctx):
+    @commands.command(name="pendu", help="Démarre une nouvelle partie de pendu")
+    async def pendu(self, ctx):
         if ctx.channel.id not in self.games:
             # If no game is currently running in this text channel
             try:
@@ -175,7 +120,28 @@ class Pendu(commands.Cog):
             )
         await ctx.send(response)
 
-    async def stop(self, ctx):
+    @commands.command(name="pendu-status", help="Affiche le status de la partie en cours")
+    async def pendu_status(self, ctx):
+        if ctx.channel.id in self.games:
+            visible_word = self.games[ctx.channel.id]["visible_word"]
+            response = (
+                "Le mot à deviner : "
+                + visible_word.replace("*", "\*")
+                + "\nLes lettres déjà proposées : "
+            )
+            for letter in self.games[ctx.channel.id]["guessed_letters"]:
+                response += f"{letter} "
+            response += (
+                "\nLe pendu :\n```\n"
+                + self.hanged_drawing(self.games[ctx.channel.id]["number_stroke"])
+                + "\n```"
+            )
+            await ctx.send(response)
+        else:
+            await self.no_game(ctx)
+
+    @commands.command(name="pendu-stop", help="Arrête la partie en cours")
+    async def pendu_stop(self, ctx):
         if ctx.channel.id in self.games:
             # If a game is currently running in this text channel
             response = (
@@ -188,56 +154,36 @@ class Pendu(commands.Cog):
         else:  # No game is currently running in this text channel
             await self.no_game(ctx)
 
-    async def no_game(self, ctx):
-        response = (
-            "Aucune partie de pendu n'est en cours ! "
-            + "Mais vous pouvez en lancer une avec la commande '!pendu start'"
-        )
-        await ctx.send(response)
-
-    async def restart(self, ctx):
-        if ctx.channel.id in self.games:
+    @commands.Cog.listener('on_message')
+    async def pendu_process_game(self, message):
+        if message.channel.id in self.games and re.match(r"^[a-z]$", message.content):
             # If a game is currently running in this text channel
-            response = (
-                "Bon, on recommence. Mais juste pour info, "
-                + "le mot précédent à deviner était : "
-                + f"{self.games[ctx.channel.id]['secret_word']} "
-                + f"({self.games[ctx.channel.id]['definition']})"
-            )
-            del self.games[ctx.channel.id]  # Delete the current game
-            await ctx.send(response)
-
-        await self.start(ctx)
-
-    async def guess(self, ctx, option):
-        if ctx.channel.id in self.games:
-            # If a game is currently running in this text channel
-            response = ""
+            ctx = await self.bot.get_context(message)
             guessed_letters = []  # Clean list of guessed letters
             for letters in self.games[ctx.channel.id]["guessed_letters"]:
                 guessed_letters.append(
                     re.findall(r"[a-z]", letters, flags=re.IGNORECASE)[0]
                 )
 
-            if option in guessed_letters:
+            if message.content in guessed_letters:
                 # If the guessed letter has already been guessed
-                response = f"Vous avez déjà demandé la lettre {option} !"
+                response = f"Vous avez déjà demandé la lettre {message.content} !"
 
-            elif option in self.games[ctx.channel.id]["secret_word"]:
+            elif message.content in self.games[ctx.channel.id]["secret_word"]:
                 # If the guessed letter is in the secret word
                 response = "Oui !"
                 # Add the letter to the guessed letters list
-                self.games[ctx.channel.id]["guessed_letters"].append(option)
+                self.games[ctx.channel.id]["guessed_letters"].append(message.content)
 
                 length_secret_word = len(
                     self.games[ctx.channel.id]["secret_word"]
                 )
                 for i in range(length_secret_word):
                     # Replace the guessed letter in the visible word
-                    if self.games[ctx.channel.id]["secret_word"][i] == option:
+                    if self.games[ctx.channel.id]["secret_word"][i] == message.content:
                         self.games[ctx.channel.id]["visible_word"] = (
                             self.games[ctx.channel.id]["visible_word"][:i]
-                            + option
+                            + message.content
                             + self.games[ctx.channel.id]["visible_word"][i+1:]
                         )
 
@@ -265,7 +211,7 @@ class Pendu(commands.Cog):
 
                 # Add the letter to the guessed letters list
                 self.games[ctx.channel.id]["guessed_letters"].append(
-                    f"~~{option}~~"
+                    f"~~{message.content}~~"
                 )
                 # Decrement the stroke number
                 self.games[ctx.channel.id]["number_stroke"] -= 1
@@ -287,10 +233,14 @@ class Pendu(commands.Cog):
                     return
 
             await ctx.send(response)
-            await self.status(ctx)
+            await self.pendu_status(ctx)
 
-        else:  # No game is currently running in this text channel
-            await self.no_game(ctx)
+    async def no_game(self, ctx):
+        response = (
+            "Aucune partie de pendu n'est en cours ! "
+            + "Mais vous pouvez en lancer une avec la commande '!pendu start'"
+        )
+        await ctx.send(response)
 
     def hanged_drawing(self, number_stroke):
         if number_stroke == 10:
