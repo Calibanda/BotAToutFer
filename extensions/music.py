@@ -30,7 +30,7 @@ ytdl_format_options = {
     'quiet': True,
     'no_warnings': True,
     'default_search': 'auto',
-    'source_address': '0.0.0.0' # bind to ipv4 since ipv6 addresses cause issues sometimes
+    'source_address': '0.0.0.0'  # bind to ipv4 since ipv6 addresses cause issues sometimes
 }
 
 ffmpeg_options = {
@@ -72,7 +72,8 @@ class Music(commands.Cog):
         self.MUSIC_DIR = os.path.join(Path.home(), 'Music')
         self.RPG_COMBAT_DIR = os.path.join(self.MUSIC_DIR, "RPG_Combat")
         self.RPG_EXPLORATION_DIR = os.path.join(self.MUSIC_DIR, "RPG_Exploration")
-        self.RPG_TAVERN_DIR = os.path.join(self.MUSIC_DIR, "RPG_TAVERN")
+        self.RPG_TAVERN_DIR = os.path.join(self.MUSIC_DIR, "RPG_Tavern")
+        self.MYUU_DIR = os.path.join(self.MUSIC_DIR, "Myuu")
 
     @commands.command(name="join", help="Connecte le bot dans un salon vocal")
     async def join(self, ctx, *, channel: discord.VoiceChannel=None):
@@ -100,6 +101,8 @@ class Music(commands.Cog):
             await self.play_rpg_music(ctx, self.RPG_EXPLORATION_DIR)
         elif query == "tavern":
             await self.play_rpg_music(ctx, self.RPG_TAVERN_DIR)
+        elif query == "myuu":
+            await self.play_rpg_music(ctx, self.MYUU_DIR)
         elif urlparse(query).netloc:
 
             try:
