@@ -490,7 +490,7 @@ class Games(commands.Cog, name="Jeux"):
 
     def save_pendu_score(self, guild_id, author_id, game_duration):
         try:
-            with open(self.SCORE_PATH, "w") as f:
+            with open(self.SCORE_PATH, "r") as f:
                 scores = json.load(f)
         except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
             self.bot.log.error(f"Caught exception:", exc_info=e)
@@ -513,7 +513,7 @@ class Games(commands.Cog, name="Jeux"):
 
     def save_quiz_score(self, guild_id, author_id, points):
         try:
-            with open(self.SCORE_PATH, "w") as f:
+            with open(self.SCORE_PATH, "r") as f:
                 scores = json.load(f)
         except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
             self.bot.log.error(f"Caught exception:", exc_info=e)
@@ -536,7 +536,7 @@ class Games(commands.Cog, name="Jeux"):
     @commands.command(name="scores", help="Affiche les scores des jeux")
     async def scores(self, ctx):
         try:
-            with open(self.SCORE_PATH, "w") as f:
+            with open(self.SCORE_PATH, "r") as f:
                 scores = json.load(f)
         except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
             self.bot.log.error(f"Caught exception:", exc_info=e)
