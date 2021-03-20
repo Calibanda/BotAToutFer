@@ -11,28 +11,13 @@ from discord.ext import commands
 
 def setup(bot):
     bot.add_cog(Scheduled(bot))
-    bot.loop.create_task(Scheduled(bot).daily_task())
 
 
 class Scheduled(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.hidden_cog = True
-        self.CAT_CHANNELS_PATH = os.path.join(
-            self.bot.SCRIPT_DIR,
-            "package",
-            "cat_channels.json"
-        )
-        self.cat_authorized_channels = []
-        try:
-            with open(self.CAT_CHANNELS_PATH, "r") as f:
-                # Loads authorized channels id from json
-                for channel_id in json.load(f).keys():
-                    self.cat_authorized_channels.append(
-                        self.bot.get_channel(int(channel_id))
-                    )
-        except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
-            self.bot.log.error(f"Caught exception:", exc_info=e)
+        await self.daily_task()
 
     async def daily_task(self):
         await self.bot.wait_until_ready()
