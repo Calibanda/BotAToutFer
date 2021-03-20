@@ -19,6 +19,12 @@ class Games(commands.Cog, name="Jeux"):
     def __init__(self, bot):
         self.bot = bot
 
+        self.SCORE_PATH = os.path.join(
+            self.bot.SCRIPT_DIR,
+            "package",
+            "scores.json"
+        )
+
         self.pendu_games = {}
         # pendu_games = {discord.TextChannel.id: {
         #     "secret_word": "",
@@ -110,7 +116,7 @@ class Games(commands.Cog, name="Jeux"):
                 # We save the datetime of the start of the game
                 game["starting_time"] = datetime.datetime.now()
 
-                # We add the game dictionary in the class atribute "games"
+                # We add the game dictionary in the class attribute "games"
                 # linked with the id of the text channel
                 self.pendu_games[ctx.channel.id] = game
 
@@ -208,7 +214,7 @@ class Games(commands.Cog, name="Jeux"):
                     # Replace the guessed letter in the visible word
                     if self.pendu_games[ctx.channel.id]["secret_word"][i] == message.content:
                         self.pendu_games[ctx.channel.id]["visible_word"] = (
-                                self.pendu_games[ctx.channel.id]["visible_word"][:i]
+                            self.pendu_games[ctx.channel.id]["visible_word"][:i]
                             + message.content
                             + self.pendu_games[ctx.channel.id]["visible_word"][i + 1:]
                         )
@@ -228,6 +234,9 @@ class Games(commands.Cog, name="Jeux"):
                         + f"({self.pendu_games[ctx.channel.id]['definition']})\n"
                         + f"Durée de la partie : {game_duration}"
                     )
+
+                    self.save_pendu_score(ctx.guild.id, ctx.author.id, game_duration)
+
                     del self.pendu_games[ctx.channel.id]  # Delete the current game
                     await ctx.send(response)
                     return
@@ -451,6 +460,8 @@ class Games(commands.Cog, name="Jeux"):
         if self.quiz_games[message.guild.id]["indice"]:
             points = int(points/2)
 
+        self.save_quiz_score(message.guild.id, message.author.id, points)
+
         description = f"Bravo {message.author.name}. La réponse était " + self.quiz_games[message.guild.id]["reponse_correcte"] + f". {points} point(s) !"
         colors = {
             "débutant": 0x00ff00,
@@ -476,3 +487,91 @@ class Games(commands.Cog, name="Jeux"):
         )
         await message.channel.send(embed=embed)
         del self.quiz_games[message.guild.id]
+
+    def save_pendu_score(self, guild_id, author_id, game_duration):
+        try:
+            with open(self.SCORE_PATH, "w") as f:
+                scores = json.load(f)
+        except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
+            self.bot.log.error(f"Caught exception:", exc_info=e)
+            scores = {
+                "pendu": {},
+                "quiz": {}
+            }
+
+        if str(guild_id) in scores["pendu"]:
+            if str(author_id) in scores["pendu"][str(guild_id)]:
+                if game_duration.seconds < scores["pendu"][str(guild_id)][str(author_id)]:
+                    scores["pendu"][str(guild_id)][str(author_id)] = game_duration.seconds
+            else:
+                scores["pendu"][str(guild_id)][str(author_id)] = game_duration.seconds
+        else:
+            scores["pendu"][str(guild_id)] = {str(author_id): game_duration.seconds}
+
+        with open(self.SCORE_PATH, "w", encoding="utf8") as f:
+            json.dump(scores, f, indent=4)
+
+    def save_quiz_score(self, guild_id, author_id, points):
+        try:
+            with open(self.SCORE_PATH, "w") as f:
+                scores = json.load(f)
+        except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
+            self.bot.log.error(f"Caught exception:", exc_info=e)
+            scores = {
+                "pendu": {},
+                "quiz": {}
+            }
+
+        if str(guild_id) in scores["quiz"]:
+            if str(author_id) in scores["quiz"][str(guild_id)]:
+                scores["quiz"][str(guild_id)][str(author_id)] += points
+            else:
+                scores["quiz"][str(guild_id)][str(author_id)] = points
+        else:
+            scores["quiz"][str(guild_id)] = {str(author_id): points}
+
+        with open(self.SCORE_PATH, "w", encoding="utf8") as f:
+            json.dump(scores, f, indent=4)
+
+    @commands.command(name="scores", help="Affiche les scores des jeux")
+    def scores(self, ctx):
+        try:
+            with open(self.SCORE_PATH, "w") as f:
+                scores = json.load(f)
+        except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
+            self.bot.log.error(f"Caught exception:", exc_info=e)
+        else:
+            if str(ctx.guild.id) in scores["pendu"]:
+                user_scores = scores["pendu"][str(ctx.guild.id)]
+                user_scores = sorted(user_scores.items(), key=lambda x: x[1])
+
+                description = ""
+                for user_id, score in user_scores:
+                    description += self.bot.get_user(user_id).name + " : " + str(score) + " secondes\n"
+            else:
+                description = "Il n'y a pas de scores de pendu dans ce serveur !"
+
+            embed = discord.Embed(
+                title="Voici les scores du pendu !",
+                description=description
+            )
+
+            await ctx.send(embed=embed)
+
+            if str(ctx.guild.id) in scores["quiz"]:
+                user_scores = scores["quiz"][str(ctx.guild.id)]
+                user_scores = sorted(user_scores.items(), key=lambda x: x[1], reverse=True)
+
+                description = ""
+                for user_id, score in user_scores[:10]:
+                    description += self.bot.get_user(
+                        user_id).name + " : " + str(score) + " points\n"
+            else:
+                description = "Il n'y a pas de scores de quiz dans ce serveur !"
+
+            embed = discord.Embed(
+                title="Voici les scores du quiz !",
+                description=description
+            )
+
+            await ctx.send(embed=embed)
