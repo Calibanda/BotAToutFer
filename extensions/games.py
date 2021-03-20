@@ -534,7 +534,7 @@ class Games(commands.Cog, name="Jeux"):
             json.dump(scores, f, indent=4)
 
     @commands.command(name="scores", help="Affiche les scores des jeux")
-    def scores(self, ctx):
+    async def scores(self, ctx):
         try:
             with open(self.SCORE_PATH, "w") as f:
                 scores = json.load(f)
