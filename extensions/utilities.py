@@ -229,6 +229,7 @@ class Utilitaire(commands.Cog):
         ) as scrabble_dictionary:
 
             dico_possible_words = {}
+            trestle = discord.utils.escape_markdown(trestle)
             trestle = convert_word(trestle)
 
             lines = scrabble_dictionary.readlines()
