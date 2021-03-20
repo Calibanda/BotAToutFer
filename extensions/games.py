@@ -493,7 +493,7 @@ class Games(commands.Cog, name="Jeux"):
             with open(self.SCORE_PATH, "r") as f:
                 scores = json.load(f)
         except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
-            self.bot.log.error(f"Caught exception:", exc_info=e)
+            self.bot.log.error("No score.json file: ", exc_info=e)
             scores = {
                 "pendu": {},
                 "quiz": {}
@@ -516,7 +516,7 @@ class Games(commands.Cog, name="Jeux"):
             with open(self.SCORE_PATH, "r") as f:
                 scores = json.load(f)
         except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
-            self.bot.log.error(f"Caught exception:", exc_info=e)
+            self.bot.log.error("No score.json file: ", exc_info=e)
             scores = {
                 "pendu": {},
                 "quiz": {}
@@ -539,7 +539,9 @@ class Games(commands.Cog, name="Jeux"):
             with open(self.SCORE_PATH, "r") as f:
                 scores = json.load(f)
         except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
-            self.bot.log.error(f"Caught exception:", exc_info=e)
+            self.bot.log.error("No score.json file: ", exc_info=e)
+            response = "Il n'y a pas de scores enregistrés !"
+            await ctx.send(response)
         else:
             if str(ctx.guild.id) in scores["pendu"]:
                 user_scores = scores["pendu"][str(ctx.guild.id)]
