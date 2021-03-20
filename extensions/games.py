@@ -9,6 +9,7 @@ import datetime
 import asyncio
 import discord
 from discord.ext import commands
+from discord.ext.commands import UserConverter
 
 
 def setup(bot):
@@ -18,6 +19,7 @@ def setup(bot):
 class Games(commands.Cog, name="Jeux"):
     def __init__(self, bot):
         self.bot = bot
+        self.user_converter = UserConverter()
 
         self.SCORE_PATH = os.path.join(
             self.bot.SCRIPT_DIR,
@@ -549,7 +551,8 @@ class Games(commands.Cog, name="Jeux"):
 
                 description = ""
                 for user_id, score in user_scores:
-                    description += self.bot.get_user(user_id).name + " : " + str(score) + " secondes\n"
+                    user = await self.user_converter.convert(ctx, user_id)
+                    description += user.name + " : " + str(score) + " secondes\n"
             else:
                 description = "Il n'y a pas de scores de pendu dans ce serveur !"
 
@@ -566,8 +569,8 @@ class Games(commands.Cog, name="Jeux"):
 
                 description = ""
                 for user_id, score in user_scores[:10]:
-                    description += self.bot.get_user(
-                        user_id).name + " : " + str(score) + " points\n"
+                    user = await self.user_converter.convert(ctx, user_id)
+                    description += user.name + " : " + str(score) + " points\n"
             else:
                 description = "Il n'y a pas de scores de quiz dans ce serveur !"
 
