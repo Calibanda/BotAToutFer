@@ -11,7 +11,7 @@ class Says(commands.Cog):
         self.bot = bot
         self.hidden_cog = True
 
-    @commands.command(name="says", help="Fait dire quelque chose au bot")
+    @commands.command(name="says", alias="say", help="Fait dire quelque chose au bot")
     async def says(self, ctx, *, arg: str):
         response = arg
         await ctx.message.delete()
