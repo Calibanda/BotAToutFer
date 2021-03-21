@@ -17,7 +17,7 @@ class RollDice(commands.Cog, name="Jets de dés"):
         self.dice_regex = r"\d+d\d+"
 
     @commands.command(name="roll", help="Simule un lancer de dés au format xDx")
-    async def roll(self, ctx, calculation=""):
+    async def roll(self, ctx, *, calculation=""):
         """Rolls a dice in xDx format."""
         calculation = calculation.lower().strip()
 
