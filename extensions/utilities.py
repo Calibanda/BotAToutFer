@@ -3,7 +3,6 @@ import os
 import random
 import json
 import re
-import aiohttp
 from bs4 import BeautifulSoup
 
 import discord
@@ -54,47 +53,46 @@ class Utilitaire(commands.Cog):
 
     @commands.command(name="news", help="Donne le lien d'un ou plusieurs articles de presse du jour (par défaut 1)")
     async def news(self, ctx, number_tiles: int=1):
-        async with aiohttp.ClientSession() as session:
-            self.bot.log.warning(f"Asking for the local news")
-            async with session.get(url=self.NEWS_API_URL, params=self.NEWS_API_PARAMS) as r:  # Retrieve last news
-                if r.status == 200:
-                    news = await r.json()
+        self.bot.log.warning(f"Asking for the local news")
+        async with self.bot.http_session.get(url=self.NEWS_API_URL, params=self.NEWS_API_PARAMS) as r:  # Retrieve last news
+            if r.status == 200:
+                news = await r.json()
 
-                    try:
-                        # We try to load the news that have already
-                        # been displayed by the bot
-                        with open(self.LAST_NEWS_URL_PATH, "r") as f:
-                            old_news = json.load(f)
-                    except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
-                        self.bot.log.error("last_news_url.json file not found: ", exc_info=e)
-                        old_news = []
+                try:
+                    # We try to load the news that have already
+                    # been displayed by the bot
+                    with open(self.LAST_NEWS_URL_PATH, "r") as f:
+                        old_news = json.load(f)
+                except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
+                    self.bot.log.error("last_news_url.json file not found: ", exc_info=e)
+                    old_news = []
 
-                    # We retrieve all the url that hasn't
-                    # been already displayed
-                    today_news = []
-                    for article in news["articles"]:
-                        if article["url"] not in old_news:
-                            today_news.append(article["url"])
+                # We retrieve all the url that hasn't
+                # been already displayed
+                today_news = []
+                for article in news["articles"]:
+                    if article["url"] not in old_news:
+                        today_news.append(article["url"])
 
-                    # We keep at most the number of articles asked
-                    # from the user
-                    news_to_display = today_news[:number_tiles]
+                # We keep at most the number of articles asked
+                # from the user
+                news_to_display = today_news[:number_tiles]
 
-                    if not news_to_display:
-                        response = "Pas de nouveaux articles en ce moment, réessaye plus tard."
-                        await ctx.send(response)
-                        return
+                if not news_to_display:
+                    response = "Pas de nouveaux articles en ce moment, réessaye plus tard."
+                    await ctx.send(response)
+                    return
 
-                    for news in news_to_display:
-                        await ctx.send(news)
+                for news in news_to_display:
+                    await ctx.send(news)
 
-                    # We add the just displayed news to the old ones
-                    old_news = old_news + news_to_display
+                # We add the just displayed news to the old ones
+                old_news = old_news + news_to_display
 
-                    with open(self.LAST_NEWS_URL_PATH, "w") as f:
-                        # We store the 25 most recent displayed articles
-                        # in a json file
-                        json.dump(old_news[-25:], f, indent=4)
+                with open(self.LAST_NEWS_URL_PATH, "w") as f:
+                    # We store the 25 most recent displayed articles
+                    # in a json file
+                    json.dump(old_news[-25:], f, indent=4)
 
     @commands.command(name="meteo", help="Donne la météo (d'une ville au hasard dans le monde)")
     async def meteo(self, ctx):
@@ -108,19 +106,18 @@ class Utilitaire(commands.Cog):
 
         random_city_id = random.choice(list_city_id)
 
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url=self.WEATHER_API_URL, params=self.WEATHER_API_PARAMS | {"id": str(random_city_id)}) as r:
-                if r.status == 200:
-                    weather = await r.json()
+        async with self.bot.http_session.get(url=self.WEATHER_API_URL, params=self.WEATHER_API_PARAMS | {"id": str(random_city_id)}) as r:
+            if r.status == 200:
+                weather = await r.json()
 
-                    w_description = weather["weather"][0]["description"]
-                    w_temp = round(weather["main"]["temp"], ndigits=1)
-                    w_city = weather["name"]
-                    w_country = weather["sys"]["country"]
+                w_description = weather["weather"][0]["description"]
+                w_temp = round(weather["main"]["temp"], ndigits=1)
+                w_city = weather["name"]
+                w_country = weather["sys"]["country"]
 
-                    self.bot.log.warning(f"Asking for the weather of the city {w_city} in {w_country} (id: {random_city_id})")
-                    response = f"Actuellement {w_description}, il fait {w_temp} °C à {w_city} ({w_country}) :earth_africa:"
-                    await ctx.send(response)
+                self.bot.log.warning(f"Asking for the weather of the city {w_city} in {w_country} (id: {random_city_id})")
+                response = f"Actuellement {w_description}, il fait {w_temp} °C à {w_city} ({w_country}) :earth_africa:"
+                await ctx.send(response)
 
     @commands.command(name="scrabble", help="Donne les mots possibles au Scrabble avec une combinaison donnée (entrer une * pour saisir un joker)")
     async def scrabble(self, ctx, trestle=""):
@@ -225,163 +222,160 @@ class Utilitaire(commands.Cog):
 
     @commands.command(name="inutile", help="Donne un savoir inutile")
     async def inutile(self, ctx, number=1):
-        async with aiohttp.ClientSession() as session:
-            for _ in range(min(number, 5)):
-                self.bot.log.warning(f"Asking a useless piece of knowledge")
-                async with session.get(url=self.KNOWLEDGE_URL) as r:
-                    # Retrieve a useless piece of knowledge
-                    if r.status == 200:
-                        html = await r.text("utf-8")
-                        soup = BeautifulSoup(html, "html.parser")
+        for _ in range(min(number, 5)):
+            self.bot.log.warning(f"Asking a useless piece of knowledge")
+            async with self.bot.http_session.get(url=self.KNOWLEDGE_URL) as r:
+                # Retrieve a useless piece of knowledge
+                if r.status == 200:
+                    html = await r.text("utf-8")
+                    soup = BeautifulSoup(html, "html.parser")
 
-                        knowledge = soup.find(id="phrase").string
-                        link = soup.find("meta", attrs={"name": "og:url"})["content"]
-                        publication_date = soup.find("div", id="publication").find_all("span")[-1].string.strip()
+                    knowledge = soup.find(id="phrase").string
+                    link = soup.find("meta", attrs={"name": "og:url"})["content"]
+                    publication_date = soup.find("div", id="publication").find_all("span")[-1].string.strip()
 
-                        embed = discord.Embed(
-                            title="Savoir Inutile",
-                            description=knowledge,
-                            url=link
-                        )
-                        embed.add_field(
-                            name="Date",
-                            value=publication_date,
-                            inline=True
-                        )
+                    embed = discord.Embed(
+                        title="Savoir Inutile",
+                        description=knowledge,
+                        url=link
+                    )
+                    embed.add_field(
+                        name="Date",
+                        value=publication_date,
+                        inline=True
+                    )
 
-                        await ctx.send(embed=embed)
+                    await ctx.send(embed=embed)
 
     @commands.command(name="tv", help="Donne le programme de la TNT de ce soir")
     async def tv(self, ctx, channel_number=0):
-        async with aiohttp.ClientSession() as session:
-            self.bot.log.warning(f"Asking for the TNT program of the night")
-            async with session.get(url=self.TV_URL) as r:
-                # Retrieve the TNT program of the night
-                if r.status == 200:
-                    html = await r.text("utf-8")
+        self.bot.log.warning(f"Asking for the TNT program of the night")
+        async with self.bot.http_session.get(url=self.TV_URL) as r:
+            # Retrieve the TNT program of the night
+            if r.status == 200:
+                html = await r.text("utf-8")
 
-                    soup = BeautifulSoup(html, "html.parser")
+                soup = BeautifulSoup(html, "html.parser")
 
-                    date_and_hour = soup.find(class_="timeNavigationOverlay-currentDate").p.string
+                date_and_hour = soup.find(class_="timeNavigationOverlay-currentDate").p.string
 
-                    list_date_and_hour = []
-                    for line in date_and_hour.split("\n"):
-                        if line.strip():
-                            list_date_and_hour.append(line.strip())
+                list_date_and_hour = []
+                for line in date_and_hour.split("\n"):
+                    if line.strip():
+                        list_date_and_hour.append(line.strip())
 
-                    date_and_hour = " ".join(list_date_and_hour)
+                date_and_hour = " ".join(list_date_and_hour)
 
-                    date, hour = date_and_hour.split(" de ")
+                date, hour = date_and_hour.split(" de ")
 
-                    # List that contain div of all the channels
-                    div_channels = soup.findAll(class_="doubleBroadcastCard")
-                    channels = {}
-                    # {1: "Sur la chaîne TF1 (Chaîne n°1) :...",
-                    # 2: "Sur la chaîne France 2 (Chaîne n°2) :..."}
+                # List that contain div of all the channels
+                div_channels = soup.findAll(class_="doubleBroadcastCard")
+                channels = {}
+                # {1: "Sur la chaîne TF1 (Chaîne n°1) :...",
+                # 2: "Sur la chaîne France 2 (Chaîne n°2) :..."}
 
-                    for channel in div_channels:
-                        # For all div in the list, we create a response
-                        # with the program of the channel
-                        channel_name = channel.find(class_="doubleBroadcastCard-channel").a.string.strip()
-                        channel_nb = channel.find(class_="doubleBroadcastCard-channelNumber").string.strip()
+                for channel in div_channels:
+                    # For all div in the list, we create a response
+                    # with the program of the channel
+                    channel_name = channel.find(class_="doubleBroadcastCard-channel").a.string.strip()
+                    channel_nb = channel.find(class_="doubleBroadcastCard-channelNumber").string.strip()
 
-                        program_hours = []
-                        for hour in channel.findAll(
-                                class_="doubleBroadcastCard-hour"):
-                            program_hours.append(hour.string.strip())
+                    program_hours = []
+                    for hour in channel.findAll(
+                            class_="doubleBroadcastCard-hour"):
+                        program_hours.append(hour.string.strip())
 
-                        program_infos = channel.findAll(class_="doubleBroadcastCard-infos")
+                    program_infos = channel.findAll(class_="doubleBroadcastCard-infos")
 
-                        channel_response = f"\n  Sur la chaîne {channel_name} ({channel_nb}) :\n"
+                    channel_response = f"\n  Sur la chaîne {channel_name} ({channel_nb}) :\n"
 
-                        for i in range(len(program_hours)):
-                            program_title = program_infos[i].find(class_="doubleBroadcastCard-title").string.strip()
+                    for i in range(len(program_hours)):
+                        program_title = program_infos[i].find(class_="doubleBroadcastCard-title").string.strip()
 
-                            if program_infos[i].findAll(class_="doubleBroadcastCard-subtitle"):
-                                program_subtitle = program_infos[i].findAll(class_="doubleBroadcastCard-subtitle")[0].string.strip()
-                                list_program_subtile = []
-                                for line in program_subtitle.split("\n"):
-                                    if line.strip():
-                                        list_program_subtile.append(line.strip())
-                                program_subtitle = " ".join(list_program_subtile)
-                                program_title += " - " + program_subtitle
+                        if program_infos[i].findAll(class_="doubleBroadcastCard-subtitle"):
+                            program_subtitle = program_infos[i].findAll(class_="doubleBroadcastCard-subtitle")[0].string.strip()
+                            list_program_subtile = []
+                            for line in program_subtitle.split("\n"):
+                                if line.strip():
+                                    list_program_subtile.append(line.strip())
+                            program_subtitle = " ".join(list_program_subtile)
+                            program_title += " - " + program_subtitle
 
-                            program_link = program_infos[i].find(class_="doubleBroadcastCard-title")["href"]
-                            program_category = program_infos[i].find(class_="doubleBroadcastCard-type").string.strip()
-                            program_hour = program_hours[i]
-                            program_duration = program_infos[i].find(class_="doubleBroadcastCard-durationContent").string.strip()
+                        program_link = program_infos[i].find(class_="doubleBroadcastCard-title")["href"]
+                        program_category = program_infos[i].find(class_="doubleBroadcastCard-type").string.strip()
+                        program_hour = program_hours[i]
+                        program_duration = program_infos[i].find(class_="doubleBroadcastCard-durationContent").string.strip()
 
-                            channel_response += f"    À {program_hour} {program_title}\n"
+                        channel_response += f"    À {program_hour} {program_title}\n"
 
-                        # The channel number (int) will be a key
-                        # in the dictionary
-                        channel_nb = int(re.search(r"\d+", channel_nb)[0])
+                    # The channel number (int) will be a key
+                    # in the dictionary
+                    channel_nb = int(re.search(r"\d+", channel_nb)[0])
 
-                        # Key: channel number (int).
-                        # Value: channel program (str)
-                        channels[channel_nb] = channel_response
+                    # Key: channel number (int).
+                    # Value: channel program (str)
+                    channels[channel_nb] = channel_response
 
-                    if channel_number:
-                        # If the user ask for a specific channel
-                        try:
-                            # We try to send the program of the channel if any
-                            response = (
-                                f"```Programme de ce {date} soir :\n"
-                                + channels[channel_number]
-                                + "```"
-                            )
-                            await ctx.send(response)
-                        except KeyError as e:
-                            await ctx.send("Je ne connais pas cette chaîne.")
-                        finally:
-                            return
+                if channel_number:
+                    # If the user ask for a specific channel
+                    try:
+                        # We try to send the program of the channel if any
+                        response = (
+                            f"```Programme de ce {date} soir :\n"
+                            + channels[channel_number]
+                            + "```"
+                        )
+                        await ctx.send(response)
+                    except KeyError as e:
+                        await ctx.send("Je ne connais pas cette chaîne.")
+                    finally:
+                        return
 
-                    else:  # If the user DOESNT ask for a specific channel
-                        # We create a new response string
-                        response = f"```Programme de ce {date} soir :\n"
-                        for item in channels.values():
-                            # For all the items in the dictionary
-                            if len(response + item) + 3 < 2000:
-                                # If next channel can be added
-                                # without exceed the Discord limit,
-                                # we add the program of the channel
-                                # to the response
-                                response += item
-                            else:
-                                # If next channel CANNOT be added
-                                # without exceed the Discord limit
-                                response += "```"
-                                await ctx.send(response)
-                                response = "```\n"  # We create a new response
-                                # We add the program of
-                                # the channel to the new response
-                                response += item
-                        if len(response) > 3:
-                            # We exhaust all the dictionary,
-                            # we send the last channels if any
+                else:  # If the user DOESNT ask for a specific channel
+                    # We create a new response string
+                    response = f"```Programme de ce {date} soir :\n"
+                    for item in channels.values():
+                        # For all the items in the dictionary
+                        if len(response + item) + 3 < 2000:
+                            # If next channel can be added
+                            # without exceed the Discord limit,
+                            # we add the program of the channel
+                            # to the response
+                            response += item
+                        else:
+                            # If next channel CANNOT be added
+                            # without exceed the Discord limit
                             response += "```"
                             await ctx.send(response)
+                            response = "```\n"  # We create a new response
+                            # We add the program of
+                            # the channel to the new response
+                            response += item
+                    if len(response) > 3:
+                        # We exhaust all the dictionary,
+                        # we send the last channels if any
+                        response += "```"
+                        await ctx.send(response)
 
     @commands.command(name="dico", help="Donne la définition du mot demandé")
     async def dico(self, ctx, word: str=""):
         if word:
             word = re.split("\W", word.lower())[0]
-            async with aiohttp.ClientSession() as session:
-                self.bot.log.warning(f"Asking for word definition")
-                url = f"https://api.dicolink.com/v1/mot/{word}/definitions"
-                params = {"limite": "1", "api_key": self.bot.DICOLINK_TOKEN}
-                async with session.get(url=url, params=params) as r:  # Retrieve a definition
-                    if r.status == 200:
-                        definition = await r.json()
-                        try:
-                            response = (
-                                f"Définition du mot "
-                                + f"\"{definition[0]['mot']}\" : "
-                                + f"{definition[0]['definition']}"
-                            )
-                        except KeyError as e:
-                            response = "Ce mot n'existe pas"
-                        await ctx.send(response)
+            self.bot.log.warning(f"Asking for word definition")
+            url = f"https://api.dicolink.com/v1/mot/{word}/definitions"
+            params = {"limite": "1", "api_key": self.bot.DICOLINK_TOKEN}
+            async with self.bot.http_session.get(url=url, params=params) as r:  # Retrieve a definition
+                if r.status == 200:
+                    definition = await r.json()
+                    try:
+                        response = (
+                            f"Définition du mot "
+                            + f"\"{definition[0]['mot']}\" : "
+                            + f"{definition[0]['definition']}"
+                        )
+                    except KeyError as e:
+                        response = "Ce mot n'existe pas"
+                    await ctx.send(response)
 
     @commands.command(name="marmiton", help="Retourne des recettes liées à un thème donné sur marmiton")
     async def marmiton(self, ctx, *, options:str=""):
@@ -490,85 +484,84 @@ class Utilitaire(commands.Cog):
                 if seasonal:
                     http_params.append(("type", "season"))
 
-                async with aiohttp.ClientSession() as session:
-                    self.bot.log.warning(f"Asking recipes on marmiton")
-                    async with session.get(url=self.MARMITON_URL, params=http_params) as r:
-                        # Retrieve a marmiton page
-                        if r.status == 200:
-                            html = await r.text("utf-8")
-                            soup = BeautifulSoup(html, "html.parser")
+                self.bot.log.warning(f"Asking recipes on marmiton")
+                async with self.bot.http_session.get(url=self.MARMITON_URL, params=http_params) as r:
+                    # Retrieve a marmiton page
+                    if r.status == 200:
+                        html = await r.text("utf-8")
+                        soup = BeautifulSoup(html, "html.parser")
 
-                            nb_results = soup.find(class_="recipe-search__nb-results").string.strip()
-                            nb_results = int(re.search(r"\d+", nb_results)[0])
+                        nb_results = soup.find(class_="recipe-search__nb-results").string.strip()
+                        nb_results = int(re.search(r"\d+", nb_results)[0])
 
-                            if nb_results:
-                                div_results = soup.find("div", class_="recipe-results")
-                                list_recipes = div_results.find_all(class_="recipe-card")
-                                nb_recipes = min(nb_recipes, len(list_recipes))
+                        if nb_results:
+                            div_results = soup.find("div", class_="recipe-results")
+                            list_recipes = div_results.find_all(class_="recipe-card")
+                            nb_recipes = min(nb_recipes, len(list_recipes))
 
-                                response = f"{nb_results} résultat(s) trouvé sur Marmiton ! J'en affiche {nb_recipes}"
-                                await ctx.send(response)
+                            response = f"{nb_results} résultat(s) trouvé sur Marmiton ! J'en affiche {nb_recipes}"
+                            await ctx.send(response)
 
-                                for i in range(nb_recipes):
-                                    div_recipe = list_recipes[i]
+                            for i in range(nb_recipes):
+                                div_recipe = list_recipes[i]
 
-                                    element_description = div_recipe.find(class_="recipe-card__description").contents
-                                    description = ""
-                                    for element in element_description:
-                                        if element == "\n":
-                                            continue
-                                        try:
-                                            description += str(element.contents[0])
-                                        except Exception as e:
-                                            description += str(element)
-                                    description = description.replace("<br/>", "\n")
+                                element_description = div_recipe.find(class_="recipe-card__description").contents
+                                description = ""
+                                for element in element_description:
+                                    if element == "\n":
+                                        continue
+                                    try:
+                                        description += str(element.contents[0])
+                                    except Exception as e:
+                                        description += str(element)
+                                description = description.replace("<br/>", "\n")
 
-                                    div_rating = div_recipe.find(class_="recipe-card__rating")
-                                    rating = div_rating.find(class_="recipe-card__rating__value").string.strip()
-                                    rating += " " + div_rating.find(class_="recipe-card__rating__value__fract").string.strip()
-                                    rating += " " + div_rating.find(class_="mrtn-font-discret").string.strip()
+                                div_rating = div_recipe.find(class_="recipe-card__rating")
+                                rating = div_rating.find(class_="recipe-card__rating__value").string.strip()
+                                rating += " " + div_rating.find(class_="recipe-card__rating__value__fract").string.strip()
+                                rating += " " + div_rating.find(class_="mrtn-font-discret").string.strip()
 
-                                    embed = discord.Embed(
-                                        title=div_recipe.find("h4").string.strip(),
-                                        description=description,
-                                        url="https://www.marmiton.org" + div_recipe.find("a", class_="recipe-card-link")["href"],
-                                        color=0xFF9B90
-                                    )
-                                    embed.set_thumbnail(
-                                        url=div_recipe.find("img")["data-src"]
-                                    )
-                                    embed.set_author(
-                                        name=ctx.author.name,
-                                        icon_url=ctx.author.avatar_url
-                                    )
+                                embed = discord.Embed(
+                                    title=div_recipe.find("h4").string.strip(),
+                                    description=description,
+                                    url="https://www.marmiton.org" + div_recipe.find("a", class_="recipe-card-link")["href"],
+                                    color=0xFF9B90
+                                )
+                                embed.set_thumbnail(
+                                    url=div_recipe.find("img")["data-src"]
+                                )
+                                embed.set_author(
+                                    name=ctx.author.name,
+                                    icon_url=ctx.author.avatar_url
+                                )
+                                embed.add_field(
+                                    name="Durée",
+                                    value=div_recipe.find(class_="recipe-card__duration__value").string.strip(),
+                                    inline=True
+                                )
+                                embed.add_field(
+                                    name="Note",
+                                    value=rating,
+                                    inline=True
+                                )
+
+                                if div_recipe.find(class_="recipe-card__sponsored"):
+                                    sponsor = re.search(
+                                        pattern=r"(?<=\[).+(?=\])",
+                                        string=div_recipe.find(class_="recipe-card-link")["onclick"],
+                                        flags=re.IGNORECASE
+                                    )[0]
                                     embed.add_field(
-                                        name="Durée",
-                                        value=div_recipe.find(class_="recipe-card__duration__value").string.strip(),
+                                        name="Contenu sponsorisé",
+                                        value=sponsor,
                                         inline=True
                                     )
-                                    embed.add_field(
-                                        name="Note",
-                                        value=rating,
-                                        inline=True
-                                    )
 
-                                    if div_recipe.find(class_="recipe-card__sponsored"):
-                                        sponsor = re.search(
-                                            pattern=r"(?<=\[).+(?=\])",
-                                            string=div_recipe.find(class_="recipe-card-link")["onclick"],
-                                            flags=re.IGNORECASE
-                                        )[0]
-                                        embed.add_field(
-                                            name="Contenu sponsorisé",
-                                            value=sponsor,
-                                            inline=True
-                                        )
+                                await ctx.send(embed=embed)
 
-                                    await ctx.send(embed=embed)
-
-                            else:
-                                response = "Désolé, je n'ai pas trouvé de résultats..."
-                                return await ctx.send(response)
+                        else:
+                            response = "Désolé, je n'ai pas trouvé de résultats..."
+                            return await ctx.send(response)
 
             else:  # Display help
                 response = (

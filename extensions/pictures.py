@@ -1,6 +1,5 @@
 # background pictures for for BotÀToutFer (send cute animals pictures)
 import random
-import aiohttp
 import datetime
 import os
 import json
@@ -48,46 +47,44 @@ class Pictures(commands.Cog):
                 # Statistically send 1 message per day
                 # (one chance on 160 every 6 minutes between 7AM and 11PM)
                 try:
-                    async with aiohttp.ClientSession() as session:
+                    choice = random.choice(["cat", "cat", "cat", "otter", "red panda"])
+                    if choice == "cat":
+                        self.bot.log.warning(f"Asking for a cat pic in this channel: {channel.guild}, #{channel.name} ({channel.id})")
+                        async with self.bot.http_session.get(url=self.CAT_API_URL, params=self.CAT_API_PARAMS) as r:
+                            # Retrieve a cat json
+                            if r.status == 200:
+                                cat = await r.json()
+                                message = cat[0]["url"]
 
-                        choice = random.choice(["cat", "cat", "cat", "otter", "red panda"])
-                        if choice == "cat":
-                            self.bot.log.warning(f"Asking for a cat pic in this channel: {channel.guild}, #{channel.name} ({channel.id})")
-                            async with session.get(url=self.CAT_API_URL, params=self.CAT_API_PARAMS) as r:
-                                # Retrieve a cat json
-                                if r.status == 200:
-                                    cat = await r.json()
-                                    message = cat[0]["url"]
+                    elif choice == "red panda":
+                        self.bot.log.warning(f"Asking a red fox pic in this channel: {channel.guild}, #{channel.name} ({channel.id})")
+                        async with self.bot.http_session.get(url=self.RED_PANDA_URL) as r:
+                            # Retrieve a red fox json
+                            if r.status == 200:
+                                red_panda = await r.json()
+                                message = red_panda["link"]
 
-                        elif choice == "red panda":
-                            self.bot.log.warning(f"Asking a red fox pic in this channel: {channel.guild}, #{channel.name} ({channel.id})")
-                            async with session.get(url=self.RED_PANDA_URL) as r:
-                                # Retrieve a red fox json
-                                if r.status == 200:
-                                    red_panda = await r.json()
-                                    message = red_panda["link"]
+                    else:
+                        self.bot.log.warning(f"Asking an otter pic in this channel: {channel.guild}, #{channel.name} ({channel.id})")
+                        async with self.bot.http_session.get(url=self.OTTER_URL, params=self.OTTER_PARAMS) as r:
+                            if r.status == 200:
+                                otter = await r.json()
 
-                        else:
-                            self.bot.log.warning(f"Asking an otter pic in this channel: {channel.guild}, #{channel.name} ({channel.id})")
-                            async with session.get(url=self.OTTER_URL, params=self.OTTER_PARAMS) as r:
-                                if r.status == 200:
-                                    otter = await r.json()
+                                urls = []
+                                for post in otter["data"]["children"]:
+                                    try:
+                                        hint = post["data"]["post_hint"]
+                                        post_url = post["data"]["url"]
+                                    except Exception as e:
+                                        pass
+                                    else:
+                                        if post_url.startswith("https://i.redd.it/") and hint == "image":
+                                            urls.append(post["data"]["url"])
 
-                                    urls = []
-                                    for post in otter["data"]["children"]:
-                                        try:
-                                            hint = post["data"]["post_hint"]
-                                            post_url = post["data"]["url"]
-                                        except Exception as e:
-                                            pass
-                                        else:
-                                            if post_url.startswith("https://i.redd.it/") and hint == "image":
-                                                urls.append(post["data"]["url"])
+                                random.shuffle(urls)
+                                message = urls[0]
 
-                                    random.shuffle(urls)
-                                    message = urls[0]
-
-                        await channel.send(message)
+                    await channel.send(message)
 
                 except Exception as e:
                     self.bot.log.exception(f"Unable to send a cute picture in this channel: {channel.guild}, #{channel.name} ({channel.id})", exc_info=e)

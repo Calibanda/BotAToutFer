@@ -1,6 +1,7 @@
 # main.py
 import os
 
+import aiohttp
 from dotenv import load_dotenv
 import discord
 from discord.ext import commands
@@ -81,6 +82,8 @@ def bot_init():
             except commands.errors.ExtensionError as e:
                 bot.log.error(f"Erreur avec l'extension {e.name}", exc_info=e)
                 print(f"Erreur avec l'extension {e.name}")
+
+        bot.http_session = aiohttp.ClientSession()
 
     @bot.event
     async def on_command_error(ctx, error):

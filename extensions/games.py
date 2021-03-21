@@ -3,7 +3,6 @@ import os
 import random
 import json
 import re
-import aiohttp
 import datetime
 
 import asyncio
@@ -92,15 +91,14 @@ class Games(commands.Cog, name="Jeux"):
                 game["definition"] = "Désolé, je n'ai pas trouvé cette définition..."
 
                 try:
-                    async with aiohttp.ClientSession() as session:
-                        self.bot.log.warning(f"Asking for word definition")
-                        url = f"https://api.dicolink.com/v1/mot/{game['secret_word']}/definitions"
-                        params = {"limite": "1", "api_key": self.bot.DICOLINK_TOKEN}
-                        async with session.get(url=url, params=params) as r:
-                            # Retrieve a definition
-                            if r.status == 200:
-                                definit = await r.json()
-                                game["definition"] = definit[0]["definition"]
+                    self.bot.log.warning(f"Asking for word definition")
+                    url = f"https://api.dicolink.com/v1/mot/{game['secret_word']}/definitions"
+                    params = {"limite": "1", "api_key": self.bot.DICOLINK_TOKEN}
+                    async with self.bot.http_session.get(url=url, params=params) as r:
+                        # Retrieve a definition
+                        if r.status == 200:
+                            definit = await r.json()
+                            game["definition"] = definit[0]["definition"]
                 except Exception as e:
                     self.bot.log.exception(f"Unable to load a word definition in this channel: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})", exc_info=e)
 
@@ -306,23 +304,22 @@ class Games(commands.Cog, name="Jeux"):
             await ctx.send(response)
 
         async with self.quiz_semaphore:
-            async with aiohttp.ClientSession() as session:
-                self.bot.log.warning(f"Asking for a quiz question")
-                async with session.get(url=self.QUIZ_API_URL, params=self.QUIZ_API_PARAMETERS) as r:
-                    self.api_last_call = datetime.datetime.now()
-                    if r.status == 200:
-                        question = await r.json()
-                        if question["response_code"] == 0:  # Succès
-                            self.quiz_games[ctx.guild.id] = question["results"][0]
-                            self.quiz_games[ctx.guild.id]["starting_time"] = datetime.datetime.now()
-                            random.shuffle(self.quiz_games[ctx.guild.id]["autres_choix"])
-                            self.quiz_games[ctx.guild.id]["clean_response"] = self.clean_response(self.quiz_games[ctx.guild.id]["reponse_correcte"])
-                            self.quiz_games[ctx.guild.id]["indice"] = False
-                            await self.send_quiz_question(ctx)
-                        else:
-                            self.bot.log.error(f"Problem with the API key, code: {question['response_code']}")
-                            response = "Désolé, je n'ai pas réussi à trouver une question de quiz..."
-                            await ctx.send(response)
+            self.bot.log.warning(f"Asking for a quiz question")
+            async with self.bot.http_session.get(url=self.QUIZ_API_URL, params=self.QUIZ_API_PARAMETERS) as r:
+                self.api_last_call = datetime.datetime.now()
+                if r.status == 200:
+                    question = await r.json()
+                    if question["response_code"] == 0:  # Succès
+                        self.quiz_games[ctx.guild.id] = question["results"][0]
+                        self.quiz_games[ctx.guild.id]["starting_time"] = datetime.datetime.now()
+                        random.shuffle(self.quiz_games[ctx.guild.id]["autres_choix"])
+                        self.quiz_games[ctx.guild.id]["clean_response"] = self.clean_response(self.quiz_games[ctx.guild.id]["reponse_correcte"])
+                        self.quiz_games[ctx.guild.id]["indice"] = False
+                        await self.send_quiz_question(ctx)
+                    else:
+                        self.bot.log.error(f"Problem with the API key, code: {question['response_code']}")
+                        response = "Désolé, je n'ai pas réussi à trouver une question de quiz..."
+                        await ctx.send(response)
 
             execution_time = (datetime.datetime.now() - self.api_last_call).seconds
             if execution_time < 65:
