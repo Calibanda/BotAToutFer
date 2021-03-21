@@ -17,7 +17,7 @@ class Scheduled(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.hidden_cog = True
-        await self.daily_task()
+        self.bot.loop.create_task(self.daily_task())
 
     async def daily_task(self):
         await self.bot.wait_until_ready()
