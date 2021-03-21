@@ -68,6 +68,7 @@ class Games(commands.Cog, name="Jeux"):
             "wiki": "1"
         }
         self.api_last_call = None
+        self.quiz_semaphore = asyncio.Semaphore(1)
 
     @commands.command(name="pendu", help="Démarre une nouvelle partie de pendu")
     async def pendu(self, ctx):
@@ -300,30 +301,32 @@ class Games(commands.Cog, name="Jeux"):
 
     async def launch_quiz(self, ctx):
         self.quiz_games[ctx.guild.id] = {}
-        if self.api_last_call:
-            delta = (datetime.datetime.now() - self.api_last_call).seconds
-            if delta < 65:
-                response = f"J'envoie une question dans {65 - delta} seconde(s) !"
-                await ctx.send(response)
-                await asyncio.sleep(65 - delta)
+        if self.api_last_call and (datetime.datetime.now() - self.api_last_call).seconds < 65:
+            response = "J'envoie une question dans quelques secondes !"
+            await ctx.send(response)
 
-        async with aiohttp.ClientSession() as session:
-            self.bot.log.warning(f"Asking for a quiz question")
-            async with session.get(url=self.QUIZ_API_URL, params=self.QUIZ_API_PARAMETERS) as r:
-                if r.status == 200:
+        async with self.quiz_semaphore:
+            async with aiohttp.ClientSession() as session:
+                self.bot.log.warning(f"Asking for a quiz question")
+                async with session.get(url=self.QUIZ_API_URL, params=self.QUIZ_API_PARAMETERS) as r:
                     self.api_last_call = datetime.datetime.now()
-                    question = await r.json()
-                    if question["response_code"] == 0:  # Succès
-                        self.quiz_games[ctx.guild.id] = question["results"][0]
-                        self.quiz_games[ctx.guild.id]["starting_time"] = datetime.datetime.now()
-                        random.shuffle(self.quiz_games[ctx.guild.id]["autres_choix"])
-                        self.quiz_games[ctx.guild.id]["clean_response"] = self.clean_response(self.quiz_games[ctx.guild.id]["reponse_correcte"])
-                        self.quiz_games[ctx.guild.id]["indice"] = False
-                        await self.send_quiz_question(ctx)
-                    else:
-                        self.bot.log.error(f"Problem with the API key, code: {question['response_code']}")
-                        response = "Désolé, je n'ai pas réussi à trouver une question de quiz..."
-                        await ctx.send(response)
+                    if r.status == 200:
+                        question = await r.json()
+                        if question["response_code"] == 0:  # Succès
+                            self.quiz_games[ctx.guild.id] = question["results"][0]
+                            self.quiz_games[ctx.guild.id]["starting_time"] = datetime.datetime.now()
+                            random.shuffle(self.quiz_games[ctx.guild.id]["autres_choix"])
+                            self.quiz_games[ctx.guild.id]["clean_response"] = self.clean_response(self.quiz_games[ctx.guild.id]["reponse_correcte"])
+                            self.quiz_games[ctx.guild.id]["indice"] = False
+                            await self.send_quiz_question(ctx)
+                        else:
+                            self.bot.log.error(f"Problem with the API key, code: {question['response_code']}")
+                            response = "Désolé, je n'ai pas réussi à trouver une question de quiz..."
+                            await ctx.send(response)
+
+            execution_time = (datetime.datetime.now() - self.api_last_call).seconds
+            if execution_time < 65:
+                await asyncio.sleep(65 - execution_time)
 
     def clean_response(self, response):
         response = response.casefold().strip()
