@@ -1,5 +1,5 @@
 # dice commands for BotÀToutFer
-import random
+import secrets
 
 from discord.ext import commands
 
@@ -21,10 +21,10 @@ class RollDice(commands.Cog, name="Jets de dés"):
             if number_of_dice <= 200 and number_of_sides <= 200:
                 dices = []
                 for _ in range(number_of_dice):
-                    dices.append(random.randint(1, number_of_sides))
+                    dices.append(secrets.randbelow(number_of_sides) + 1)
 
                 total = sum(dices)
-                response = f"**{total}** (" + " + ".join(str(d) for d in dices) + f" = {total})"
+                response = f"{ctx.author.mention}: **{total}** (" + " + ".join(str(d) for d in dices) + f" = {total})"
             else:
                 response = "Ohh la flemme de lancer tous ces dés !"
 
@@ -129,8 +129,8 @@ class RollDice(commands.Cog, name="Jets de dés"):
                     await ctx.send(response)
                     return
 
-                dices = [random.choice(sides) for _ in range(number_of_dice)]
-                response = " + ".join(str(d) for d in dices)
+                dices = [secrets.choice(sides) for _ in range(number_of_dice)]
+                response = f"{ctx.author.mention} : " + " + ".join(str(d) for d in dices)
 
             await ctx.send(response)
         except Exception as e:
