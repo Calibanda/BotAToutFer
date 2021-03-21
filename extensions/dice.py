@@ -49,7 +49,7 @@ class RollDice(commands.Cog, name="Jets de dés"):
             except (TypeError, SyntaxError) as e:
                 response = "Ceci n'est pas une expression valide !"
             else:
-                response = f"{ctx.author.mention}: **{total}** *({math_expression})*"
+                response = f"{ctx.author.mention}: **{total}** *({math_expression} = **{total}**)*"
 
         await ctx.send(response)
 
