@@ -1,5 +1,8 @@
 # dice commands for BotÀToutFer
 import secrets
+import re
+import ast
+import operator as op
 
 from discord.ext import commands
 
@@ -11,27 +14,73 @@ def setup(bot):
 class RollDice(commands.Cog, name="Jets de dés"):
     def __init__(self, bot):
         self.bot = bot
-        self._last_member = None
+        self.dice_regex = r"\d+d\d+"
 
     @commands.command(name="roll", help="Simule un lancer de dés au format xDx")
-    async def roll(self, ctx, dice: str=""):
+    async def roll(self, ctx, calculation=""):
         """Rolls a dice in xDx format."""
+        calculation = calculation.lower().strip()
+
+        dices_expression = re.findall(
+            pattern=self.dice_regex,
+            string=calculation,
+            flags=re.IGNORECASE
+        )
+
         try:
-            number_of_dice, number_of_sides = map(int, dice.lower().split('d'))
-            if number_of_dice <= 200 and number_of_sides <= 200:
-                dices = []
-                for _ in range(number_of_dice):
-                    dices.append(secrets.randbelow(number_of_sides) + 1)
-
-                total = sum(dices)
-                response = f"{ctx.author.mention}: **{total}** (" + " + ".join(str(d) for d in dices) + f" = {total})"
+            dice_results = []
+            for dice in dices_expression:
+                dice_results.append(self.process_dice(dice))
+        except ValueError as e:
+            response = "Ohh la flemme de lancer tous ces dés !"
+        else:
+            math_expression = calculation
+            for dice_result in dice_results:
+                math_expression = re.sub(
+                    pattern=self.dice_regex,
+                    repl=dice_result,
+                    string=math_expression,
+                    count=1,
+                    flags=re.IGNORECASE
+                )
+            try:
+                self.bot.log.warning(f"User {ctx.author.name} ({ctx.author.id}) asks to evaluate this expression: '{math_expression}' in this channel: {ctx.guild}, #{ctx.channel.name} ({ctx.channel.id})")
+                total = self.eval_expr(math_expression)
+            except (TypeError, SyntaxError) as e:
+                response = "Ceci n'est pas une expression valide !"
             else:
-                response = "Ohh la flemme de lancer tous ces dés !"
+                response = f"{ctx.author.mention}: **{total}** *({math_expression})*"
 
-            await ctx.send(response)
-        except Exception as e:
-            self.bot.log.error("Caught exception: ", exc_info=e)
-            await ctx.send("Format has to be in xDx!")
+        await ctx.send(response)
+
+    def process_dice(self, dice):
+        number_of_dice, number_of_sides = map(int, dice.split('d'))
+        if number_of_dice <= 200 and number_of_sides <= 200:
+            dice_results = []
+            for _ in range(number_of_dice):
+                dice_results.append(secrets.randbelow(number_of_sides) + 1)
+
+            return "(" + " + ".join(str(d) for d in dice_results) + ")"
+        else:
+            raise ValueError
+
+    def eval_expr(self, expr):
+
+        def eval_(node):
+            # supported operators
+            operators = {ast.Add: op.add, ast.Sub: op.sub, ast.Mult: op.mul,
+                         ast.Div: op.truediv, ast.Pow: op.pow, ast.BitXor: op.xor,
+                         ast.USub: op.neg}
+            if isinstance(node, ast.Num):  # <number>
+                return node.n
+            elif isinstance(node, ast.BinOp):  # <left> <operator> <right>
+                return operators[type(node.op)](eval_(node.left), eval_(node.right))
+            elif isinstance(node, ast.UnaryOp):  # <operator> <operand> e.g., -1
+                return operators[type(node.op)](eval_(node.operand))
+            else:
+                raise TypeError(node)
+
+        return eval_(ast.parse(expr, mode='eval').body)
 
     @commands.command(name="roll-sw", help="Simule un lancer de dés Star Wars au format xD<name>")
     async def roll_sw(self, ctx, dice: str=""):
