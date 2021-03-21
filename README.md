@@ -22,7 +22,7 @@ Install needed packages with:
 ```
 pip3 install -r requirements.txt
 ```
-OR manualy install them:
+OR manually install them:
 
 ```
 pip3 install -U discord.py[voice]
@@ -45,6 +45,7 @@ OWNER_ID= #Enter here the ID of the bot owner
 COFFEE_URL= #Enter here the URL of your coffee pot
 COFFEE_PASSWORD= #Enter here the password needed to access to your coffee URL
 DICOLINK_TOKEN= #Enter here the token of the dicolink dictionnay API
+OPENQUIZZDB_TOKEN= #Enter here the token of the openquizzdb API
 ```
 
 ## Running the bot
