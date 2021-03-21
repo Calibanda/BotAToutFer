@@ -59,8 +59,8 @@ class Games(commands.Cog, name="Jeux"):
         #     "indice": False
         # }}
 
-        self.API_URL = "https://www.openquizzdb.org/api.php"
-        self.API_PARAMETERS = {
+        self.QUIZ_API_URL = "https://www.openquizzdb.org/api.php"
+        self.QUIZ_API_PARAMETERS = {
             "key": self.bot.OPENQUIZZDB_TOKEN,
             "lang": "fr",
             "mono": "0",
@@ -88,32 +88,20 @@ class Games(commands.Cog, name="Jeux"):
                 # Create the list to store all the guessed letters
                 game["guessed_letters"] = []
                 # The definition of the word
-                game["definition"] = (
-                    "Désolé, je n'ai pas trouvé cette définition..."
-                )
+                game["definition"] = "Désolé, je n'ai pas trouvé cette définition..."
 
                 try:
                     async with aiohttp.ClientSession() as session:
                         self.bot.log.warning(f"Asking for word definition")
-                        url = (
-                            "https://api.dicolink.com/v1/mot/"
-                            + f"{game['secret_word']}/definitions"
-                            + f"?limite=1&api_key={self.bot.DICOLINK_TOKEN}"
-                        )
-                        async with session.get(url) as r:
+                        url = f"https://api.dicolink.com/v1/mot/{game['secret_word']}/definitions"
+                        params = {"limite": "1", "api_key": self.bot.DICOLINK_TOKEN}
+                        async with session.get(url=url, params=params) as r:
                             # Retrieve a definition
                             if r.status == 200:
                                 definit = await r.json()
                                 game["definition"] = definit[0]["definition"]
                 except Exception as e:
-                    self.bot.log.exception(
-                        (
-                            "Unable to load a word definition in "
-                            + f"this channel: {ctx.channel.guild}, "
-                            + f"#{ctx.channel.name} ({ctx.channel.id})"
-                        ),
-                        exc_info=e
-                    )
+                    self.bot.log.exception(f"Unable to load a word definition in this channel: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})", exc_info=e)
 
                 # We save the datetime of the start of the game
                 game["starting_time"] = datetime.datetime.now()
@@ -124,33 +112,19 @@ class Games(commands.Cog, name="Jeux"):
 
                 response = (
                     "Je lance une partie de pendu !\n"
-                    + f"Vous avez {game['number_stroke']} coup(s) pour "
-                    + "trouver le mot secret selon les règles du pendu !\n"
-                    + "Voici le mot à deviner : "
-                    + game["visible_word"].replace("*", "\*")
+                    + f"Vous avez {game['number_stroke']} coup(s) pour trouver le mot secret selon les règles du pendu !\n"
+                    + "Voici le mot à deviner : " + game["visible_word"].replace("*", "\*")
                 )
 
             except Exception as e:
-                self.bot.log.exception(
-                    (
-                        "Unable to launch a 'pendu' game in this channel: "
-                        + f"{ctx.channel.guild}, "
-                        + f"#{ctx.channel.name} ({ctx.channel.id})"
-                    ),
-                    exc_info=e
-                )
-                response = (
-                    "Désolé, je n'ai pas réussi à lancer une partie. "
-                    + "Veuillez réessayer."
-                )
+                self.bot.log.exception(f"Unable to launch a 'pendu' game in this channel: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})", exc_info=e)
+                response = "Désolé, je n'ai pas réussi à lancer une partie. Veuillez réessayer."
 
         else:  # A game is currently running in this text channel
             visible_word = self.pendu_games[ctx.channel.id]["visible_word"]
             response = (
-                f"Une partie est déjà en cours !\n"
-                + f"Il reste {self.pendu_games[ctx.channel.id]['number_stroke']} "
-                + "coup(s) et voici le mot à deviner : "
-                + visible_word.replace("*", "\*")
+                "Une partie est déjà en cours !\n"
+                + f"Il reste {self.pendu_games[ctx.channel.id]['number_stroke']} coup(s) et voici le mot à deviner : " + visible_word.replace("*", "\*")
             )
         await ctx.send(response)
 
@@ -158,11 +132,7 @@ class Games(commands.Cog, name="Jeux"):
     async def pendu_status(self, ctx):
         if ctx.channel.id in self.pendu_games:
             visible_word = self.pendu_games[ctx.channel.id]["visible_word"]
-            response = (
-                "Le mot à deviner : "
-                + visible_word.replace("*", "\*")
-                + "\nLes lettres déjà proposées : "
-            )
+            response = "Le mot à deviner : " + visible_word.replace("*", "\*") + "\nLes lettres déjà proposées : "
             for letter in self.pendu_games[ctx.channel.id]["guessed_letters"]:
                 response += f"{letter} "
             response += (
@@ -181,7 +151,7 @@ class Games(commands.Cog, name="Jeux"):
             response = (
                 "Ohhh, dommage, mais je comprend que vous souhaitez arrêter. "
                 + "Voici le mot qui était à deviner : "
-                + f"{self.pendu_games[ctx.channel.id]['secret_word']}"
+                + self.pendu_games[ctx.channel.id]['secret_word']
             )
             del self.pendu_games[ctx.channel.id]
             await ctx.send(response)
@@ -195,9 +165,7 @@ class Games(commands.Cog, name="Jeux"):
             ctx = await self.bot.get_context(message)
             guessed_letters = []  # Clean list of guessed letters
             for letters in self.pendu_games[ctx.channel.id]["guessed_letters"]:
-                guessed_letters.append(
-                    re.findall(r"[a-z]", letters, flags=re.IGNORECASE)[0]
-                )
+                guessed_letters.append(re.findall(r"[a-z]", letters, flags=re.IGNORECASE)[0])
 
             if message.content in guessed_letters:
                 # If the guessed letter has already been guessed
@@ -209,9 +177,7 @@ class Games(commands.Cog, name="Jeux"):
                 # Add the letter to the guessed letters list
                 self.pendu_games[ctx.channel.id]["guessed_letters"].append(message.content)
 
-                length_secret_word = len(
-                    self.pendu_games[ctx.channel.id]["secret_word"]
-                )
+                length_secret_word = len(self.pendu_games[ctx.channel.id]["secret_word"])
                 for i in range(length_secret_word):
                     # Replace the guessed letter in the visible word
                     if self.pendu_games[ctx.channel.id]["secret_word"][i] == message.content:
@@ -221,15 +187,9 @@ class Games(commands.Cog, name="Jeux"):
                             + self.pendu_games[ctx.channel.id]["visible_word"][i + 1:]
                         )
 
-                if (self.pendu_games[ctx.channel.id]["visible_word"]
-                        == self.pendu_games[ctx.channel.id]["secret_word"]):  # WIN
+                if self.pendu_games[ctx.channel.id]["visible_word"] == self.pendu_games[ctx.channel.id]["secret_word"]:  # WIN
                     # Game duration in seconds
-                    game_duration = datetime.timedelta(
-                        seconds=(
-                            datetime.datetime.now()
-                            - self.pendu_games[ctx.channel.id]['starting_time']
-                        ).seconds
-                    )
+                    game_duration = datetime.timedelta(seconds=(datetime.datetime.now() - self.pendu_games[ctx.channel.id]['starting_time']).seconds)
                     response += (
                         " C'est gagné ! Vous avez deviné le mot "
                         + f"{self.pendu_games[ctx.channel.id]['secret_word']} "
@@ -247,19 +207,14 @@ class Games(commands.Cog, name="Jeux"):
                 response = "Non !"
 
                 # Add the letter to the guessed letters list
-                self.pendu_games[ctx.channel.id]["guessed_letters"].append(
-                    f"~~{message.content}~~"
-                )
+                self.pendu_games[ctx.channel.id]["guessed_letters"].append(f"~~{message.content}~~")
                 # Decrement the stroke number
                 self.pendu_games[ctx.channel.id]["number_stroke"] -= 1
 
                 if self.pendu_games[ctx.channel.id]["number_stroke"] == 0:  # LOSE
                     response += (
-                        " C'est perdu !"
-                        + "\n```\n"
-                        + self.hanged_drawing(
-                            self.pendu_games[ctx.channel.id]["number_stroke"]
-                        )
+                        " C'est perdu !\n```\n"
+                        + self.hanged_drawing(self.pendu_games[ctx.channel.id]["number_stroke"])
                         + "\n```\n"
                         + "Le mot à deviner était : "
                         + f"{self.pendu_games[ctx.channel.id]['secret_word']} "
@@ -273,10 +228,7 @@ class Games(commands.Cog, name="Jeux"):
             await self.pendu_status(ctx)
 
     async def no_pendu_game(self, ctx):
-        response = (
-            "Aucune partie de pendu n'est en cours ! "
-            + "Mais vous pouvez en lancer une avec la commande '!pendu start'"
-        )
+        response = "Aucune partie de pendu n'est en cours ! Mais vous pouvez en lancer une avec la commande '!pendu'"
         await ctx.send(response)
 
     def hanged_drawing(self, number_stroke):
@@ -295,25 +247,13 @@ class Games(commands.Cog, name="Jeux"):
         elif number_stroke == 4:
             return " ____________\n |/     |\n |      O\n |\n |\n |\n_|_"
         elif number_stroke == 3:
-            return (
-                " ____________\n |/     |\n |      O\n |      |\n |      "
-                + "|\n |\n_|_"
-            )
+            return " ____________\n |/     |\n |      O\n |      |\n |      |\n |\n_|_"
         elif number_stroke == 2:
-            return (
-                " ____________\n |/     |\n |      O\n |     _|_\n |      "
-                + "|\n |\n_|_"
-            )
+            return " ____________\n |/     |\n |      O\n |     _|_\n |      |\n |\n_|_"
         elif number_stroke == 1:
-            return (
-                " ____________\n |/     |\n |      O\n |     _|_\n |      "
-                + "|\n |     /\n_|_"
-            )
+            return " ____________\n |/     |\n |      O\n |     _|_\n |      |\n |     /\n_|_"
         elif number_stroke == 0:
-            return (
-                " ____________\n |/     |\n |      O\n |     _|_\n |      "
-                + "|\n |     / \\ \n_|_"
-            )
+            return " ____________\n |/     |\n |      O\n |     _|_\n |      |\n |     / \\ \n_|_"
 
     @commands.command(name="quiz", help="Demande une question du quiz")
     async def quiz(self, ctx):
@@ -345,7 +285,7 @@ class Games(commands.Cog, name="Jeux"):
                     inline=True
                 )
                 embed.set_footer(
-                    text=self.quiz_games[ctx.guild.id]["wikipedia"],
+                    text=self.quiz_games[ctx.guild.id]["wikipedia"]
                 )
                 await ctx.send(embed=embed)
                 del self.quiz_games[ctx.guild.id]
@@ -369,7 +309,7 @@ class Games(commands.Cog, name="Jeux"):
 
         async with aiohttp.ClientSession() as session:
             self.bot.log.warning(f"Asking for a quiz question")
-            async with session.get(self.API_URL, params=self.API_PARAMETERS) as r:
+            async with session.get(url=self.QUIZ_API_URL, params=self.QUIZ_API_PARAMETERS) as r:
                 if r.status == 200:
                     self.api_last_call = datetime.datetime.now()
                     question = await r.json()

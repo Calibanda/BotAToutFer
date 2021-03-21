@@ -17,17 +17,23 @@ def setup(bot):
 class Utilitaire(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self._last_member = None
+
         self.LAST_NEWS_URL_PATH = os.path.join(
             self.bot.SCRIPT_DIR,
             "package",
             "last_news_url.json"
         )  # Path of the json file containing the latest retrieved news
+        self.NEWS_API_URL = "http://newsapi.org/v2/top-headlines"
+        self.NEWS_API_PARAMS = {"country": "fr", "apiKey": self.bot.NEWS_TOKEN}
+
         self.CITY_ID_PATH = os.path.join(
             self.bot.SCRIPT_DIR,
             "package",
             "list_city_id.json"
         )
+        self.WEATHER_API_URL = "http://api.openweathermap.org/data/2.5/weather"
+        self.WEATHER_API_PARAMS = {"id": "", "appid": self.bot.WEATHER_TOKEN, "units": "metric", "lang": "fr"}
+
         self.SCRABBLE_DICTIONARY_PATH = os.path.join(
             self.bot.SCRIPT_DIR,
             "package",
@@ -40,21 +46,17 @@ class Utilitaire(commands.Cog):
             "Y": 10, "Z": 10
         }
 
-    @commands.command(
-        name="news",
-        help=(
-            "Donne le lien d'un ou plusieurs articles de presse du jour "
-            + "(par défaut 1)"
-        )
-    )
+        self.KNOWLEDGE_URL = "https://www.savoir-inutile.com/"
+
+        self.TV_URL = "https://www.programme-tv.net/programme/programme-tnt.html"
+
+        self.MARMITON_URL = "https://www.marmiton.org/recettes/recherche.aspx"
+
+    @commands.command(name="news", help="Donne le lien d'un ou plusieurs articles de presse du jour (par défaut 1)")
     async def news(self, ctx, number_tiles: int=1):
         async with aiohttp.ClientSession() as session:
             self.bot.log.warning(f"Asking for the local news")
-            url = (
-                f"http://newsapi.org/v2/top-headlines?"
-                + f"country=fr&apiKey={self.bot.NEWS_TOKEN}"
-            )
-            async with session.get(url) as r:  # Retrieve last news
+            async with session.get(url=self.NEWS_API_URL, params=self.NEWS_API_PARAMS) as r:  # Retrieve last news
                 if r.status == 200:
                     news = await r.json()
 
@@ -63,10 +65,8 @@ class Utilitaire(commands.Cog):
                         # been displayed by the bot
                         with open(self.LAST_NEWS_URL_PATH, "r") as f:
                             old_news = json.load(f)
-                    except (
-                            FileNotFoundError, json.decoder.JSONDecodeError
-                    ) as e:
-                        self.bot.log.error(f"Caught exception:", exc_info=e)
+                    except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
+                        self.bot.log.error("last_news_url.json file not found: ", exc_info=e)
                         old_news = []
 
                     # We retrieve all the url that hasn't
@@ -81,10 +81,8 @@ class Utilitaire(commands.Cog):
                     news_to_display = today_news[:number_tiles]
 
                     if not news_to_display:
-                        await ctx.send(
-                            "Pas de nouveaux articles en ce moment, "
-                            + "réessaye plus tard."
-                        )
+                        response = "Pas de nouveaux articles en ce moment, réessaye plus tard."
+                        await ctx.send(response)
                         return
 
                     for news in news_to_display:
@@ -98,84 +96,66 @@ class Utilitaire(commands.Cog):
                         # in a json file
                         json.dump(old_news[-25:], f, indent=4)
 
-    @commands.command(
-        name="meteo",
-        help="Donne la météo (d'une ville au hasard dans le monde)"
-    )
+    @commands.command(name="meteo", help="Donne la météo (d'une ville au hasard dans le monde)")
     async def meteo(self, ctx):
-        with open(self.CITY_ID_PATH, "r") as f:
-            list_city_id = json.load(f)
+        try:
+            with open(self.CITY_ID_PATH, "r") as f:
+                list_city_id = json.load(f)
+        except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
+            self.bot.log.error("No list_city_id.json file: ", exc_info=e)
+            await ctx.send("Unable to load the city list")
+            return
 
-        random_city = random.choice(list_city_id)
+        random_city_id = random.choice(list_city_id)
 
         async with aiohttp.ClientSession() as session:
-            url = (
-                f"http://api.openweathermap.org/data/2.5/weather?"
-                + f"id={random_city}&"
-                + f"appid={self.bot.WEATHER_TOKEN}&"
-                + "units=metric&lang=fr"
-            )
-            async with session.get(url) as r:
+            async with session.get(url=self.WEATHER_API_URL, params=self.WEATHER_API_PARAMS | {"id": str(random_city_id)}) as r:
                 if r.status == 200:
                     weather = await r.json()
 
                     w_description = weather["weather"][0]["description"]
-                    w_temp = round(weather["main"]["temp"], 1)
+                    w_temp = round(weather["main"]["temp"], ndigits=1)
                     w_city = weather["name"]
                     w_country = weather["sys"]["country"]
 
-                    self.bot.log.warning(
-                        f"Asking for the weather of the city {w_city} "
-                        + f"in {w_country} (id: {random_city})"
-                    )
-                    response = (
-                        f"Actuellement {w_description}, il fait {w_temp} °C "
-                        + f"à {w_city} ({w_country}) :earth_africa:"
-                    )
+                    self.bot.log.warning(f"Asking for the weather of the city {w_city} in {w_country} (id: {random_city_id})")
+                    response = f"Actuellement {w_description}, il fait {w_temp} °C à {w_city} ({w_country}) :earth_africa:"
                     await ctx.send(response)
 
-    @commands.command(
-        name="scrabble",
-        help=(
-            "Donne les mots possibles au Scrabble avec une combinaison "
-            + "donnée (entrer une * pour saisir un joker)"
-        )
-    )
+    @commands.command(name="scrabble", help="Donne les mots possibles au Scrabble avec une combinaison donnée (entrer une * pour saisir un joker)")
     async def scrabble(self, ctx, trestle=""):
         self.bot.log.warning(f"Scrabble command is invoked")
 
         if not trestle.strip():
             response = (
                 "Utilise la commande '!scrabble' suivie de ton chevalet "
-                + "pour que je puisse te donner les combnaisons possible "
+                + "pour que je puisse te donner les combinaisons possible "
                 + "(entre une * pour saisir un joker)."
             )
             await ctx.send(response)
             return
 
         def convert_word(word):
-            word = word.upper()
-            word = word.replace('\n', '')
-            word = word.replace('-', '')
-            word = word.replace('À', 'A')
-            word = word.replace('Â', 'A')
-            word = word.replace('Ä', 'A')
-            word = word.replace('Ç', 'C')
-            word = word.replace('É', 'E')
-            word = word.replace('È', 'E')
-            word = word.replace('Ê', 'E')
-            word = word.replace('Ë', 'E')
-            word = word.replace('Î', 'I')
-            word = word.replace('Ï', 'I')
-            word = word.replace('Ô', 'O')
-            word = word.replace('Ö', 'O')
-            word = word.replace('Ù', 'U')
-            word = word.replace('Û', 'U')
-            word = word.replace('Ü', 'U')
-            word = word.replace('Ÿ', 'Y')
-            word = word.replace('Œ', 'OE')
-
-            return word
+            return word.upper()\
+                .replace('\n', '')\
+                .replace('-', '')\
+                .replace('À', 'A')\
+                .replace('Â', 'A')\
+                .replace('Ä', 'A')\
+                .replace('Ç', 'C')\
+                .replace('É', 'E')\
+                .replace('È', 'E')\
+                .replace('Ê', 'E')\
+                .replace('Ë', 'E')\
+                .replace('Î', 'I')\
+                .replace('Ï', 'I')\
+                .replace('Ô', 'O')\
+                .replace('Ö', 'O')\
+                .replace('Ù', 'U')\
+                .replace('Û', 'U')\
+                .replace('Ü', 'U')\
+                .replace('Ÿ', 'Y')\
+                .replace('Œ', 'OE')
 
         def compare_word(trestle, word):
             total_difference = 0
@@ -210,10 +190,7 @@ class Utilitaire(commands.Cog):
             return dico_possible_words
 
         def create_response(dico_possible_words):
-            response = (
-                "Voici la liste des mots disponibles avec "
-                + "les lettres de votre chevalet :\n```\n"
-            )
+            response = "Voici la liste des mots disponibles avec les lettres de votre chevalet :\n```\n"
             while len(dico_possible_words) > 0:
                 maximum_value = max(dico_possible_words.copy().values())
                 for key, value in dico_possible_words.copy().items():
@@ -224,16 +201,18 @@ class Utilitaire(commands.Cog):
             response += "```"
             return response
 
-        with open(
-            self.SCRABBLE_DICTIONARY_PATH, "r", encoding="utf-8"
-        ) as scrabble_dictionary:
+        dico_possible_words = {}
+        trestle = discord.utils.escape_markdown(trestle)
+        trestle = convert_word(trestle)
 
-            dico_possible_words = {}
-            trestle = discord.utils.escape_markdown(trestle)
-            trestle = convert_word(trestle)
-
-            lines = scrabble_dictionary.readlines()
-
+        try:
+            with open(self.SCRABBLE_DICTIONARY_PATH, "r", encoding="utf-8") as scrabble_dictionary:
+                lines = scrabble_dictionary.readlines()
+        except FileNotFoundError as e:
+            self.bot.log.error("No ODS7.txt file: ", exc_info=e)
+            response = "Il n'y a pas de dictionnaire pour chercher le mot !"
+            await ctx.send(response)
+        else:
             for line in lines:
                 word = convert_word(line)
                 if compare_word(trestle, word) <= trestle.count('*'):
@@ -246,24 +225,18 @@ class Utilitaire(commands.Cog):
 
     @commands.command(name="inutile", help="Donne un savoir inutile")
     async def inutile(self, ctx, number=1):
-        number = min(number, 5)
-
-        for _ in range(number):
-            async with aiohttp.ClientSession() as session:
+        async with aiohttp.ClientSession() as session:
+            for _ in range(min(number, 5)):
                 self.bot.log.warning(f"Asking a useless piece of knowledge")
-                async with session.get("https://www.savoir-inutile.com/") as r:
+                async with session.get(url=self.KNOWLEDGE_URL) as r:
                     # Retrieve a useless piece of knowledge
                     if r.status == 200:
                         html = await r.text("utf-8")
                         soup = BeautifulSoup(html, "html.parser")
 
                         knowledge = soup.find(id="phrase").string
-                        link = soup.find(
-                            "meta", attrs={"name": "og:url"}
-                        )["content"]
-                        publication_date = soup.find(
-                            "div", id="publication"
-                        ).find_all("span")[-1].string.strip()
+                        link = soup.find("meta", attrs={"name": "og:url"})["content"]
+                        publication_date = soup.find("div", id="publication").find_all("span")[-1].string.strip()
 
                         embed = discord.Embed(
                             title="Savoir Inutile",
@@ -278,24 +251,18 @@ class Utilitaire(commands.Cog):
 
                         await ctx.send(embed=embed)
 
-    @commands.command(
-        name="tv",
-        help="Donne le programme de la TNT de ce soir"
-    )
+    @commands.command(name="tv", help="Donne le programme de la TNT de ce soir")
     async def tv(self, ctx, channel_number=0):
         async with aiohttp.ClientSession() as session:
-            self.bot.log.warning(f"Asking for the TNT programm of the night")
-            url = "https://www.programme-tv.net/programme/programme-tnt.html"
-            async with session.get(url) as r:
+            self.bot.log.warning(f"Asking for the TNT program of the night")
+            async with session.get(url=self.TV_URL) as r:
                 # Retrieve the TNT program of the night
                 if r.status == 200:
                     html = await r.text("utf-8")
 
                     soup = BeautifulSoup(html, "html.parser")
 
-                    date_and_hour = soup.find(
-                        class_="timeNavigationOverlay-currentDate"
-                    ).p.string
+                    date_and_hour = soup.find(class_="timeNavigationOverlay-currentDate").p.string
 
                     list_date_and_hour = []
                     for line in date_and_hour.split("\n"):
@@ -315,63 +282,36 @@ class Utilitaire(commands.Cog):
                     for channel in div_channels:
                         # For all div in the list, we create a response
                         # with the program of the channel
-                        channel_name = channel.find(
-                            class_="doubleBroadcastCard-channel"
-                        ).a.string.strip()
-                        channel_nb = channel.find(
-                            class_="doubleBroadcastCard-channelNumber"
-                        ).string.strip()
+                        channel_name = channel.find(class_="doubleBroadcastCard-channel").a.string.strip()
+                        channel_nb = channel.find(class_="doubleBroadcastCard-channelNumber").string.strip()
 
                         program_hours = []
                         for hour in channel.findAll(
                                 class_="doubleBroadcastCard-hour"):
                             program_hours.append(hour.string.strip())
 
-                        program_infos = channel.findAll(
-                            class_="doubleBroadcastCard-infos"
-                        )
+                        program_infos = channel.findAll(class_="doubleBroadcastCard-infos")
 
-                        channel_response = (
-                            f"\n  Sur la chaîne {channel_name} "
-                            + f"({channel_nb}) :\n"
-                        )
+                        channel_response = f"\n  Sur la chaîne {channel_name} ({channel_nb}) :\n"
 
                         for i in range(len(program_hours)):
-                            program_title = program_infos[i].find(
-                                class_="doubleBroadcastCard-title"
-                            ).string.strip()
+                            program_title = program_infos[i].find(class_="doubleBroadcastCard-title").string.strip()
 
-                            if program_infos[i].findAll(
-                                    class_="doubleBroadcastCard-subtitle"):
-                                program_subtitle = program_infos[i].findAll(
-                                    class_="doubleBroadcastCard-subtitle"
-                                )[0].string.strip()
+                            if program_infos[i].findAll(class_="doubleBroadcastCard-subtitle"):
+                                program_subtitle = program_infos[i].findAll(class_="doubleBroadcastCard-subtitle")[0].string.strip()
                                 list_program_subtile = []
                                 for line in program_subtitle.split("\n"):
                                     if line.strip():
-                                        list_program_subtile.append(
-                                            line.strip()
-                                        )
-                                program_subtitle = " ".join(
-                                    list_program_subtile
-                                )
+                                        list_program_subtile.append(line.strip())
+                                program_subtitle = " ".join(list_program_subtile)
                                 program_title += " - " + program_subtitle
 
-                            program_link = program_infos[i].find(
-                                class_="doubleBroadcastCard-title"
-                            )["href"]
-                            program_category = program_infos[i].find(
-                                class_="doubleBroadcastCard-type"
-                            ).string.strip()
+                            program_link = program_infos[i].find(class_="doubleBroadcastCard-title")["href"]
+                            program_category = program_infos[i].find(class_="doubleBroadcastCard-type").string.strip()
                             program_hour = program_hours[i]
-                            program_duration = program_infos[i].find(
-                                class_="doubleBroadcastCard-durationContent"
-                            ).string.strip()
+                            program_duration = program_infos[i].find(class_="doubleBroadcastCard-durationContent").string.strip()
 
-                            channel_response += (
-                                f"    À {program_hour} "
-                                + f"{program_title}\n"
-                            )
+                            channel_response += f"    À {program_hour} {program_title}\n"
 
                         # The channel number (int) will be a key
                         # in the dictionary
@@ -391,7 +331,7 @@ class Utilitaire(commands.Cog):
                                 + "```"
                             )
                             await ctx.send(response)
-                        except Exception as e:
+                        except KeyError as e:
                             await ctx.send("Je ne connais pas cette chaîne.")
                         finally:
                             return
@@ -428,12 +368,9 @@ class Utilitaire(commands.Cog):
             word = re.split("\W", word.lower())[0]
             async with aiohttp.ClientSession() as session:
                 self.bot.log.warning(f"Asking for word definition")
-                url = (
-                    f"https://api.dicolink.com/v1/mot/"
-                    + f"{word}/definitions?limite=1&"
-                    + f"api_key={self.bot.DICOLINK_TOKEN}"
-                )
-                async with session.get(url) as r:  # Retrieve a definition
+                url = f"https://api.dicolink.com/v1/mot/{word}/definitions"
+                params = {"limite": "1", "api_key": self.bot.DICOLINK_TOKEN}
+                async with session.get(url=url, params=params) as r:  # Retrieve a definition
                     if r.status == 200:
                         definition = await r.json()
                         try:
@@ -446,10 +383,7 @@ class Utilitaire(commands.Cog):
                             response = "Ce mot n'existe pas"
                         await ctx.send(response)
 
-    @commands.command(
-        name="marmiton",
-        help="Retourne des recettes liées à un thème donné sur marmiton"
-    )
+    @commands.command(name="marmiton", help="Retourne des recettes liées à un thème donné sur marmiton")
     async def marmiton(self, ctx, *, options:str=""):
         # marmiton_regex = r"^(\w+ ?)+(((-n|--nombre) \d+ ?)|((-p|--plat)
         # (accompagnement ?|amusegueule ?|boisson ?|confiserie ?|conseil
@@ -558,81 +492,46 @@ class Utilitaire(commands.Cog):
 
                 async with aiohttp.ClientSession() as session:
                     self.bot.log.warning(f"Asking recipes on marmiton")
-                    url = "https://www.marmiton.org/recettes/recherche.aspx"
-                    async with session.get(url, params=http_params) as r:
+                    async with session.get(url=self.MARMITON_URL, params=http_params) as r:
                         # Retrieve a marmiton page
                         if r.status == 200:
                             html = await r.text("utf-8")
                             soup = BeautifulSoup(html, "html.parser")
 
-                            nb_results = soup.find(
-                                class_="recipe-search__nb-results"
-                            ).string.strip()
+                            nb_results = soup.find(class_="recipe-search__nb-results").string.strip()
                             nb_results = int(re.search(r"\d+", nb_results)[0])
 
                             if nb_results:
-                                div_results = soup.find(
-                                    "div",
-                                    class_="recipe-results"
-                                )
-                                list_recipes = div_results.find_all(
-                                    class_="recipe-card"
-                                )
+                                div_results = soup.find("div", class_="recipe-results")
+                                list_recipes = div_results.find_all(class_="recipe-card")
                                 nb_recipes = min(nb_recipes, len(list_recipes))
 
-                                response = (
-                                    f"{nb_results} résultat(s) trouvé sur "
-                                    + f"Marmiton ! J'en affiche {nb_recipes}"
-                                )
+                                response = f"{nb_results} résultat(s) trouvé sur Marmiton ! J'en affiche {nb_recipes}"
                                 await ctx.send(response)
 
                                 for i in range(nb_recipes):
                                     div_recipe = list_recipes[i]
 
-                                    element_description = div_recipe.find(
-                                        class_="recipe-card__description"
-                                    ).contents
+                                    element_description = div_recipe.find(class_="recipe-card__description").contents
                                     description = ""
                                     for element in element_description:
                                         if element == "\n":
                                             continue
                                         try:
-                                            description += str(
-                                                element.contents[0]
-                                            )
+                                            description += str(element.contents[0])
                                         except Exception as e:
                                             description += str(element)
-                                    description = description.replace(
-                                        "<br/>",
-                                        "\n"
-                                    )
+                                    description = description.replace("<br/>", "\n")
 
-                                    div_rating = div_recipe.find(
-                                        class_="recipe-card__rating"
-                                    )
-                                    rating = div_rating.find(
-                                        class_="recipe-card__rating__value"
-                                    ).string.strip()
-                                    rating += " " + div_rating.find(
-                                        class_=(
-                                            "recipe-card__"
-                                            + "rating__value__fract"
-                                        )
-                                    ).string.strip()
-                                    rating += " " + div_rating.find(
-                                        class_="mrtn-font-discret"
-                                    ).string.strip()
+                                    div_rating = div_recipe.find(class_="recipe-card__rating")
+                                    rating = div_rating.find(class_="recipe-card__rating__value").string.strip()
+                                    rating += " " + div_rating.find(class_="recipe-card__rating__value__fract").string.strip()
+                                    rating += " " + div_rating.find(class_="mrtn-font-discret").string.strip()
 
                                     embed = discord.Embed(
                                         title=div_recipe.find("h4").string.strip(),
                                         description=description,
-                                        url=(
-                                            "https://www.marmiton.org"
-                                            + div_recipe.find(
-                                                "a",
-                                                class_="recipe-card-link"
-                                            )["href"]
-                                        ),
+                                        url="https://www.marmiton.org" + div_recipe.find("a", class_="recipe-card-link")["href"],
                                         color=0xFF9B90
                                     )
                                     embed.set_thumbnail(
@@ -644,11 +543,7 @@ class Utilitaire(commands.Cog):
                                     )
                                     embed.add_field(
                                         name="Durée",
-                                        value=div_recipe.find(
-                                            class_=(
-                                                "recipe-card__duration__value"
-                                            )
-                                        ).string.strip(),
+                                        value=div_recipe.find(class_="recipe-card__duration__value").string.strip(),
                                         inline=True
                                     )
                                     embed.add_field(
@@ -657,14 +552,12 @@ class Utilitaire(commands.Cog):
                                         inline=True
                                     )
 
-                                    if div_recipe.find(
-                                            class_="recipe-card__sponsored"):
+                                    if div_recipe.find(class_="recipe-card__sponsored"):
                                         sponsor = re.search(
-                                            r"(?<=\[).+(?=\])",
-                                            div_recipe.find(
-                                                class_="recipe-card-link"
-                                            )["onclick"],
-                                            re.IGNORECASE)[0]
+                                            pattern=r"(?<=\[).+(?=\])",
+                                            string=div_recipe.find(class_="recipe-card-link")["onclick"],
+                                            flags=re.IGNORECASE
+                                        )[0]
                                         embed.add_field(
                                             name="Contenu sponsorisé",
                                             value=sponsor,
@@ -674,56 +567,28 @@ class Utilitaire(commands.Cog):
                                     await ctx.send(embed=embed)
 
                             else:
-                                response = (
-                                    "Désolé, je n'ai pas trouvé "
-                                    + "de résultats..."
-                                )
+                                response = "Désolé, je n'ai pas trouvé de résultats..."
                                 return await ctx.send(response)
 
             else:  # Display help
                 response = (
                     "```\n"
                     + "Usage :\n"
-                    + "  !marmiton <nom de la recherche> [--options "
-                    + "<arguments>...]\n"
+                    + "  !marmiton <nom de la recherche> [--options <arguments>...]\n"
                     + "\n"
                     + "Options :\n"
-                    + "  -n <argument>, --nombre <argument>             "
-                    + "Précise le nombre de recettes à retourner "
-                    + "[défaut : 2]\n"
-                    + "  -p <argument>..., --plat <argument>...         "
-                    + "Précise un ou plusieurs types de plats parmi : "
-                    + "accompagnement, amusegueule, boisson, confiserie, "
-                    + "conseil, dessert, entree, platprincipal, sauce\n"
-                    + "  -d <argument>..., --difficulte <argument>...   "
-                    + "Précise un ou plusieurs niveau de difficulté parmi : "
-                    + "1 (très facile), 2 (facile), 3 (moyen), 4 (difficile)\n"
-                    + "  -c <argument>..., --cout <argument>...         "
-                    + "Précise un ou plusieurs coût de recette parmi : "
-                    + "1 (bon marché), 2 (coût moyen), 3 (assez cher)\n"
-                    + "  -r <argument>..., --restriction <argument>...  "
-                    + "Précise une ou plusieurs restriction alimentaire "
-                    + "parmi : 1 (végétarien), 2 (sans gluten), 3 (végan), "
-                    + "4 (sans lactose)\n"
-                    + "  -t <argument>, --temps <argument>              "
-                    + "Précise le temps maximum de la recette parmi : "
-                    + "15, 30, 45\n"
-                    + "  --cuisson <argument>...                        "
-                    + "Précise un ou plusieurs type de cuisson parmi : "
-                    + "1 (four), 2 (micro-ondes), 3 (aucun)\n"
-                    + "  -s, --saison                                   "
-                    + "Précise si la recette doit être de saison\n"
+                    + "  -n <argument>, --nombre <argument>             Précise le nombre de recettes à retourner [défaut : 2]\n"
+                    + "  -p <argument>..., --plat <argument>...         Précise un ou plusieurs types de plats parmi : accompagnement, amusegueule, boisson, confiserie, conseil, dessert, entree, platprincipal, sauce\n"
+                    + "  -d <argument>..., --difficulte <argument>...   Précise un ou plusieurs niveau de difficulté parmi : 1 (très facile), 2 (facile), 3 (moyen), 4 (difficile)\n"
+                    + "  -c <argument>..., --cout <argument>...         Précise un ou plusieurs coût de recette parmi : 1 (bon marché), 2 (coût moyen), 3 (assez cher)\n"
+                    + "  -r <argument>..., --restriction <argument>...  Précise une ou plusieurs restriction alimentaire parmi : 1 (végétarien), 2 (sans gluten), 3 (végan), 4 (sans lactose)\n"
+                    + "  -t <argument>, --temps <argument>              Précise le temps maximum de la recette parmi : 15, 30, 45\n"
+                    + "  --cuisson <argument>...                        Précise un ou plusieurs type de cuisson parmi : 1 (four), 2 (micro-ondes), 3 (aucun)\n"
+                    + "  -s, --saison                                   Précise si la recette doit être de saison\n"
                     + "```\n"
                 )
                 await ctx.send(response)
 
         except Exception as e:
-            self.bot.log.exception(
-                (
-                    f"Unable to send a marmiton recipe in this channel: "
-                    + f"{ctx.channel.guild}, #{ctx.channel.name} "
-                    + f"({ctx.channel.id})"
-                 ),
-                exc_info=e
-            )
+            self.bot.log.exception(f"Unable to send a marmiton recipe in this channel: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})", exc_info=e)
             await ctx.send("Something went wrong https://tenor.com/s8CP.gif")

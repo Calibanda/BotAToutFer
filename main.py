@@ -19,10 +19,7 @@ def bot_init():
     bot = commands.Bot(
         command_prefix="!",
         case_insensitive=True,
-        description=(
-            "BotAToutFer, le bot qui fait tout, "
-            + "même le café !"
-        ),
+        description="BotAToutFer, le bot qui fait tout, même le café !",
         help_command=None,
         activity=discord.Activity(
             name="!help",
@@ -55,10 +52,7 @@ def bot_init():
         print(f"{bot.user} is connected to the following guild(s):")
         for guild in bot.guilds:
             print(f"{guild.name} (id: {guild.id})")
-            bot.log.warning(
-                f"{bot.user} is connected to the following guild: "
-                + f"{guild.name} (id: {guild.id})"
-            )
+            bot.log.warning(f"{bot.user} is connected to the following guild: {guild.name} (id: {guild.id})")
 
         extensions_to_load = [
             "anniv",
@@ -220,9 +214,7 @@ def logger_init():
         encoding="utf-8"
     )
     handler.suffix = "%Y-%m-%d"
-    handler.setFormatter(
-        logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s")
-    )
+    handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s"))
     logger.addHandler(handler)
 
     return logger

@@ -9,7 +9,6 @@ def setup(bot):
 class Says(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self._last_member = None
         self.hidden_cog = True
 
     @commands.command(name="says", help="Fait dire quelque chose au bot")

@@ -15,7 +15,6 @@ def setup(bot):
 class Pictures(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.cat.start()
         self.hidden_cog = True
         self.CAT_CHANNELS_PATH = os.path.join(
             self.bot.SCRIPT_DIR,
@@ -27,11 +26,17 @@ class Pictures(commands.Cog):
             with open(self.CAT_CHANNELS_PATH, "r") as f:
                 # Loads authorized channels id from json
                 for channel_id in json.load(f).keys():
-                    self.cat_authorized_channels.append(
-                        self.bot.get_channel(int(channel_id))
-                    )
+                    self.cat_authorized_channels.append(self.bot.get_channel(int(channel_id)))
         except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
-            self.bot.log.error(f"Caught exception:", exc_info=e)
+            self.bot.log.error("cat_channels.json file not found: ", exc_info=e)
+
+        self.CAT_API_URL = "https://api.thecatapi.com/v1/images/search"
+        self.CAT_API_PARAMS = {"api_key": self.bot.CAT_TOKEN}
+        self.RED_PANDA_URL = "https://some-random-api.ml/img/red_panda"
+        self.OTTER_URL = f"https://www.reddit.com/r/Otters/hot.json"
+        self.OTTER_PARAMS = {"limit": "50", "t": "day"}
+
+        self.cat.start()
 
     def cog_unload(self):
         self.cat.cancel()
@@ -39,68 +44,32 @@ class Pictures(commands.Cog):
     @tasks.loop(minutes=6.0)
     async def cat(self):
         for channel in self.cat_authorized_channels:
-            if (random.randrange(180) < 1
-                    and datetime.datetime.now().hour in range(7, 23)):
+            if random.randrange(180) < 1 and datetime.datetime.now().hour in range(7, 23):
                 # Statistically send 1 message per day
                 # (one chance on 160 every 6 minutes between 7AM and 11PM)
                 try:
                     async with aiohttp.ClientSession() as session:
 
-                        choice = random.choice(
-                            ["cat", "cat", "cat", "otter", "red panda"]
-                        )
+                        choice = random.choice(["cat", "cat", "cat", "otter", "red panda"])
                         if choice == "cat":
-                            self.bot.log.warning(
-                                (
-                                    "Asking for a cat pic in this channel: "
-                                    + f"{channel.guild}, "
-                                    + f"#{channel.name} ({channel.id})"
-                                )
-                            )
-                            url = (
-                                "https://api.thecatapi.com/v1/images/search?"
-                                + f"api_key={self.bot.CAT_TOKEN}"
-                            )
-                            async with session.get(url) as r:
+                            self.bot.log.warning(f"Asking for a cat pic in this channel: {channel.guild}, #{channel.name} ({channel.id})")
+                            async with session.get(url=self.CAT_API_URL, params=self.CAT_API_PARAMS) as r:
                                 # Retrieve a cat json
                                 if r.status == 200:
                                     cat = await r.json()
                                     message = cat[0]["url"]
 
                         elif choice == "red panda":
-                            self.bot.log.warning(
-                                (
-                                    "Asking a red fox pic in this channel: "
-                                    + f"{channel.guild}, "
-                                    + f"#{channel.name} ({channel.id})"
-                                )
-                            )
-                            url = "https://some-random-api.ml/img/red_panda"
-                            async with session.get(url) as r:
+                            self.bot.log.warning(f"Asking a red fox pic in this channel: {channel.guild}, #{channel.name} ({channel.id})")
+                            async with session.get(url=self.RED_PANDA_URL) as r:
                                 # Retrieve a red fox json
                                 if r.status == 200:
                                     red_panda = await r.json()
                                     message = red_panda["link"]
 
                         else:
-                            subreddit = "Otters"
-                            limit = 50
-                            timeframe = "day"
-                            listing = "hot"
-
-                            self.bot.log.warning(
-                                (
-                                    "Asking an otter pic in this channel: "
-                                    + f"{channel.guild}, "
-                                    + f"#{channel.name} ({channel.id})"
-                                )
-                            )
-                            url = (
-                                f"https://www.reddit.com/r/{subreddit}/"
-                                + f"{listing}.json?"
-                                + f"limit={limit}&t={timeframe}"
-                            )
-                            async with session.get(url) as r:
+                            self.bot.log.warning(f"Asking an otter pic in this channel: {channel.guild}, #{channel.name} ({channel.id})")
+                            async with session.get(url=self.OTTER_URL, params=self.OTTER_PARAMS) as r:
                                 if r.status == 200:
                                     otter = await r.json()
 
@@ -112,12 +81,8 @@ class Pictures(commands.Cog):
                                         except Exception as e:
                                             pass
                                         else:
-                                            if (post_url.startswith(
-                                                    "https://i.redd.it/")
-                                                    and hint == "image"):
-                                                urls.append(
-                                                    post["data"]["url"]
-                                                )
+                                            if post_url.startswith("https://i.redd.it/") and hint == "image":
+                                                urls.append(post["data"]["url"])
 
                                     random.shuffle(urls)
                                     message = urls[0]
@@ -125,14 +90,7 @@ class Pictures(commands.Cog):
                         await channel.send(message)
 
                 except Exception as e:
-                    self.bot.log.exception(
-                        (
-                            "Unable to send a cute picture in this channel: "
-                            + f"{channel.guild}, "
-                            + f"#{channel.name} ({channel.id})"
-                        ),
-                        exc_info=e
-                    )
+                    self.bot.log.exception(f"Unable to send a cute picture in this channel: {channel.guild}, #{channel.name} ({channel.id})", exc_info=e)
 
     @cat.before_loop
     async def before_cat(self):
@@ -153,18 +111,14 @@ class Pictures(commands.Cog):
             del cat_json[str(ctx.channel.id)]
             response = "Disable cute animal pictures in this channel"
         else:  # Channel id is NOT in json so we add it
-            cat_json[str(ctx.channel.id)] = (
-                f"{ctx.channel.guild.name} > {ctx.channel.name}"
-            )
+            cat_json[str(ctx.channel.id)] = f"{ctx.channel.guild.name} > {ctx.channel.name}"
             response = "Enable cute animal pictures in this channel"
 
-        with open(self.CAT_CHANNELS_PATH, "w", encoding='utf8') as f:
+        with open(self.CAT_CHANNELS_PATH, "w", encoding="utf8") as f:
             json.dump(cat_json, f, indent=4, ensure_ascii=False)
 
         self.cat_authorized_channels = []  # We reload cat channels
         for channel_id in cat_json.keys():
-            self.cat_authorized_channels.append(
-                self.bot.get_channel(int(channel_id))
-            )
+            self.cat_authorized_channels.append(self.bot.get_channel(int(channel_id)))
 
         await ctx.send(response)

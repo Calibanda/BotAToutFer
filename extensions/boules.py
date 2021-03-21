@@ -7,6 +7,7 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import UserConverter
 
+
 def setup(bot):
     bot.add_cog(Boules(bot))
 
@@ -24,31 +25,22 @@ class Boules(commands.Cog):
         self.messages = [
             "J'aurais pas aimé...",
             "Sans rancune hein ?",
-            (
-                "Ouch alors ça, qu'on soit de cet univers ou d'un autre, "
-                + "ça doit faire très très mal !"
-            ),
+            "Ouch alors ça, qu'on soit de cet univers ou d'un autre, ça doit faire très très mal !",
             "Ah, ça a fait un sale bruit.",
             "À force, elles seront comme du fer.",
             "La prochaine fois je lui ferai pas confiance...",
             "Je peux même fournir le bâton :innocent:",
-            (
-                "Je comprendrai jamais le goût qu'ont les humains "
-                + "pour le masochisme..."
-            )
+            "Je comprendrai jamais le goût qu'ont les humains pour le masochisme..."
         ]
 
-    @commands.command(
-        name="boules",
-        help="Envie de vous tabasser les boules ?"
-    )
+    @commands.command(name="boules", help="Envie de vous tabasser les boules ?")
     async def boules(self, ctx, *, user=None):
         try:  # Try to retrieve the balls history from file
             with open(self.BOULES_PATH, "r") as f:
                 boules = json.load(f)
         except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
             # boules.json does not exist, we create a empty dictionary
-            self.bot.log.error(f"Caught exception:", exc_info=e)
+            self.bot.log.error("boules.json file not found: ", exc_info=e)
             boules = {
                 'total': 0
             }
@@ -74,21 +66,13 @@ class Boules(commands.Cog):
             mention = user
 
         if user:
-            response = (
-                f"{ctx.author.mention} a envie de tabasser "
-                + f"les boules de {mention} "
-            )
+            response = f"{ctx.author.mention} a envie de tabasser les boules de {mention} "
 
         else:
-            response = (
-                f"{ctx.author.mention} a envie de se tabasser les boules "
-            )
+            response = f"{ctx.author.mention} a envie de se tabasser les boules "
 
-        response += (
-            f"({channel_balls} paires de boules tabassées "
-            + f"dans ce salon, {boules['total']} au total).\n"
-            + random.choice(self.messages)
-        )
+        response += f"({channel_balls} paires de boules tabassées dans ce salon, {boules['total']} au total).\n"
+        response += random.choice(self.messages)
 
         await ctx.send(response)
 

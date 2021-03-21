@@ -9,7 +9,6 @@ def setup(bot):
 class Ping(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self._last_member = None
         self.hidden_cog = True
 
     @commands.command(name="ping", help="Répond pong")

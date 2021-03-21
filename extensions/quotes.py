@@ -11,7 +11,6 @@ def setup(bot):
 class Quotes(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self._last_member = None
         self.brooklyn_99_quotes = [
             "I'm the human form of the :100: emoji.",
             "Bingpot!",
@@ -152,10 +151,7 @@ class Quotes(commands.Cog):
         response = random.choice(self.sherlock_quotes)
         await ctx.send(response)
 
-    @commands.command(
-        name="kaamelott",
-        help="Répond une réplique de Kaamelott"
-    )
+    @commands.command(name="kaamelott", help="Répond une réplique de Kaamelott")
     async def kaamelott(self, ctx):
         response = random.choice(self.kaamelott_quotes)
         if len(response) < 2000:

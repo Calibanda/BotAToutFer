@@ -16,15 +16,11 @@ class Santa(commands.Cog):
         self._last_member = None
         self.hidden_cog = True
 
-    @commands.command(
-        name="santa",
-        help="Tire les pères Noëls secret avec les utilisateurs précisés"
-    )
+    @commands.command(name="santa", help="Tire les pères Noëls secret avec les utilisateurs précisés")
     @commands.has_role("Santa")
     async def santa(self, ctx, *users: discord.User):
         if len(users) < 2:
-            response = "Il faut au moins 2 personnes pour tirer " \
-                       "les pères Noël secrets !"
+            response = "Il faut au moins 2 personnes pour tirer les pères Noël secrets !"
             await ctx.send(response)
             return
 
@@ -39,8 +35,6 @@ class Santa(commands.Cog):
                 dm_channel = sender.dm_channel
             else:
                 dm_channel = await sender.create_dm()
-            message = f"Salut {sender.name} ! Le tirage au sort des Pères " \
-                      "Noëls secrets à été effectué :santa: \nIl ne te " \
-                      f"reste plus qu'à trouver un cadeau pour {recipient} " \
-                      ":gift_heart:. Et un joyeux Noël à tous ! "
+            message = f"Salut {sender.name} ! Le tirage au sort des Pères Noëls secrets à été effectué :santa: \n"
+            message += f"Il ne te reste plus qu'à trouver un cadeau pour {recipient} :gift_heart:. Et un joyeux Noël à tous !"
             await dm_channel.send(message)

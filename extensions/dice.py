@@ -8,15 +8,12 @@ def setup(bot):
     bot.add_cog(RollDice(bot))
 
 
-class RollDice(commands.Cog, name='Jets de dés'):
+class RollDice(commands.Cog, name="Jets de dés"):
     def __init__(self, bot):
         self.bot = bot
         self._last_member = None
 
-    @commands.command(
-        name="roll",
-        help="Simule un lancer de dés au format xDx"
-    )
+    @commands.command(name="roll", help="Simule un lancer de dés au format xDx")
     async def roll(self, ctx, dice: str=""):
         """Rolls a dice in xDx format."""
         try:
@@ -27,23 +24,16 @@ class RollDice(commands.Cog, name='Jets de dés'):
                     dices.append(random.randint(1, number_of_sides))
 
                 total = sum(dices)
-                response = (
-                    f"**{total}** ("
-                    + " + ".join(str(d) for d in dices)
-                    + f" = {total})"
-                )
+                response = f"**{total}** (" + " + ".join(str(d) for d in dices) + f" = {total})"
             else:
                 response = "Ohh la flemme de lancer tous ces dés !"
 
             await ctx.send(response)
         except Exception as e:
-            self.bot.log.error(f"Caught exception:", exc_info=e)
-            await ctx.send('Format has to be in xDx!')
+            self.bot.log.error("Caught exception: ", exc_info=e)
+            await ctx.send("Format has to be in xDx!")
 
-    @commands.command(
-        name="roll-sw",
-        help="Simule un lancer de dés Star Wars au format xD<name>"
-    )
+    @commands.command(name="roll-sw", help="Simule un lancer de dés Star Wars au format xD<name>")
     async def roll_sw(self, ctx, dice: str=""):
         """Rolls a dice in xD<name> format."""
         try:
@@ -78,9 +68,7 @@ class RollDice(commands.Cog, name='Jets de dés'):
                         "Avantage :trident:",
                         "2 Avantages :trident: :trident:"
                     ]
-                elif (dice_type == "difficulte"
-                        or dice_type == "difficulté"
-                        or dice_type == "d"):
+                elif dice_type == "difficulte" or dice_type == "difficulté" or dice_type == "d":
                     sides = [
                         "Vierge :shrug:",
                         "Échec :warning:",
@@ -91,9 +79,7 @@ class RollDice(commands.Cog, name='Jets de dés'):
                         "Menace :snowflake:",
                         "2 Menaces :snowflake: :snowflake:"
                     ]
-                elif (dice_type == "maitrise"
-                        or dice_type == "maîtrise"
-                        or dice_type == "m"):
+                elif dice_type == "maitrise" or dice_type == "maîtrise" or dice_type == "m":
                     sides = [
                         "Vierge :shrug:",
                         "Succès net :boom:",
@@ -139,11 +125,7 @@ class RollDice(commands.Cog, name='Jets de dés'):
                         "2 Côté lumineux :white_circle: :white_circle:",
                     ]
                 else:
-                    response = (
-                        "Merci de choisir un dé parmi : fortune (ou f), "
-                        + "infortune (ou i), aptitude (ou a), "
-                        + "maitrise (ou m), defi, force"
-                    )
+                    response = "Merci de choisir un dé parmi : fortune (ou f), infortune (ou i), aptitude (ou a), maitrise (ou m), defi, force"
                     await ctx.send(response)
                     return
 
@@ -152,5 +134,5 @@ class RollDice(commands.Cog, name='Jets de dés'):
 
             await ctx.send(response)
         except Exception as e:
-            self.bot.log.error(f"Caught exception:", exc_info=e)
-            await ctx.send('Format has to be in xD<name>!')
+            self.bot.log.error("Caught exception: ", exc_info=e)
+            await ctx.send("Format has to be in xD<name>!")

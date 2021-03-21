@@ -12,18 +12,13 @@ class Help(commands.Cog):
         self.bot = bot
         self._last_member = None
 
-    @commands.command(
-        name="help",
-        help="Affiche ce message",
-        pass_context=True
-    )
+    @commands.command(name="help", help="Affiche ce message")
     async def help(self, ctx, command=""):
         response = f"```\n{self.bot.description}\n\n"  # Create a new response
 
         list_cogs = []
         for cog in self.bot.cogs:
-            if (not hasattr(self.bot.get_cog(cog), "hidden_cog")
-                    or not self.bot.get_cog(cog).hidden_cog):
+            if not hasattr(self.bot.get_cog(cog), "hidden_cog") or not self.bot.get_cog(cog).hidden_cog:
                 # If the cog has no attribute "hidden_cog"
                 # or if this attribute is false
                 list_cogs.append(cog)
@@ -47,11 +42,7 @@ class Help(commands.Cog):
 
             for command in alphabetical_cogs:
                 if not command.hidden:
-                    cog_help += (
-                        "  "
-                        + command.name.ljust(number_spaces, " ")
-                        + f"{command.help}\n"
-                    )
+                    cog_help += "  " + command.name.ljust(number_spaces, " ") + f"{command.help}\n"
             cog_help += "\n"
 
             if len(response + cog_help) + 3 < 2000:

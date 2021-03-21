@@ -24,28 +24,30 @@ class Jokes(commands.Cog):
             "j suis ",
             "j sui ",
         ]
-        self.CURSE_LIST = [  # The list of cursed words
-            {"curse_word": "merde", "traduction": "merle"},
-            {"curse_word": "putain", "traduction": "mutin"},
-            {"curse_word": "connard", "traduction": "canard"},
-            {"curse_word": "connarde", "traduction": "canarde"},
-            {"curse_word": "connasse", "traduction": "godasse"},
-            {"curse_word": "pute", "traduction": "butte"},
-            {"curse_word": "bordel", "traduction": "bordé"},
-            {"curse_word": "foutre", "traduction": "floute"},
-            # {"curse_word": "poufiace", "traduction": ""},
-            {"curse_word": "enculé", "traduction": "granulé"},
 
-            {"curse_word": "fuck", "traduction": "fork"},
-            {"curse_word": "fucking", "traduction": "forking"},
-            {"curse_word": "fucker", "traduction": "forker"},
-            {"curse_word": "shit", "traduction": "shirt"},
-            {"curse_word": "bitch", "traduction": "bench"},
-            {"curse_word": "asshole", "traduction": "ash-hole"},
-            {"curse_word": "ass", "traduction": "ash"},
-            {"curse_word": "cock", "traduction": "cork"},
-            {"curse_word": "dick", "traduction": "deck"},
-        ]
+        self.CURSE_DICT = {  # The dictionary of cursed words
+            "merde": "merle",
+            "putain": "mutin",
+            "connard": "canard",
+            "connarde": "canarde",
+            "connasse": "godasse",
+            "pute": "butte",
+            "bordel": "bordé",
+            "foutre": "floute",
+            # "poufiace": "",
+            "enculé": "granulé",
+
+            "fuck": "fork",
+            "fucking": "forking",
+            "fucker": "forker",
+            "shit": "shirt",
+            "bitch": "bench",
+            "asshole": "ash-hole",
+            "ass": "ash",
+            "cock": "cork",
+            "dick": "deck",
+        }
+
         self.JOKE_WORDS_PATH = os.path.join(
             self.bot.SCRIPT_DIR,
             "package",
@@ -56,7 +58,7 @@ class Jokes(commands.Cog):
             with open(self.JOKE_WORDS_PATH, "r") as f:
                 self.joke_words = json.load(f)
         except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
-            self.bot.log.error(f"Caught exception:", exc_info=e)
+            self.bot.log.error("joke_words.json file not found: ", exc_info=e)
             self.joke_words = {}
 
     @commands.Cog.listener('on_message')
@@ -87,15 +89,11 @@ class Jokes(commands.Cog):
 
         if has_suis:
             # If any "je suis" in the original message
-            regex_je_suis = (  # "(je suis)|(j'suis)|(chuis) ..."
-                "("
-                + ")|(".join(self.LIST_JE_SUIS)
-                + ")"
-            )
+            regex_je_suis = "(" + ")|(".join(self.LIST_JE_SUIS) + ")"  # "(je suis)|(j'suis)|(chuis) ..."
             i_am = re.split(
-                regex_je_suis,
-                message.content,
-                1,
+                pattern=regex_je_suis,
+                string=message.content,
+                maxsplit=1,
                 flags=re.IGNORECASE
             )[-1]
             response = f"Salut *{i_am}*, moi c'est le {self.bot.user.mention}"
@@ -104,19 +102,18 @@ class Jokes(commands.Cog):
     async def cursed_words(self, message, words_in_message):
         has_curse_word = False
         for word in words_in_message:
-            for curse_dict in self.CURSE_LIST:
-                if word == curse_dict["curse_word"]:
-                    has_curse_word = True
+            if word in self.CURSE_DICT:
+                has_curse_word = True
 
         if has_curse_word:
             # If any curse word in the original message
             response = message.content
-            for curse_dict in self.CURSE_LIST:
+            for curse_word, traduction in self.CURSE_DICT.items():
                 response = re.sub(
-                    r"(?<!\:)" + curse_dict["curse_word"],
-                    "*" + curse_dict["traduction"] + "*",
-                    response,
-                    0,
+                    pattern=r"(?<!\:)" + curse_word,
+                    repl=f"*{traduction}*",
+                    string=response,
+                    count=0,
                     flags=re.IGNORECASE
                 )
 
