@@ -254,13 +254,13 @@ class Games(commands.Cog, name="Jeux"):
         elif number_stroke == 0:
             return " ____________\n |/     |\n |      O\n |     _|_\n |      |\n |     / \\ \n_|_"
 
-    @commands.command(name="quiz", help="Demande une question du quiz")
-    async def quiz(self, ctx):
+    @commands.command(name="quiz", help="Demande une question du quiz. Option, choix du niveau de difficulté (1=débutant, 2=confirmé, 3=expert)")
+    async def quiz(self, ctx, option=""):
         if ctx.guild.id in self.quiz_games:
             if "question" in self.quiz_games[ctx.guild.id]:
                 await self.send_quiz_question(ctx)
         else:
-            await self.launch_quiz(ctx)
+            await self.launch_quiz(ctx, option)
 
     @commands.command(name="quiz-indice", help="Demander les 4 propositions de réponse à la question en cours")
     async def quiz_indice(self, ctx):
@@ -297,15 +297,24 @@ class Games(commands.Cog, name="Jeux"):
             if self.quiz_games[message.guild.id]["clean_response"] in self.remove_accents(message.content.casefold().strip()):
                 await self.quiz_win(message)
 
-    async def launch_quiz(self, ctx):
+    async def launch_quiz(self, ctx, option):
         self.quiz_games[ctx.guild.id] = {}
         if self.api_last_call and (datetime.datetime.now() - self.api_last_call).seconds < 65:
             response = "J'envoie une question dans quelques secondes !"
             await ctx.send(response)
 
+        if option in ["facile", "débutant", "debutant", "1"]:
+            params = self.QUIZ_API_PARAMETERS | {"diff": 1}
+        elif option in ["moyen", "confirmé", "confirme", "2"]:
+            params = self.QUIZ_API_PARAMETERS | {"diff": 2}
+        elif option in ["difficile", "expert", "3"]:
+            params = self.QUIZ_API_PARAMETERS | {"diff": 3}
+        else:
+            params = self.QUIZ_API_PARAMETERS
+
         async with self.quiz_semaphore:
             self.bot.log.warning(f"Asking for a quiz question")
-            async with self.bot.http_session.get(url=self.QUIZ_API_URL, params=self.QUIZ_API_PARAMETERS) as r:
+            async with self.bot.http_session.get(url=self.QUIZ_API_URL, params=params) as r:
                 self.api_last_call = datetime.datetime.now()
                 if r.status == 200:
                     try:
