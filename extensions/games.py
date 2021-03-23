@@ -308,18 +308,24 @@ class Games(commands.Cog, name="Jeux"):
             async with self.bot.http_session.get(url=self.QUIZ_API_URL, params=self.QUIZ_API_PARAMETERS) as r:
                 self.api_last_call = datetime.datetime.now()
                 if r.status == 200:
-                    question = await r.json()
-                    if question["response_code"] == 0:  # Succès
-                        self.quiz_games[ctx.guild.id] = question["results"][0]
-                        self.quiz_games[ctx.guild.id]["starting_time"] = datetime.datetime.now()
-                        random.shuffle(self.quiz_games[ctx.guild.id]["autres_choix"])
-                        self.quiz_games[ctx.guild.id]["clean_response"] = self.clean_response(self.quiz_games[ctx.guild.id]["reponse_correcte"])
-                        self.quiz_games[ctx.guild.id]["indice"] = False
-                        await self.send_quiz_question(ctx)
-                    else:
-                        self.bot.log.error(f"Problem with the API key, code: {question['response_code']}")
-                        response = "Désolé, je n'ai pas réussi à trouver une question de quiz..."
+                    try:
+                        question = await r.json()
+                    except json.decoder.JSONDecodeError as e:
+                        self.bot.log.exception(f"Unable to decode API response in this channel: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})", exc_info=e)
+                        response = "Erreur d'API, merci de réessayer"
                         await ctx.send(response)
+                    else:
+                        if question["response_code"] == 0:  # Succès
+                            self.quiz_games[ctx.guild.id] = question["results"][0]
+                            self.quiz_games[ctx.guild.id]["starting_time"] = datetime.datetime.now()
+                            random.shuffle(self.quiz_games[ctx.guild.id]["autres_choix"])
+                            self.quiz_games[ctx.guild.id]["clean_response"] = self.clean_response(self.quiz_games[ctx.guild.id]["reponse_correcte"])
+                            self.quiz_games[ctx.guild.id]["indice"] = False
+                            await self.send_quiz_question(ctx)
+                        else:
+                            self.bot.log.error(f"Problem with the API key, code: {question['response_code']}")
+                            response = "Désolé, je n'ai pas réussi à trouver une question de quiz..."
+                            await ctx.send(response)
 
             execution_time = (datetime.datetime.now() - self.api_last_call).seconds
             if execution_time < 65:
