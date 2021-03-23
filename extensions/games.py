@@ -304,11 +304,11 @@ class Games(commands.Cog, name="Jeux"):
             await ctx.send(response)
 
         if option in ["facile", "débutant", "debutant", "1"]:
-            params = self.QUIZ_API_PARAMETERS | {"diff": "1"}
+            params = dict(self.QUIZ_API_PARAMETERS, **{"diff": "1"})
         elif option in ["moyen", "confirmé", "confirme", "2"]:
-            params = self.QUIZ_API_PARAMETERS | {"diff": "2"}
+            params = dict(self.QUIZ_API_PARAMETERS, **{"diff": "2"})
         elif option in ["difficile", "expert", "3"]:
-            params = self.QUIZ_API_PARAMETERS | {"diff": "3"}
+            params = dict(self.QUIZ_API_PARAMETERS, **{"diff": "3"})
         else:
             params = self.QUIZ_API_PARAMETERS
 
