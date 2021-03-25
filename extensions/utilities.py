@@ -505,39 +505,28 @@ class Utilitaire(commands.Cog):
                             for i in range(nb_recipes):
                                 div_recipe = list_recipes[i]
 
-                                element_description = div_recipe.find(class_="recipe-card__description").contents
-                                description = ""
-                                for element in element_description:
-                                    if element == "\n":
-                                        continue
-                                    try:
-                                        description += str(element.contents[0])
-                                    except Exception as e:
-                                        description += str(element)
-                                description = description.replace("<br/>", "\n")
+                                recipe_title = div_recipe.find("h4").text.strip()
 
-                                div_rating = div_recipe.find(class_="recipe-card__rating")
-                                rating = div_rating.find(class_="recipe-card__rating__value").string.strip()
-                                rating += " " + div_rating.find(class_="recipe-card__rating__value__fract").string.strip()
-                                rating += " " + div_rating.find(class_="mrtn-font-discret").string.strip()
+                                rating = div_recipe.find(class_="MuiTypography-root MuiTypography-caption").text.strip()
+                                rating += " " + div_recipe.find(class_="RecipeCardResultstyle__RatingNumber-sc-30rwkm-3 jtNPhW").text.strip()
+
+                                recipe_url = "https://www.marmiton.org" + div_recipe["href"]
+
+                                recipe_thumbnail = div_recipe.find("img")["src"]
+
+                                recipe_is_sponsor = True if div_recipe.find(class_="RecipeCardResultstyle__SponsoredLabel-sc-30rwkm-1 jitMUn") else False
 
                                 embed = discord.Embed(
-                                    title=div_recipe.find("h4").string.strip(),
-                                    description=description,
-                                    url="https://www.marmiton.org" + div_recipe.find("a", class_="recipe-card-link")["href"],
+                                    title=recipe_title,
+                                    url=recipe_url,
                                     color=0xFF9B90
                                 )
                                 embed.set_thumbnail(
-                                    url=div_recipe.find("img")["data-src"]
+                                    url=recipe_thumbnail
                                 )
                                 embed.set_author(
                                     name=ctx.author.name,
                                     icon_url=ctx.author.avatar_url
-                                )
-                                embed.add_field(
-                                    name="Durée",
-                                    value=div_recipe.find(class_="recipe-card__duration__value").string.strip(),
-                                    inline=True
                                 )
                                 embed.add_field(
                                     name="Note",
@@ -545,15 +534,9 @@ class Utilitaire(commands.Cog):
                                     inline=True
                                 )
 
-                                if div_recipe.find(class_="recipe-card__sponsored"):
-                                    sponsor = re.search(
-                                        pattern=r"(?<=\[).+(?=\])",
-                                        string=div_recipe.find(class_="recipe-card-link")["onclick"],
-                                        flags=re.IGNORECASE
-                                    )[0]
+                                if recipe_is_sponsor:
                                     embed.add_field(
                                         name="Contenu sponsorisé",
-                                        value=sponsor,
                                         inline=True
                                     )
 
