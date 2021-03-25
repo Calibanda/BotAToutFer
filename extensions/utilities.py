@@ -269,7 +269,7 @@ class Utilitaire(commands.Cog):
                 date, hour = date_and_hour.split(" de ")
 
                 # List that contain div of all the channels
-                div_channels = soup.findAll(class_="doubleBroadcastCard")
+                div_channels = soup.findAll(class_="bouquet-cards")
                 channels = {}
                 # {1: "Sur la chaîne TF1 (Chaîne n°1) :...",
                 # 2: "Sur la chaîne France 2 (Chaîne n°2) :..."}
@@ -277,34 +277,22 @@ class Utilitaire(commands.Cog):
                 for channel in div_channels:
                     # For all div in the list, we create a response
                     # with the program of the channel
-                    channel_name = channel.find(class_="doubleBroadcastCard-channel").a.string.strip()
-                    channel_nb = channel.find(class_="doubleBroadcastCard-channelNumber").string.strip()
-
-                    program_hours = []
-                    for hour in channel.findAll(
-                            class_="doubleBroadcastCard-hour"):
-                        program_hours.append(hour.string.strip())
-
-                    program_infos = channel.findAll(class_="doubleBroadcastCard-infos")
+                    channel_name = channel.find(class_="bouquet-cardsChannelItemLink")["title"].strip()
+                    channel_nb = channel.find(class_="bouquet-channelNumber").string.strip()
 
                     channel_response = f"\n  Sur la chaîne {channel_name} ({channel_nb}) :\n"
 
-                    for i in range(len(program_hours)):
-                        program_title = program_infos[i].find(class_="doubleBroadcastCard-title").string.strip()
-
-                        if program_infos[i].findAll(class_="doubleBroadcastCard-subtitle"):
-                            program_subtitle = program_infos[i].findAll(class_="doubleBroadcastCard-subtitle")[0].string.strip()
-                            list_program_subtile = []
-                            for line in program_subtitle.split("\n"):
-                                if line.strip():
-                                    list_program_subtile.append(line.strip())
-                            program_subtitle = " ".join(list_program_subtile)
+                    programs_div = channel.findAll(class_=["first", "last"])
+                    for program_div in programs_div:
+                        program_title = program_div.find(class_="mainBroadcastCard-title").a.string.strip()
+                        try:
+                            program_subtitle = program_div.find(class_="mainBroadcastCard-subtitle").string.strip()
+                        except AttributeError as e:
+                            pass
+                        else:
                             program_title += " - " + program_subtitle
 
-                        program_link = program_infos[i].find(class_="doubleBroadcastCard-title")["href"]
-                        program_category = program_infos[i].find(class_="doubleBroadcastCard-type").string.strip()
-                        program_hour = program_hours[i]
-                        program_duration = program_infos[i].find(class_="doubleBroadcastCard-durationContent").string.strip()
+                        program_hour = program_div.find(class_="mainBroadcastCard-startingHour").string.strip()
 
                         channel_response += f"    À {program_hour} {program_title}\n"
 
