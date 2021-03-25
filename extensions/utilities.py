@@ -491,12 +491,12 @@ class Utilitaire(commands.Cog):
                         html = await r.text("utf-8")
                         soup = BeautifulSoup(html, "html.parser")
 
-                        nb_results = soup.find(class_="recipe-search__nb-results").string.strip()
+                        nb_results = soup.find("span", class_="SearchSummarystyle__ResultNumber-sc-16jp16z-2").text.strip()
                         nb_results = int(re.search(r"\d+", nb_results)[0])
 
                         if nb_results:
-                            div_results = soup.find("div", class_="recipe-results")
-                            list_recipes = div_results.find_all(class_="recipe-card")
+                            div_results = soup.find("div", class_="SearchResultsstyle__Layout-sc-1gofnyi-0")
+                            list_recipes = div_results.find_all(class_="SearchResultsstyle__SearchCardResult-sc-1gofnyi-2")
                             nb_recipes = min(nb_recipes, len(list_recipes))
 
                             response = f"{nb_results} résultat(s) trouvé sur Marmiton ! J'en affiche {nb_recipes}"
