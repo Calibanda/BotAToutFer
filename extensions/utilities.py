@@ -537,6 +537,7 @@ class Utilitaire(commands.Cog):
                                 if recipe_is_sponsor:
                                     embed.add_field(
                                         name="Contenu sponsorisé",
+                                        value=":money_mouth:",
                                         inline=True
                                     )
 
