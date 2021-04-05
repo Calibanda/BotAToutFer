@@ -495,8 +495,11 @@ class Utilitaire(commands.Cog):
 
                                 recipe_title = div_recipe.find("h4").text.strip()
 
-                                rating = div_recipe.find(class_="sc-jGVbCA fQDgZz").text.strip()
-                                rating += " " + div_recipe.find(class_="RecipeCardResultstyle__RatingNumber-sc-30rwkm-3 jtNPhW").text.strip()
+                                try:
+                                    rating = div_recipe.find(class_="sc-jGVbCA fQDgZz").text.strip()
+                                    rating += " " + div_recipe.find(class_="RecipeCardResultstyle__RatingNumber-sc-30rwkm-3 jtNPhW").text.strip()
+                                except Exception as e:
+                                    rating = ""
 
                                 recipe_url = "https://www.marmiton.org" + div_recipe["href"]
 
