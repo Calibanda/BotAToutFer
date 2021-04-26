@@ -30,7 +30,13 @@ class Boules(commands.Cog):
             "À force, elles seront comme du fer.",
             "La prochaine fois je lui ferai pas confiance...",
             "Je peux même fournir le bâton :innocent:",
-            "Je comprendrai jamais le goût qu'ont les humains pour le masochisme..."
+            "Je comprendrai jamais le goût qu'ont les humains pour le masochisme...",
+            "Moi ça m'en touche une sans faire bouger l'autre",
+            "C'est en voyant un moustique se poser sur ses testicules qu'on réalise qu'on ne peut pas régler tous les problèmes par la violence...",
+            "Jingle Bells, Jingle Bells... :bell:",
+            "Si j'en avais je compatirais",
+            "Écouter la douleur c'est déjà l'adoucir",
+
         ]
 
     @commands.command(name="boules", help="Envie de vous tabasser les boules ?")
