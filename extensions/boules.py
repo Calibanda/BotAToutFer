@@ -15,7 +15,6 @@ def setup(bot):
 class Boules(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self._last_member = None
         # Path of the json file containing the balls counter
         self.BOULES_PATH = os.path.join(
             self.bot.SCRIPT_DIR,
