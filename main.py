@@ -18,7 +18,7 @@ def bot_init():
 
     # Create bot
     bot = commands.Bot(
-        command_prefix="!",
+        command_prefix=commands.when_mentioned_or("!"),
         case_insensitive=True,
         description="BotAToutFer, le bot qui fait tout, même le café !",
         help_command=None,
