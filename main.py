@@ -1,5 +1,7 @@
 # main.py
 import os
+import logging
+from logging.handlers import TimedRotatingFileHandler
 
 import aiohttp
 from dotenv import load_dotenv
@@ -193,8 +195,6 @@ def logger_init():
     Returns:
         logging.Logger: The logger object ready to go
     """
-    import logging
-    from logging.handlers import TimedRotatingFileHandler
 
     # Retrieve the directory path of the script
     script_dir, script_filename = os.path.split(os.path.abspath(__file__))
