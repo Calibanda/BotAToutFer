@@ -1,4 +1,5 @@
-# main.py
+#!/usr/bin/python3
+
 import os
 import logging
 from logging.handlers import TimedRotatingFileHandler
