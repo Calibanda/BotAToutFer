@@ -105,8 +105,10 @@ class Utilitaire(commands.Cog):
             return
 
         random_city_id = random.choice(list_city_id)
+        api_params = self.WEATHER_API_PARAMS.copy()
+        api_params["id"] = str(random_city_id)
 
-        async with self.bot.http_session.get(url=self.WEATHER_API_URL, params=self.WEATHER_API_PARAMS | {"id": str(random_city_id)}) as r:
+        async with self.bot.http_session.get(url=self.WEATHER_API_URL, params=api_params) as r:
             if r.status == 200:
                 weather = await r.json()
 
