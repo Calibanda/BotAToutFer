@@ -187,6 +187,10 @@ def bot_init():
     async def zero(ctx):
         1/0
 
+    @bot.event
+    async def on_disconnect():
+        await bot.http_session.close()
+
     return bot
 
 
