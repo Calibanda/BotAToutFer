@@ -89,6 +89,17 @@ def bot_init():
         bot.http_session = aiohttp.ClientSession()
 
     @bot.event
+    async def on_connect():
+        """When the bot connects to Discord, make sure an active aiohttp session is active"""
+        if bot.http_session.closed:
+            bot.http_session = aiohttp.ClientSession()
+
+    @bot.event
+    async def on_disconnect():
+        """When the bot is disconnected form Discord, close the aiohttp session"""
+        await bot.http_session.close()
+
+    @bot.event
     async def on_command_error(ctx, error):
         """When a command error occurs, displays the reason in gild chat"""
         if hasattr(error, "original"):
@@ -186,10 +197,6 @@ def bot_init():
     @commands.is_owner()
     async def zero(ctx):
         1/0
-
-    @bot.event
-    async def on_disconnect():
-        await bot.http_session.close()
 
     return bot
 
