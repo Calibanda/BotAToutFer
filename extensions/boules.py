@@ -75,10 +75,9 @@ class Boules(commands.Cog):
             json.dump(boules, f, indent=4)
 
         try:
-            converter = UserConverter()
-            user = await converter.convert(ctx, user)
+            user = await UserConverter().convert(ctx, user)
             mention = user.mention
-        except Exception as e:
+        except commands.UserNotFound as e:
             mention = user
 
         if user:
