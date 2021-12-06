@@ -3,3 +3,4 @@ python-dotenv>=0.19.2
 bs4>=0.0.1
 youtube-dl>=2021.6.6
 python-dateutil>=2.8.2
+urllib3>=1.26.7
