@@ -1,4 +1,10 @@
-# dice commands for BotÀToutFer
+"""RollDice Cog for the "BotAToutFer" discord bot
+
+(C) 2021 Clément SEIJIDO
+Released under GNU General Public License v3.0 (GNU GPLv3)
+e-mail clement@seijido.fr
+"""
+
 import secrets
 import re
 import ast
@@ -17,7 +23,11 @@ class RollDice(commands.Cog, name="Jets de dés"):
         self.bot = bot
         self.dice_regex = r"\d+d\d+"
 
-    @commands.command(name="roll", aliases=["r"], help="Simule un lancer de dés au format xDx")
+    @commands.command(
+        name="roll",
+        aliases=["r"],
+        help="Simule un lancer de dés au format xDx"
+    )
     async def roll(self, ctx, *, calculation=""):
         """Rolls a dice in xDx format."""
         calculation = calculation.lower().strip()
@@ -35,22 +45,29 @@ class RollDice(commands.Cog, name="Jets de dés"):
         except ValueError as e:
             response = "Ohh la flemme de lancer tous ces dés !"
         else:
-            math_expression = calculation
+            math_expr = calculation
             for dice_result in dice_results:
-                math_expression = re.sub(
+                math_expr = re.sub(
                     pattern=self.dice_regex,
                     repl=dice_result,
-                    string=math_expression,
+                    string=math_expr,
                     count=1,
                     flags=re.IGNORECASE
                 )
             try:
-                self.bot.log.warning(f"User {ctx.author.name} ({ctx.author.id}) asks to evaluate this expression: '{math_expression}' in this channel: {ctx.guild}, #{ctx.channel.name} ({ctx.channel.id})")
-                total = self.eval_expr(math_expression)
+                self.bot.log.warning(
+                    f"User {ctx.author.name} ({ctx.author.id}) asks to "
+                    f"evaluate this expression: '{math_expr}' in this "
+                    f"channel: {ctx.guild}, #{ctx.channel.name} "
+                    f"({ctx.channel.id})"
+                )
+                total = self.eval_expr(math_expr)
             except (TypeError, SyntaxError) as e:
                 response = "Ceci n'est pas une expression valide !"
             else:
-                response = f"{ctx.author.mention}: **{total}** *({discord.utils.escape_markdown(math_expression)} = **{total}**)*"
+                response = f"{ctx.author.mention}: **{total}** *(" \
+                           f"{discord.utils.escape_markdown(math_expr)}" \
+                           f" = **{total}**)*"
 
         await ctx.send(response)
 
@@ -66,25 +83,35 @@ class RollDice(commands.Cog, name="Jets de dés"):
             raise ValueError
 
     def eval_expr(self, expr):
-
         def eval_(node):
-            # supported operators
-            operators = {ast.Add: op.add, ast.Sub: op.sub, ast.Mult: op.mul,
-                         ast.Div: op.truediv, ast.Pow: op.pow, ast.BitXor: op.xor,
-                         ast.USub: op.neg}
+            operators = {  # supported operators
+                ast.Add: op.add,
+                ast.Sub: op.sub,
+                ast.Mult: op.mul,
+                ast.Div: op.truediv,
+                ast.Pow: op.pow,
+                ast.BitXor: op.xor,
+                ast.USub: op.neg
+            }
             if isinstance(node, ast.Num):  # <number>
                 return node.n
             elif isinstance(node, ast.BinOp):  # <left> <operator> <right>
-                return operators[type(node.op)](eval_(node.left), eval_(node.right))
-            elif isinstance(node, ast.UnaryOp):  # <operator> <operand> e.g., -1
+                return operators[type(node.op)](
+                    eval_(node.left),
+                    eval_(node.right)
+                )
+            elif isinstance(node, ast.UnaryOp):  # <operator> <operand>
                 return operators[type(node.op)](eval_(node.operand))
             else:
                 raise TypeError(node)
 
         return eval_(ast.parse(expr, mode='eval').body)
 
-    @commands.command(name="roll-sw", help="Simule un lancer de dés Star Wars au format xD<name>")
-    async def roll_sw(self, ctx, dice: str=""):
+    @commands.command(
+        name="roll-sw",
+        help="Simule un lancer de dés Star Wars au format xD<name>"
+    )
+    async def roll_sw(self, ctx, dice=""):
         """Rolls a dice in xD<name> format."""
         try:
             number_of_dice, dice_type = dice.lower().split('d', maxsplit=1)
@@ -118,7 +145,8 @@ class RollDice(commands.Cog, name="Jets de dés"):
                         "Avantage :trident:",
                         "2 Avantages :trident: :trident:"
                     ]
-                elif dice_type == "difficulte" or dice_type == "difficulté" or dice_type == "d":
+                elif dice_type == "difficulte" or dice_type == "difficulté" \
+                        or dice_type == "d":
                     sides = [
                         "Vierge :shrug:",
                         "Échec :warning:",
@@ -129,7 +157,8 @@ class RollDice(commands.Cog, name="Jets de dés"):
                         "Menace :snowflake:",
                         "2 Menaces :snowflake: :snowflake:"
                     ]
-                elif dice_type == "maitrise" or dice_type == "maîtrise" or dice_type == "m":
+                elif dice_type == "maitrise" or dice_type == "maîtrise" \
+                        or dice_type == "m":
                     sides = [
                         "Vierge :shrug:",
                         "Succès net :boom:",
@@ -175,12 +204,15 @@ class RollDice(commands.Cog, name="Jets de dés"):
                         "2 Côté lumineux :white_circle: :white_circle:",
                     ]
                 else:
-                    response = "Merci de choisir un dé parmi : fortune (ou f), infortune (ou i), aptitude (ou a), maitrise (ou m), defi, force"
+                    response = "Merci de choisir un dé parmi : fortune (ou " \
+                               "f), infortune (ou i), aptitude (ou a), " \
+                               "maitrise (ou m), defi, force"
                     await ctx.send(response)
                     return
 
                 dices = [secrets.choice(sides) for _ in range(number_of_dice)]
-                response = f"{ctx.author.mention} : " + " + ".join(str(d) for d in dices)
+                response = f"{ctx.author.mention} : "
+                response += " + ".join(str(d) for d in dices)
 
             await ctx.send(response)
         except Exception as e:
