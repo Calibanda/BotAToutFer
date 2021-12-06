@@ -111,6 +111,9 @@ def bot_init():
         elif isinstance(error, commands.MissingRequiredArgument):
             # Send a "Did you forget something?" gif
             await ctx.send("https://tenor.com/bmqvT.gif")
+        elif isinstance(error, commands.errors.UserNotFound):
+            # Send a "WHO DAT?" gif
+            await ctx.send("https://tenor.com/bg6ud.gif")
         elif isinstance(error, discord.HTTPException):
             # Send a "Far too long" gif
             await ctx.send("https://tenor.com/bmQvt.gif")
