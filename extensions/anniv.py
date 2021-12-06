@@ -36,6 +36,7 @@ class Anniversaire(commands.Cog):
 
     @tasks.loop(hours=24)
     async def birthday_loop(self):
+        self.bot.log.warning("Start birthday loop")
         try:
             with open(self.BIRTHDAYS_PATH, "r") as f:
                 birthdays = json.load(f)
@@ -49,16 +50,32 @@ class Anniversaire(commands.Cog):
         now = datetime.datetime.now()
         today = f"{now.day:02d}/{now.month:02d}"  # DD/MM
 
-        for user in birthdays:
-            if birthdays[user]["birthdate"][:5] == today:
-                message = f"Bon anniversaire " \
-                          f"{self.bot.get_user(user).mention} ! :tada:"
-                server = self.bot.get_guild(birthdays[user]["server_id"])
-                await server.system_channel.send(message)
+        for channel_id in birthdays:
+            for user_id in birthdays[channel_id]:
+                if birthdays[channel_id][user_id][:5] == today[:5]:
+                    user = await self.bot.fetch_user(int(user_id))
+                    if user is None:
+                        self.bot.log.warning(
+                            f"No user found with id {user_id}"
+                        )
+                        continue
+
+                    channel = await self.bot.fetch_channel(channel_id)
+                    if channel is None:
+                        self.bot.log.warning(
+                            f"No channel found with id {channel_id} to "
+                            f"wish birthday to {user_id}"
+                        )
+                        continue
+
+                    message = f"Bon anniversaire {user.mention} ! :tada:"
+                    await channel.send(message)
 
     @birthday_loop.before_loop
     async def before_birthday_loop(self):
         await self.bot.wait_until_ready()
+
+        self.bot.log.warning("Start before_birthday_loop")
 
         alarm = datetime.datetime.now().replace(
             hour=9,
@@ -70,7 +87,13 @@ class Anniversaire(commands.Cog):
         if delta < 0:  # 9AM is passed today
             delta += datetime.timedelta(days=1).total_seconds()
 
+        self.bot.log.warning(f"sleep {delta} seconds")
         await asyncio.sleep(delta)  # await next 9AM
+
+    @birthday_loop.error
+    async def error_birthday_loop(self, e):
+        self.bot.log.error("Error during birthday loop", exc_info=e)
+        self.birthday_loop.restart()
 
     @commands.command(
         name="anniv",
@@ -88,11 +111,12 @@ class Anniversaire(commands.Cog):
                 )
                 birthdays = {}
 
-            if str(user.id) in birthdays:
-                date = birthdays[str(user.id)]["birthdate"][:5]  # DD/MM
-                response = f"L'anniv de cette chouette personne est le {date}"
-            else:
+            try:
+                date = birthdays[ctx.guild.id][ctx.user.id]
+            except KeyError as e:
                 response = f"Jamais entendu parler de cette personne"
+            else:
+                response = f"L'anniv de cette chouette personne est le {date}"
         else:
             response = f"Jamais entendu parler de cette personne"
         await ctx.send(response)
@@ -103,7 +127,7 @@ class Anniversaire(commands.Cog):
     )
     async def mon_anniv(self, ctx, date: str = ""):
         try:
-            date = parser.parse(date)
+            date = parser.parse(date, dayfirst=True)
         except parser.ParserError as e:
             response = "Euhhh, c'est quoi cette date bourrée ?"
             await ctx.send(response)
@@ -119,10 +143,14 @@ class Anniversaire(commands.Cog):
             )
             birthdays = {}
 
-        birthdays[str(ctx.author.id)] = {
-            "server_id": str(ctx.guild.id),
-            "birthdate": f"{date.day:02d}/{date.month:02d}/{date.year}"
-        }
+        if ctx.channel.id in birthdays:
+            birthdays[ctx.channel.id][ctx.author.id] = f"{date.day:02d}/" \
+                                                       f"{date.month:02d}/" \
+                                                       f"{date.year}"
+        else:
+            birthdays[ctx.channel.id] = {
+                ctx.author.id: f"{date.day:02d}/{date.month:02d}/{date.year}"
+            }
 
         with open(self.BIRTHDAYS_PATH, "w") as f:
             json.dump(birthdays, f, indent=4)
