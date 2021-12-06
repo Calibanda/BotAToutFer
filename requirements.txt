@@ -1,4 +1,5 @@
-discord.py[voice]>=1.5.0
-python-dotenv>=0.14.0
+discord.py[voice]>=1.7.3
+python-dotenv>=0.19.2
 bs4>=0.0.1
-youtube-dl>=2020.11.21.1
+youtube-dl>=2021.6.6
+python-dateutil>=2.8.2
