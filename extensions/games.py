@@ -1,14 +1,22 @@
-# games commands for BotÀToutFer
+"""Games Cog for the "BotAToutFer" discord bot
+
+(C) 2021 Clément SEIJIDO
+Released under GNU General Public License v3.0 (GNU GPLv3)
+e-mail clement@seijido.fr
+"""
+
 import os
-import random
 import json
 import re
 import datetime
-
 import asyncio
+
 import discord
 from discord.ext import commands
 from discord.ext.commands import UserConverter
+
+from game_controlers.hangman import Hangman
+from game_controlers.quiz import Quiz
 
 
 def setup(bot):
@@ -18,7 +26,6 @@ def setup(bot):
 class Games(commands.Cog, name="Jeux"):
     def __init__(self, bot):
         self.bot = bot
-        self.user_converter = UserConverter()
 
         self.SCORE_PATH = os.path.join(
             self.bot.SCRIPT_DIR,
@@ -26,16 +33,7 @@ class Games(commands.Cog, name="Jeux"):
             "scores.json"
         )
 
-        self.pendu_games = {}
-        # pendu_games = {discord.TextChannel.id: {
-        #     "secret_word": "",
-        #     "visible_word": "",
-        #     "number_stroke": 10,
-        #     "guessed_letters": [],
-        #     "definition": "",
-        #     "starting_time": datetime.datetime
-        # }}
-
+        self.pendu_games = {}  # {discord.TextChannel.id: Hangman, ...}
         # Path of the french scrabble dictionary
         self.DICTIONARY_PATH = os.path.join(
             self.bot.SCRIPT_DIR,
@@ -43,21 +41,7 @@ class Games(commands.Cog, name="Jeux"):
             "ODS7.txt"
         )
 
-        self.quiz_games = {}
-        # games = {discord.Guild.id: {
-        #     "langue": "",
-        #     "categorie": "",
-        #     "theme": "",
-        #     "difficulte": "",
-        #     "question": "",
-        #     "reponse_correcte": "",
-        #     "autres_choix": []
-        #     "anecdote": "",
-        #     "wikipedia": ""
-        #     "starting_time": datetime.datetime
-        #     "indice": False
-        # }}
-
+        self.quiz_games = {}  # {discord.Guild.id: Quiz, ...}
         self.QUIZ_API_URL = "https://www.openquizzdb.org/api.php"
         self.QUIZ_API_PARAMETERS = {
             "key": self.bot.OPENQUIZZDB_TOKEN,
@@ -68,224 +52,277 @@ class Games(commands.Cog, name="Jeux"):
         }
         self.api_last_call = None
         self.quiz_semaphore = asyncio.Semaphore(1)
+        self.quiz_colors = {
+            "débutant": 0x00ff00,
+            "confirmé": 0xffcc00,
+            "expert": 0xff0000
+        }
 
-    @commands.command(name="pendu", help="Démarre une nouvelle partie de pendu")
+    @commands.command(
+        name="pendu",
+        help="Démarre une nouvelle partie de pendu"
+    )
     async def pendu(self, ctx):
         if ctx.channel.id not in self.pendu_games:
             # If no game is currently running in this text channel
             try:
-                game = {}  # Creating a new dictionary
+                game = Hangman(self.DICTIONARY_PATH)
+                game.definition = self.get_word_definition(
+                    ctx,
+                    game.secret_word
+                )
 
-                with open(self.DICTIONARY_PATH, "r", encoding="utf-8") as f:
-                    # Chose a secret word in the dictionary
-                    word = random.choice(f.readlines())
-                    game["secret_word"] = word.casefold().strip()
-
-                # Creating a word with "*" that will be displayed to players
-                game["visible_word"] = "*" * len(game["secret_word"])
-                # Players have 10 strokes to find the word
-                game["number_stroke"] = 10
-                # Create the list to store all the guessed letters
-                game["guessed_letters"] = []
-                # The definition of the word
-                game["definition"] = "Désolé, je n'ai pas trouvé cette définition..."
-
-                try:
-                    self.bot.log.warning(f"Asking for word definition")
-                    url = f"https://api.dicolink.com/v1/mot/{game['secret_word']}/definitions"
-                    params = {"limite": "1", "api_key": self.bot.DICOLINK_TOKEN}
-                    async with self.bot.http_session.get(url=url, params=params) as r:
-                        # Retrieve a definition
-                        if r.status == 200:
-                            definit = await r.json()
-                            game["definition"] = definit[0]["definition"]
-                except Exception as e:
-                    self.bot.log.exception(f"Unable to load a word definition in this channel: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})", exc_info=e)
-
-                # We save the datetime of the start of the game
-                game["starting_time"] = datetime.datetime.now()
-
-                # We add the game dictionary in the class attribute "games"
+                # We add the game object in the class attribute "games"
                 # linked with the id of the text channel
                 self.pendu_games[ctx.channel.id] = game
 
-                response = (
-                    "Je lance une partie de pendu !\n"
-                    + f"Vous avez {game['number_stroke']} coup(s) pour trouver le mot secret selon les règles du pendu !\n"
-                    + "Voici le mot à deviner : " + game["visible_word"].replace("*", "\*")
-                )
+                response = "Je lance une partie de pendu !\n" \
+                           f"Vous avez {game.number_stroke} coup(s) pour " \
+                           f"trouver le mot secret selon les règles du " \
+                           f"pendu !\n" \
+                           f"Voici le mot à deviner : "
+                response += discord.utils.escape_markdown(game.visible_word)
 
             except Exception as e:
-                self.bot.log.exception(f"Unable to launch a 'pendu' game in this channel: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})", exc_info=e)
-                response = "Désolé, je n'ai pas réussi à lancer une partie. Veuillez réessayer."
+                self.bot.log.exception(
+                    f"Unable to launch a hangman game in this channel: "
+                    f"{ctx.channel.guild}, #{ctx.channel.name} "
+                    f"({ctx.channel.id})",
+                    exc_info=e
+                )
+                response = "Désolé, je n'ai pas réussi à lancer une partie. " \
+                           "Veuillez réessayer."
 
         else:  # A game is currently running in this text channel
-            visible_word = self.pendu_games[ctx.channel.id]["visible_word"]
-            response = (
-                "Une partie est déjà en cours !\n"
-                + f"Il reste {self.pendu_games[ctx.channel.id]['number_stroke']} coup(s) et voici le mot à deviner : " + visible_word.replace("*", "\*")
-            )
+            game = self.pendu_games[ctx.channel.id]
+            response = "Une partie est déjà en cours !\n" \
+                       f"Il reste {game.number_stroke} coup(s) et voici le " \
+                       f"mot à deviner : "
+            response += discord.utils.escape_markdown(game.visible_word)
+
         await ctx.send(response)
 
-    @commands.command(name="pendu-status", help="Affiche le status de la partie en cours")
+    async def get_word_definition(self, ctx, word):
+        try:
+            self.bot.log.warning(f"Asking for word definition: {word}")
+            url = f"https://api.dicolink.com/v1/mot/{word}/definitions"
+            params = {
+                "limite": "1",
+                "api_key": self.bot.DICOLINK_TOKEN
+            }
+            async with self.bot.http_session.get(url=url, params=params) as r:
+                # Retrieve a definition
+                if r.status == 200:
+                    response_content = await r.json()
+                    return response_content[0]["definition"]
+        except Exception as e:
+            self.bot.log.exception(
+                f"Unable to load a word definition in this channel: "
+                f"{ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})",
+                exc_info=e
+            )
+            return "Désolé, je n'ai pas trouvé cette définition..."
+
+    @commands.command(
+        name="pendu-status",
+        help="Affiche le status de la partie en cours"
+    )
     async def pendu_status(self, ctx):
         if ctx.channel.id in self.pendu_games:
-            visible_word = self.pendu_games[ctx.channel.id]["visible_word"]
-            response = "Le mot à deviner : " + visible_word.replace("*", "\*") + "\nLes lettres déjà proposées : "
-            for letter in self.pendu_games[ctx.channel.id]["guessed_letters"]:
-                response += f"{letter} "
-            response += (
-                "\nLe pendu :\n```\n"
-                + self.hanged_drawing(self.pendu_games[ctx.channel.id]["number_stroke"])
-                + "\n```"
-            )
-            await ctx.send(response)
+            # If a game is currently running in this text channel
+            game = self.pendu_games[ctx.channel.id]
+            response = "Le mot à deviner : " \
+                       f"{discord.utils.escape_markdown(game.visible_word)}" \
+                       "\n" \
+                       f"Les lettres déjà proposées : " \
+                       f"{game.get_guessed_letters()}\n" \
+                       f"\nLe pendu :\n```\n{game.drawing()}\n```"
+
         else:
-            await self.no_pendu_game(ctx)
+            response = "Aucune partie de pendu n'est en cours ! Mais vous " \
+                       "pouvez en lancer une avec la commande '!pendu'"
+
+        await ctx.send(response)
 
     @commands.command(name="pendu-stop", help="Arrête la partie en cours")
     async def pendu_stop(self, ctx):
         if ctx.channel.id in self.pendu_games:
             # If a game is currently running in this text channel
-            response = (
-                "Ohhh, dommage, mais je comprend que vous souhaitez arrêter. "
-                + "Voici le mot qui était à deviner : "
-                + self.pendu_games[ctx.channel.id]['secret_word']
-            )
+            response = "Ohhh, dommage, mais je comprend que vous souhaitez " \
+                       "arrêter. Voici le mot qui était à deviner : " \
+                       f"{self.pendu_games[ctx.channel.id].secret_word}"
             del self.pendu_games[ctx.channel.id]
-            await ctx.send(response)
-        else:  # No game is currently running in this text channel
-            await self.no_pendu_game(ctx)
+
+        else:
+            response = "Aucune partie de pendu n'est en cours ! Mais vous " \
+                       "pouvez en lancer une avec la commande '!pendu'"
+
+        await ctx.send(response)
 
     @commands.Cog.listener('on_message')
     async def pendu_process_game(self, message):
-        if message.channel.id in self.pendu_games and re.match(r"^[a-z]$", message.content):
-            # If a game is currently running in this text channel
-            ctx = await self.bot.get_context(message)
-            guessed_letters = []  # Clean list of guessed letters
-            for letters in self.pendu_games[ctx.channel.id]["guessed_letters"]:
-                guessed_letters.append(re.findall(r"[a-z]", letters, flags=re.IGNORECASE)[0])
+        if not re.match(r"^[a-z]$", message.content, flags=re.IGNORECASE):
+            # the message is not a single letter
+            return
 
-            if message.content in guessed_letters:
-                # If the guessed letter has already been guessed
-                response = f"Vous avez déjà demandé la lettre {message.content} !"
+        if message.channel.id not in self.pendu_games:
+            # If no game is currently running in this text channel
+            return
 
-            elif message.content in self.pendu_games[ctx.channel.id]["secret_word"]:
-                # If the guessed letter is in the secret word
-                response = "Oui !"
-                # Add the letter to the guessed letters list
-                self.pendu_games[ctx.channel.id]["guessed_letters"].append(message.content)
+        ctx = await self.bot.get_context(message)
+        game = self.pendu_games[ctx.channel.id]
+        user_guess = message.content.upper()
 
-                length_secret_word = len(self.pendu_games[ctx.channel.id]["secret_word"])
-                for i in range(length_secret_word):
-                    # Replace the guessed letter in the visible word
-                    if self.pendu_games[ctx.channel.id]["secret_word"][i] == message.content:
-                        self.pendu_games[ctx.channel.id]["visible_word"] = (
-                            self.pendu_games[ctx.channel.id]["visible_word"][:i]
-                            + message.content
-                            + self.pendu_games[ctx.channel.id]["visible_word"][i + 1:]
-                        )
+        if user_guess in game.guessed_letters:
+            # If the guessed letter has already been guessed
+            response = f"Vous avez déjà demandé la lettre {user_guess} !"
 
-                if self.pendu_games[ctx.channel.id]["visible_word"] == self.pendu_games[ctx.channel.id]["secret_word"]:  # WIN
-                    # Game duration in seconds
-                    game_duration = datetime.timedelta(seconds=(datetime.datetime.now() - self.pendu_games[ctx.channel.id]['starting_time']).seconds)
-                    response += (
-                        " C'est gagné ! Vous avez deviné le mot "
-                        + f"{self.pendu_games[ctx.channel.id]['secret_word']} "
-                        + f"({self.pendu_games[ctx.channel.id]['definition']})\n"
-                        + f"Durée de la partie : {game_duration}"
-                    )
+            await ctx.send(response)
+            await self.pendu_status(ctx)  # reminder players the game status
 
-                    self.save_pendu_score(ctx.guild.id, ctx.author.id, game_duration)
+        elif user_guess in game.secret_word:
+            # If the guessed letter is in the secret word
+            response = "Oui !"
+            # Add the letter to the guessed letters list
+            game.guessed_letters.append(user_guess)
+            # Modify the visible word
+            game.process_visible_word(user_guess)
 
-                    del self.pendu_games[ctx.channel.id]  # Delete the current game
-                    await ctx.send(response)
-                    return
+            if game.visible_word == game.secret_word:  # WIN
+                # Game duration in seconds
+                game_duration = datetime.timedelta(
+                    seconds=(
+                        datetime.datetime.now() - game.starting_time
+                    ).seconds
+                )
 
-            else:  # If the guessed letter is not in the secret word
-                response = "Non !"
+                response += " C'est gagné ! Vous avez deviné le mot " \
+                            f"{game.secret_word} ({game.definition})\n" \
+                            f"Durée de la partie : {game_duration}"
 
-                # Add the letter to the guessed letters list
-                self.pendu_games[ctx.channel.id]["guessed_letters"].append(f"~~{message.content}~~")
-                # Decrement the stroke number
-                self.pendu_games[ctx.channel.id]["number_stroke"] -= 1
+                self.save_pendu_score(
+                    str(ctx.guild.id),
+                    str(ctx.author.id),
+                    game_duration.seconds
+                )
 
-                if self.pendu_games[ctx.channel.id]["number_stroke"] == 0:  # LOSE
-                    response += (
-                        " C'est perdu !\n```\n"
-                        + self.hanged_drawing(self.pendu_games[ctx.channel.id]["number_stroke"])
-                        + "\n```\n"
-                        + "Le mot à deviner était : "
-                        + f"{self.pendu_games[ctx.channel.id]['secret_word']} "
-                        + f"({self.pendu_games[ctx.channel.id]['definition']})"
-                    )
-                    del self.pendu_games[ctx.channel.id]  # Delete the current game
-                    await ctx.send(response)
-                    return
+                del self.pendu_games[ctx.channel.id]  # Delete the current game
+                await ctx.send(response)
+                return
 
             await ctx.send(response)
             await self.pendu_status(ctx)
 
-    async def no_pendu_game(self, ctx):
-        response = "Aucune partie de pendu n'est en cours ! Mais vous pouvez en lancer une avec la commande '!pendu'"
-        await ctx.send(response)
+        else:  # If the guessed letter is not in the secret word
+            response = "Non !"
 
-    def hanged_drawing(self, number_stroke):
-        if number_stroke == 10:
-            return ""
-        elif number_stroke == 9:
-            return "___"
-        elif number_stroke == 8:
-            return " |\n |\n |\n |\n |\n_|_"
-        elif number_stroke == 7:
-            return " ____________\n |\n |\n |\n |\n |\n_|_"
-        elif number_stroke == 6:
-            return " ____________\n |/\n |\n |\n |\n |\n_|_"
-        elif number_stroke == 5:
-            return " ____________\n |/     |\n |\n |\n |\n |\n_|_"
-        elif number_stroke == 4:
-            return " ____________\n |/     |\n |      O\n |\n |\n |\n_|_"
-        elif number_stroke == 3:
-            return " ____________\n |/     |\n |      O\n |      |\n |      |\n |\n_|_"
-        elif number_stroke == 2:
-            return " ____________\n |/     |\n |      O\n |     _|_\n |      |\n |\n_|_"
-        elif number_stroke == 1:
-            return " ____________\n |/     |\n |      O\n |     _|_\n |      |\n |     /\n_|_"
-        elif number_stroke == 0:
-            return " ____________\n |/     |\n |      O\n |     _|_\n |      |\n |     / \\ \n_|_"
+            # Add the letter to the guessed letters list
+            game.guessed_letters.append(user_guess)
+            # Decrement the stroke number
+            game.number_stroke -= 1
 
-    @commands.command(name="quiz", help="Demande une question du quiz. Option, choix du niveau de difficulté (1=débutant, 2=confirmé, 3=expert)")
-    async def quiz(self, ctx, option=""):
-        if ctx.guild.id in self.quiz_games:
-            if "question" in self.quiz_games[ctx.guild.id]:
-                await self.send_quiz_question(ctx)
+            if game.number_stroke == 0:  # LOSE
+                response += f" C'est perdu !\n```\n{game.drawing()}\n```\n" \
+                            f"Le mot à deviner était : {game.secret_word} " \
+                            f"({game.definition})"
+
+                del self.pendu_games[ctx.channel.id]  # Delete the current game
+                await ctx.send(response)
+                return
+
+            await ctx.send(response)
+            await self.pendu_status(ctx)
+
+    def save_pendu_score(self, guild_id: str, author_id: str, game_duration):
+        try:
+            with open(self.SCORE_PATH, "r") as f:
+                scores = json.load(f)
+        except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
+            self.bot.log.error("No score.json file: ", exc_info=e)
+            scores = {
+                "pendu": {},
+                "quiz": {}
+            }
+
+        if guild_id in scores["pendu"]:
+            if author_id in scores["pendu"][guild_id]:
+                if game_duration < scores["pendu"][guild_id][author_id]:
+                    scores["pendu"][guild_id][author_id] = game_duration
+            else:
+                scores["pendu"][guild_id][author_id] = game_duration
         else:
-            await self.launch_quiz(ctx, option)
+            scores["pendu"][guild_id] = {author_id: game_duration}
 
-    @commands.command(name="quiz-indice", help="Demander les 4 propositions de réponse à la question en cours")
+        with open(self.SCORE_PATH, "w", encoding="utf8") as f:
+            json.dump(scores, f, indent=4)
+
+    @commands.command(
+        name="quiz",
+        help="Demande une question du quiz. Option, choix du niveau "
+             "de difficulté (1=débutant, 2=confirmé, 3=expert)"
+    )
+    async def quiz(self, ctx, option=""):
+        if ctx.guild.id not in self.quiz_games:
+            # If no game is currently running in this text channel
+            await self.launch_quiz(ctx, option)
+        else:
+            game = self.quiz_games[ctx.guild.id]
+            if game.ready:
+                await ctx.send(embed=self.create_quiz_embed(game))
+
+    def create_quiz_embed(self, game):
+        embed = discord.Embed(
+            title=f"Quiz - Catégorie {game.category} ({game.difficulty})",
+            description=game.question,
+            color=self.quiz_colors[game.difficulty]
+        )
+
+        if game.hint:
+            for other_choice in game.other_choices:
+                embed.add_field(
+                    name="Proposition",
+                    value=other_choice,
+                    inline=True
+                )
+
+        return embed
+
+    @commands.command(
+        name="quiz-indice",
+        help="Demander les 4 propositions de réponse à la question en cours"
+    )
     async def quiz_indice(self, ctx):
         if ctx.guild.id in self.quiz_games:
-            if "question" in self.quiz_games[ctx.guild.id]:
-                self.quiz_games[ctx.guild.id]["indice"] = True
-                await self.send_quiz_question(ctx)
+            # If a game is currently running in this text channel
+            game = self.quiz_games[ctx.guild.id]
+            if game.ready:
+                game.hint = True
+                await ctx.send(embed=self.create_quiz_embed(game))
         else:
             await ctx.send("Il n'y a pas de quiz en cours dans ce serveur !")
 
-    @commands.command(name="quiz-stop", help="Annule la question de quiz en cours")
+    @commands.command(
+        name="quiz-stop",
+        help="Annule la question de quiz en cours"
+    )
     async def quiz_stop(self, ctx):
         if ctx.guild.id in self.quiz_games:
-            if "question" in self.quiz_games[ctx.guild.id]:
-                title = "Quiz - Fin de la question"
-                description = self.quiz_games[ctx.guild.id]["reponse_correcte"]
-                embed = discord.Embed(title=title, description=description)
+            # If a game is currently running in this text channel
+            game = self.quiz_games[ctx.guild.id]
+            if game.ready:
+                embed = discord.Embed(
+                    title="Quiz - Fin de la question",
+                    description=game.correct_answer
+                )
                 embed.add_field(
                     name="Anecdote",
-                    value=self.quiz_games[ctx.guild.id]["anecdote"],
+                    value=game.anecdote,
                     inline=True
                 )
                 embed.set_footer(
-                    text=self.quiz_games[ctx.guild.id]["wikipedia"]
+                    text=game.wikipedia
                 )
+
                 await ctx.send(embed=embed)
                 del self.quiz_games[ctx.guild.id]
         else:
@@ -293,13 +330,17 @@ class Games(commands.Cog, name="Jeux"):
 
     @commands.Cog.listener('on_message')
     async def quiz_process_game(self, message):
-        if message.guild.id in self.quiz_games and "question" in self.quiz_games[message.guild.id]:
-            if self.quiz_games[message.guild.id]["clean_response"] in self.remove_accents(message.content.casefold().strip()):
+        if message.guild.id in self.quiz_games \
+                and self.quiz_games[message.guild.id].ready:
+            game = self.quiz_games[message.guild.id]
+            if game.cleaned_response in Quiz.clean_response(message.content):
                 await self.quiz_win(message)
 
     async def launch_quiz(self, ctx, option):
-        self.quiz_games[ctx.guild.id] = {}
-        if self.api_last_call and (datetime.datetime.now() - self.api_last_call).seconds < 65:
+        game = Quiz()
+        self.quiz_games[ctx.guild.id] = game
+        now = datetime.datetime.now()
+        if self.api_last_call and (now - self.api_last_call).seconds < 65:
             response = "J'envoie une question dans quelques secondes !"
             await ctx.send(response)
 
@@ -313,122 +354,67 @@ class Games(commands.Cog, name="Jeux"):
             params = self.QUIZ_API_PARAMETERS
 
         async with self.quiz_semaphore:
-            self.bot.log.warning(f"Asking for a quiz question")
-            async with self.bot.http_session.get(url=self.QUIZ_API_URL, params=params) as r:
+            self.bot.log.warning("Asking for a quiz question")
+            async with self.bot.http_session.get(
+                    url=self.QUIZ_API_URL, params=params) as r:
                 self.api_last_call = datetime.datetime.now()
                 if r.status == 200:
                     try:
                         question = await r.json()
                     except json.decoder.JSONDecodeError as e:
-                        self.bot.log.exception(f"Unable to decode API response in this channel: {ctx.channel.guild}, #{ctx.channel.name} ({ctx.channel.id})", exc_info=e)
+                        self.bot.log.exception(
+                            f"Unable to decode API response in this channel: "
+                            f"{ctx.channel.guild}, #{ctx.channel.name} "
+                            f"({ctx.channel.id})",
+                            exc_info=e
+                        )
                         response = "Erreur d'API, merci de réessayer"
                         await ctx.send(response)
                     else:
                         if question["response_code"] == 0:  # Succès
-                            self.quiz_games[ctx.guild.id] = question["results"][0]
-                            self.quiz_games[ctx.guild.id]["starting_time"] = datetime.datetime.now()
-                            random.shuffle(self.quiz_games[ctx.guild.id]["autres_choix"])
-                            self.quiz_games[ctx.guild.id]["clean_response"] = self.clean_response(self.quiz_games[ctx.guild.id]["reponse_correcte"])
-                            self.quiz_games[ctx.guild.id]["indice"] = False
-                            await self.send_quiz_question(ctx)
+                            game.start(question["results"][0])
+                            await ctx.send(embed=self.create_quiz_embed(game))
                         else:
-                            self.bot.log.error(f"Problem with the API key, code: {question['response_code']}")
-                            response = "Désolé, je n'ai pas réussi à trouver une question de quiz..."
+                            self.bot.log.error(
+                                f"Problem with the API key, code: "
+                                f"{question['response_code']}"
+                            )
+                            response = "Désolé, je n'ai pas réussi à " \
+                                       "trouver une question de quiz..."
                             await ctx.send(response)
 
-            execution_time = (datetime.datetime.now() - self.api_last_call).seconds
+            execution_time = (
+                    datetime.datetime.now() - self.api_last_call
+                ).seconds
             if execution_time < 65:
+                # keep the semaphore for one minute
                 await asyncio.sleep(65 - execution_time)
 
-    def clean_response(self, response):
-        response = response.casefold().strip()
-
-        if response[0] == "'":
-            response = response[1:]
-        if response[-1] == "'":
-            response = response[:-1]
-
-        stop_words = [
-            "le",
-            "la",
-            "les",
-            "un",
-            "une",
-            "des"
-        ]
-        response = " ".join([word for word in response.split(" ") if word not in stop_words])
-
-        response = self.remove_accents(response)
-
-        return response
-
-    def remove_accents(self, text):
-        return text.replace("à", "a")\
-            .replace("â", "a")\
-            .replace("ä", "a")\
-            .replace("ç", "c")\
-            .replace("é", "e")\
-            .replace("è", "e")\
-            .replace("ê", "e")\
-            .replace("ë", "e")\
-            .replace("î", "i")\
-            .replace("ï", "i")\
-            .replace("ô", "o")\
-            .replace("ö", "o")\
-            .replace("ù", "u")\
-            .replace("û", "u")\
-            .replace("ü", "u")\
-            .replace("ÿ", "y")\
-            .replace("œ", "oe")\
-            .replace("’", "'")
-
-    async def send_quiz_question(self, ctx):
-        title = "Quiz - Catégorie " + self.quiz_games[ctx.guild.id]["categorie"] + " (" + self.quiz_games[ctx.guild.id]["difficulte"] + ")"
-        colors = {
-            "débutant": 0x00ff00,
-            "confirmé": 0xffcc00,
-            "expert": 0xff0000
-        }
-        description = self.quiz_games[ctx.guild.id]["question"]
-        embed = discord.Embed(
-            title=title,
-            description=description,
-            color=colors[self.quiz_games[ctx.guild.id]["difficulte"]]
-        )
-        if self.quiz_games[ctx.guild.id]["indice"]:
-            for autre_choix in self.quiz_games[ctx.guild.id]["autres_choix"]:
-                embed.add_field(
-                    name="Proposition",
-                    value=autre_choix,
-                    inline=True
-                )
-        await ctx.send(embed=embed)
-
     async def quiz_win(self, message):
-        title = "Quiz - Fin de la question"
+        game = self.quiz_games[message.guild.id]
         points = 0
-        if self.quiz_games[message.guild.id]["difficulte"] == "débutant":
+        if game.difficulty == "débutant":
             points = 2
-        elif self.quiz_games[message.guild.id]["difficulte"] == "confirmé":
+        elif game.difficulty == "confirmé":
             points = 4
-        elif self.quiz_games[message.guild.id]["difficulte"] == "expert":
+        elif game.difficulty == "expert":
             points = 6
 
-        if self.quiz_games[message.guild.id]["indice"]:
+        if game.hint:
             points = int(points/2)
 
-        self.save_quiz_score(message.guild.id, message.author.id, points)
+        self.save_quiz_score(
+            str(message.guild.id),
+            str(message.author.id),
+            points
+        )
 
-        description = f"Bravo {message.author.name}. La réponse était " + self.quiz_games[message.guild.id]["reponse_correcte"] + f". {points} point(s) !"
-        colors = {
-            "débutant": 0x00ff00,
-            "confirmé": 0xffcc00,
-            "expert": 0xff0000
-        }
         embed = discord.Embed(
-            title=title,
-            description=description,
-            color=colors[self.quiz_games[message.guild.id]["difficulte"]]
+            title="Quiz - Fin de la question",
+            description=f"Bravo {message.author.name}. "
+                        f"La réponse était {game.correct_answer}. "
+                        f"{points} point(s) !",
+            color=self.quiz_colors[game.difficulty]
         )
         embed.set_author(
             name=message.author.name,
@@ -436,16 +422,16 @@ class Games(commands.Cog, name="Jeux"):
         )
         embed.add_field(
             name="Anecdote",
-            value=self.quiz_games[message.guild.id]["anecdote"],
+            value=game.anecdote,
             inline=True
         )
         embed.set_footer(
-            text=self.quiz_games[message.guild.id]["wikipedia"],
+            text=game.wikipedia,
         )
         await message.channel.send(embed=embed)
         del self.quiz_games[message.guild.id]
 
-    def save_pendu_score(self, guild_id, author_id, game_duration):
+    def save_quiz_score(self, guild_id: str, author_id: str, points):
         try:
             with open(self.SCORE_PATH, "r") as f:
                 scores = json.load(f)
@@ -456,36 +442,13 @@ class Games(commands.Cog, name="Jeux"):
                 "quiz": {}
             }
 
-        if str(guild_id) in scores["pendu"]:
-            if str(author_id) in scores["pendu"][str(guild_id)]:
-                if game_duration.seconds < scores["pendu"][str(guild_id)][str(author_id)]:
-                    scores["pendu"][str(guild_id)][str(author_id)] = game_duration.seconds
+        if guild_id in scores["quiz"]:
+            if author_id in scores["quiz"][guild_id]:
+                scores["quiz"][guild_id][author_id] += points
             else:
-                scores["pendu"][str(guild_id)][str(author_id)] = game_duration.seconds
+                scores["quiz"][guild_id][author_id] = points
         else:
-            scores["pendu"][str(guild_id)] = {str(author_id): game_duration.seconds}
-
-        with open(self.SCORE_PATH, "w", encoding="utf8") as f:
-            json.dump(scores, f, indent=4)
-
-    def save_quiz_score(self, guild_id, author_id, points):
-        try:
-            with open(self.SCORE_PATH, "r") as f:
-                scores = json.load(f)
-        except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
-            self.bot.log.error("No score.json file: ", exc_info=e)
-            scores = {
-                "pendu": {},
-                "quiz": {}
-            }
-
-        if str(guild_id) in scores["quiz"]:
-            if str(author_id) in scores["quiz"][str(guild_id)]:
-                scores["quiz"][str(guild_id)][str(author_id)] += points
-            else:
-                scores["quiz"][str(guild_id)][str(author_id)] = points
-        else:
-            scores["quiz"][str(guild_id)] = {str(author_id): points}
+            scores["quiz"][guild_id] = {author_id: points}
 
         with open(self.SCORE_PATH, "w", encoding="utf8") as f:
             json.dump(scores, f, indent=4)
@@ -499,39 +462,58 @@ class Games(commands.Cog, name="Jeux"):
             self.bot.log.error("No score.json file: ", exc_info=e)
             response = "Il n'y a pas de scores enregistrés !"
             await ctx.send(response)
+            return
+
+        if str(ctx.guild.id) in scores["pendu"]:
+            user_scores = scores["pendu"][str(ctx.guild.id)]
+            user_scores = sorted(user_scores.items(), key=lambda x: x[1])
+
+            description = ""
+            for user_id, score in user_scores:
+                try:
+                    user = await UserConverter().convert(ctx, user_id)
+                except discord.ext.commands.UserNotFound as e:
+                    self.bot.log.error(
+                        f"user {user_id} not found in {ctx.guild.id}",
+                        exc_info=e
+                    )
+                else:
+                    description += f"{user.name} : {score} secondes\n"
         else:
-            if str(ctx.guild.id) in scores["pendu"]:
-                user_scores = scores["pendu"][str(ctx.guild.id)]
-                user_scores = sorted(user_scores.items(), key=lambda x: x[1])
+            description = "Il n'y a pas de scores de pendu dans ce serveur !"
 
-                description = ""
-                for user_id, score in user_scores:
-                    user = await self.user_converter.convert(ctx, user_id)
-                    description += user.name + " : " + str(score) + " secondes\n"
-            else:
-                description = "Il n'y a pas de scores de pendu dans ce serveur !"
+        embed = discord.Embed(
+            title="Voici les scores du pendu !",
+            description=description
+        )
 
-            embed = discord.Embed(
-                title="Voici les scores du pendu !",
-                description=description
+        await ctx.send(embed=embed)
+
+        if str(ctx.guild.id) in scores["quiz"]:
+            user_scores = scores["quiz"][str(ctx.guild.id)]
+            user_scores = sorted(
+                user_scores.items(),
+                key=lambda x: x[1],
+                reverse=True
             )
 
-            await ctx.send(embed=embed)
+            description = ""
+            for user_id, score in user_scores[:10]:
+                try:
+                    user = await UserConverter().convert(ctx, user_id)
+                except discord.ext.commands.UserNotFound as e:
+                    self.bot.log.error(
+                        f"user {user_id} not found in {ctx.guild.id}",
+                        exc_info=e
+                    )
+                else:
+                    description += f"{user.name} : {score} secondes\n"
+        else:
+            description = "Il n'y a pas de scores de quiz dans ce serveur !"
 
-            if str(ctx.guild.id) in scores["quiz"]:
-                user_scores = scores["quiz"][str(ctx.guild.id)]
-                user_scores = sorted(user_scores.items(), key=lambda x: x[1], reverse=True)
+        embed = discord.Embed(
+            title="Voici les scores du quiz !",
+            description=description
+        )
 
-                description = ""
-                for user_id, score in user_scores[:10]:
-                    user = await self.user_converter.convert(ctx, user_id)
-                    description += user.name + " : " + str(score) + " points\n"
-            else:
-                description = "Il n'y a pas de scores de quiz dans ce serveur !"
-
-            embed = discord.Embed(
-                title="Voici les scores du quiz !",
-                description=description
-            )
-
-            await ctx.send(embed=embed)
+        await ctx.send(embed=embed)
