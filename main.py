@@ -1,241 +1,263 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
+"""The BotÀToutFer Discord bot
+
+Copyright (C) 2022, Clément SEIJIDO
+Released under GNU General Public License v3.0 (GNU GPLv3)
+e-mail clement@seijido.fr
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""
 
 import os
+import pathlib
 import logging
 from logging.handlers import TimedRotatingFileHandler
 
-import aiohttp
 from dotenv import load_dotenv
 import discord
 from discord.ext import commands
+from discord import ApplicationContext
 
 
-def bot_init():
-    """Create and return the Discord bot object with all configuration
+def initialize_logger(level: int, name: str) -> None:
+    """Initialize logging system.
 
-    Returns:
-        discord.ext.commands.Bot: The Discord bot client ready to go
+    Args:
+        level (int): The level of logging (e.g. logging.DEBUG).
+        name (str): The name of the log file.
     """
+    # Retrieve the directory path of the script
+    script_dir = pathlib.Path(__file__).resolve().parent
 
-    load_dotenv()  # Loads sensitive constants form env
+    # The directory containing logs
+    log_dir = script_dir / 'logs'
+    # Create log_dir if needed
+    log_dir.mkdir(parents=True, exist_ok=True)
 
-    # Create bot
+    # Absolute path of the new log file
+    log_file_path = log_dir / f'{name}.log'
+
+    # Setting up the logging system
+    logger = logging.getLogger()
+    logger.setLevel(level)
+    handler = TimedRotatingFileHandler(
+        filename=log_file_path,
+        when='midnight',
+        backupCount=5,
+        encoding='utf-8'
+    )
+    handler.suffix = '%Y-%m-%d.log'
+    handler.setFormatter(
+        logging.Formatter('%(asctime)s %(levelname)s %(name)s: %(message)s')
+    )
+
+    logger.addHandler(handler)
+
+
+def main() -> None:
+    load_dotenv()  # load sensitive constants form .env file
+
     bot = commands.Bot(
-        command_prefix=commands.when_mentioned_or("!"),
+        command_prefix=commands.when_mentioned_or('!'),
         case_insensitive=True,
         description="BotAToutFer, le bot qui fait tout, même le café !",
         help_command=None,
         activity=discord.Activity(
-            name="!help",
+            name='!help',
             type=discord.ActivityType.playing
         ),
-        owner_id=int(os.getenv("OWNER_ID"))
+        debug_guilds=set(map(int, os.getenv('DEBUG_GUILDS').split(';'))),
+        owner_ids=set(map(int, os.getenv('OWNER_IDS').split(';')))
     )
 
-    # Add constants as variables in bot object
+    log = logging.getLogger(__name__)
+    log.info('Starting bot')
 
-    bot.log = logger_init()  # Add logger object to bot
-    # Add the absolute path to repo directory
-    bot.SCRIPT_DIR = os.path.split(os.path.abspath(__file__))[0]
-    bot.TOKEN = os.getenv("DISCORD_TOKEN")  # Add Discord bot token to bot
+    script_dir = pathlib.Path(__file__).resolve().parent
+    cog_directory = script_dir / 'cogs'
+    cogs_to_load = [
+        f'cogs.{cog.stem}' for cog in cog_directory.iterdir()
+        if cog.is_file() and not cog.name.startswith('.')
+    ]
 
-    bot.COFFEE_URL = os.getenv("COFFEE_URL")
-    bot.COFFEE_PASSWORD = os.getenv("COFFEE_PASSWORD")
+    cogs_to_load.sort()
 
-    bot.WEATHER_TOKEN = os.getenv("WEATHER_TOKEN")
-    bot.NEWS_TOKEN = os.getenv("NEWS_TOKEN")
-    bot.CAT_TOKEN = os.getenv("CAT_TOKEN")
-    bot.DICOLINK_TOKEN = os.getenv("DICOLINK_TOKEN")
-    bot.OPENQUIZZDB_TOKEN = os.getenv("OPENQUIZZDB_TOKEN")
+    for cog in cogs_to_load:
+        try:
+            bot.load_extension(cog)
+        except discord.ExtensionError as e:
+            log.error(f'Error with extension {e.name}', exc_info=e)
+            print(f'Error with extension {e.name}')
+
+    # ensure the 'package' directory exists
+    (script_dir / 'package').mkdir(parents=True, exist_ok=True)
 
     @bot.event
     async def on_ready():
-        """When the bot is connected to the guild, print guild information"""
-        print(f"Logged in as {bot.user} (user ID: {bot.user.id})")
-        bot.log.warning(f"Logged in as {bot.user} (user ID: {bot.user.id})")
-        print(f"{bot.user} is connected to the following guild(s):")
+        """When bot is ready, display and log useful information.
+        """
+        print(f'Logged in as {bot.user} (user ID: {bot.user.id})')
+        log.info(f'Logged in as {bot.user} (user ID: {bot.user.id})')
+        print(f'{bot.user} is connected to the following guild(s):')
         for guild in bot.guilds:
-            print(f"{guild.name} (id: {guild.id})")
-            bot.log.warning(f"{bot.user} is connected to the following guild: {guild.name} (id: {guild.id})")
+            print(f'{guild.name} (id: {guild.id})')
+            log.info(
+                f'{bot.user} is connected to the following guild: '
+                f'{guild.name} (id: {guild.id})'
+            )
 
-        extensions_to_load = [
-            "anniv",
-            "boules",
-            "dice",
-            "discussion",
-            # "drinks",
-            "games",
-            "help",
-            "message_jokes",
-            # "music",
-            "pictures",
-            "ping",
-            "quotes",
-            # "santa",
-            "says",
-            "utilities",
-            "vbe_music",
-        ]
+    def process_error(error: Exception) -> str:
+        """Log a given error and return an associated joke.
 
-        for extension in extensions_to_load:
-            try:
-                bot.load_extension(f"extensions.{extension}")
-            except commands.errors.ExtensionError as e:
-                bot.log.error(f"Erreur avec l'extension {e.name}", exc_info=e)
-                print(f"Erreur avec l'extension {e.name}")
+        Args:
+            error (Exception): the exception to handle.
 
-        bot.http_session = aiohttp.ClientSession()
-
-    @bot.event
-    async def on_connect():
-        """When the bot connects to Discord, make sure an active aiohttp session is active"""
-        if bot.http_session.closed:
-            bot.http_session = aiohttp.ClientSession()
-
-    @bot.event
-    async def on_disconnect():
-        """When the bot is disconnected form Discord, close the aiohttp session"""
-        await bot.http_session.close()
-
-    @bot.event
-    async def on_command_error(ctx, error):
-        """When a command error occurs, displays the reason in gild chat"""
-        if hasattr(error, "original"):
-            bot.log.error(f"Caught exception:", exc_info=error.original)
+        Returns:
+            str: the joke to send in Discord channel.
+        """
+        if hasattr(error, 'original'):
+            log.error('Caught exception:', exc_info=error.original)
         else:
-            bot.log.error(f"Caught exception:", exc_info=error)
+            log.error('Caught exception:', exc_info=error)
         if isinstance(error, commands.errors.CheckFailure):
-            await ctx.send("Nope, t'as pas le droit :P")
+            return "Nope, t'as pas le droit :P"
         elif isinstance(error, commands.MissingRequiredArgument):
-            # Send a "Did you forget something?" gif
-            await ctx.send("https://tenor.com/bmqvT.gif")
+            return 'https://tenor.com/bmqvT.gif'  # 'Did you forget something?'
         elif isinstance(error, commands.errors.UserNotFound):
-            # Send a "WHO DAT?" gif
-            await ctx.send("https://tenor.com/bg6ud.gif")
+            return 'https://tenor.com/bg6ud.gif'  # 'WHO DAT?'
+        elif 'Author not connected to a voice channel.' in str(error):
+            return 'You are not connected to a voice channel.'
         elif isinstance(error, discord.HTTPException):
-            # Send a "Far too long" gif
-            await ctx.send("https://tenor.com/bmQvt.gif")
+            return 'https://tenor.com/bmQvt.gif'  # 'Far too long'
         elif isinstance(error, commands.CommandNotFound):
-            # Send a "C'est pas faux" gif
-            await ctx.send("https://tenor.com/uqe8.gif")
+            return 'https://tenor.com/uqe8.gif'  # "C'est pas faux"
         else:
-            # Send an error gif
-            await ctx.send("https://tenor.com/bj9EB.gif")
+            return 'https://tenor.com/bj9EB.gif'  # error
 
     @bot.event
-    async def on_error(event, *args, **kwargs):
-        bot.log.exception(f"Caught exception:")
+    async def on_command_error(ctx: commands.Context, error: Exception):
+        """When a command error occurs, displays the reason in gild chat.
+        """
+        response = process_error(error)
+        await ctx.message.reply(response)
+
+    @bot.event
+    async def on_application_command_error(
+            ctx: ApplicationContext,
+            error: Exception
+    ):
+        """When a command error occurs, displays the reason in gild chat.
+        """
+        response = process_error(error)
+        await ctx.respond(response)
+
+    @bot.event
+    async def on_error(event: str, *args, **kwargs):
+        """On error, log the occurred exception.
+        """
+        log.exception(
+            f'Caught on_error exception, {event=}, {args=}, {kwargs=}:'
+        )
 
     @bot.command()
     @commands.is_owner()
-    async def load(ctx, name=None):
-        if name:
+    async def load(ctx: commands.Context, extension_name: str):
+        """Load a given extension. Reserved to bot owner(s).
+        """
+        if extension_name:
             try:
-                bot.load_extension(f"extensions.{name}")
-            except commands.errors.ExtensionNotFound as e:
-                response = f"**L'extension *{name}* n'existe pas !**"
-                await ctx.send(response)
-            except commands.errors.ExtensionAlreadyLoaded as e:
-                await _reload(ctx, name)
-            except commands.errors.ExtensionError as e:
-                bot.log.error(f"Erreur avec l'extension {e.name}", exc_info=e)
-                response = f"**Erreur avec l'extension {e.name}**"
-                await ctx.send(response)
+                bot.load_extension(f'cogs.{extension_name}')
+            except discord.ExtensionNotFound:
+                response = f'**Extension *{extension_name}* does not exist!**'
+                await ctx.message.reply(response)
+            except discord.ExtensionAlreadyLoaded:
+                await _reload(ctx, extension_name)
+            except discord.ExtensionError as e:
+                log.error(f'Error with extension {e.name}', exc_info=e)
+                response = f'**Error with extension {e.name}**'
+                await ctx.message.reply(response)
             else:
-                response = f"L'extension *{name}* a bien été chargée"
-                await ctx.send(response)
+                response = f'Extension *{extension_name}* has been loaded'
+                await ctx.message.reply(response)
 
     @bot.command()
     @commands.is_owner()
-    async def unload(ctx, name=None):
-        if name:
+    async def unload(ctx: commands.Context, extension_name: str):
+        """Unload a given extension. Reserved to bot owner(s).
+        """
+        if extension_name:
             try:
-                bot.unload_extension(f"extensions.{name}")
-            except commands.errors.ExtensionNotLoaded as e:
-                response = f"**L'extension *{name}* n'était pas chargée !**"
-                await ctx.send(response)
+                bot.unload_extension(f'cogs.{extension_name}')
+            except discord.ExtensionNotLoaded:
+                response = f'**The extension *{extension_name}* was ' \
+                           f'not loaded**'
+                await ctx.message.reply(response)
             else:
-                response = f"L'extension *{name}* a bien été déchargée"
-                await ctx.send(response)
+                response = f'Extension *{extension_name}* unloaded'
+                await ctx.message.reply(response)
 
-    @bot.command(name="reload")
+    @bot.command(name='reload')
     @commands.is_owner()
-    async def _reload(ctx, name=None):
-        if name:
+    async def _reload(ctx: commands.Context, extension_name: str):
+        """Reload a given extension. Reserved to bot owner(s).
+        """
+        if extension_name:
             try:
-                bot.reload_extension(f"extensions.{name}")
-            except commands.errors.ExtensionNotLoaded as e:
-                await load(ctx, name)
-            except commands.errors.ExtensionNotFound as e:
-                response = f"**L'extension *{name}* n'existe pas !**"
-                await ctx.send(response)
-            except commands.errors.ExtensionError as e:
-                bot.log.error(f"Erreur avec l'extension {e.name}", exc_info=e)
-                response = f"**Erreur avec l'extension {e.name}**"
-                await ctx.send(response)
+                bot.reload_extension(f'cogs.{extension_name}')
+            except discord.ExtensionNotLoaded:
+                await load(ctx, extension_name)
+            except discord.ExtensionNotFound:
+                response = f'**Extension *{extension_name}* does not exist!**'
+                await ctx.message.reply(response)
+            except discord.ExtensionError as e:
+                log.error(f'Error with extension {e.name}', exc_info=e)
+                response = f'**Error with extension {e.name}**'
+                await ctx.message.reply(response)
             else:
-                response = f"L'extension *{name}* a bien été rechargée"
-                await ctx.send(response)
+                response = f'Extension *{extension_name}* reloaded'
+                await ctx.message.reply(response)
 
-    @bot.command(name="reload-all")
+    @bot.command(name='reload-all')
     @commands.is_owner()
-    async def reload_all(ctx):
-        for extension in bot.extensions:
+    async def reload_all(ctx: commands.Context):
+        """Reload all loaded extensions. Reserved to bot owner(s).
+        """
+        extension_to_reload = [ext for ext in bot.extensions.keys()]
+        for extension in extension_to_reload:
             try:
                 bot.reload_extension(extension)
-            except commands.errors.ExtensionNotFound as e:
-                response = f"**L'extension *{e.name}* n'existe pas !**"
-                await ctx.send(response)
-            except commands.errors.ExtensionError as e:
-                bot.log.error(f"Erreur avec l'extension {e.name}", exc_info=e)
-                response = f"**Erreur avec l'extension {e.name}**"
-                await ctx.send(response)
+            except discord.ExtensionNotFound:
+                response = f'**Extension *{extension}* does not exist!**'
+                await ctx.message.reply(response)
+            except discord.ExtensionError as e:
+                log.error(f'Error with extension {e.name}', exc_info=e)
+                response = f'**Error with extension {e.name}**'
+                await ctx.message.reply(response)
 
-        response = "Extensions rechargées"
-        await ctx.send(response)
+        response = 'All extensions reloaded'
+        await ctx.message.reply(response)
 
     @bot.command()
     @commands.is_owner()
-    async def zero(ctx):
+    async def zero(ctx: commands.Context):
+        """Generate a ZeroDivisionError. Reserved to bot owner(s).
+        """
         1/0
 
-    return bot
+    bot.run(os.getenv('DISCORD_TOKEN'))
 
 
-def logger_init():
-    """Create and return the logger object
-
-    Returns:
-        logging.Logger: The logger object ready to go
-    """
-
-    # Retrieve the directory path of the script
-    script_dir, script_filename = os.path.split(os.path.abspath(__file__))
-
-    # The directory containing logs
-    log_dir = os.path.join(script_dir, "logs")
-    # Absolute path of the new log file
-    log_file_path = os.path.join(log_dir, "botatoutfer.log")
-
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
-
-    # Setting up the logging system
-    logger = logging.getLogger("discord")
-    logger.setLevel(logging.WARNING)
-    handler = TimedRotatingFileHandler(
-        filename=log_file_path,
-        when='midnight',
-        interval=1,
-        encoding="utf-8"
-    )
-    handler.suffix = "%Y-%m-%d"
-    handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s"))
-    logger.addHandler(handler)
-
-    return logger
-
-
-if __name__ == "__main__":
-    bot = bot_init()
-    bot.run(bot.TOKEN)
+if __name__ == '__main__':
+    initialize_logger(logging.INFO, 'discord')
+    main()
