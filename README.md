@@ -35,6 +35,10 @@ python -m pip install --upgrade pip
 
 *For more information about virtual environments see the [official documentation](https://docs.python.org/3/library/venv.html).*
 
+### Follow installation of py-cord
+
+Follow the installation of the Pycord library on https://github.com/Pycord-Development/pycord
+    
 ### Install needed packages
 
 Install needed packages with:
