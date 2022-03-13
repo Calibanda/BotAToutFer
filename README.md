@@ -62,6 +62,7 @@ At the source of the directory, create a file named ".env". In this file, enter 
 DISCORD_TOKEN= #Enter here the token of your Discord bot
 OWNER_IDS= #Enter here the IDS of the bot owners (separated by a semicolon)
 DEBUG_GUILDS= #Enter here the IDS of the debug guilds if any (separated by a semicolon)
+GM_ROLES= #Enter here the IDS of the roles authorized to create role manager messages (separated by a semicolon)
 ```
 
 ## Running the bot

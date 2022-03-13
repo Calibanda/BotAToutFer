@@ -21,10 +21,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import logging
 import pathlib
 import __main__
+import os
 import datetime
 import json
 import asyncio
 
+from dotenv import load_dotenv
 import discord
 from discord.ext import commands, tasks
 from discord import ApplicationContext
@@ -68,6 +70,10 @@ class RoleManagerMessage:
         return self.__str__()
 
 
+load_dotenv()  # load sensitive constants form .env file
+gm_roles = set(map(int, os.getenv('GM_ROLES').split(';')))
+
+
 class RolesManagement(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -79,8 +85,6 @@ class RolesManagement(commands.Cog):
         self.package_dir.mkdir(parents=True, exist_ok=True)
 
         self.role_manager_json = self.package_dir / 'role_managers.json'
-
-        self.gm_role_id = 949935758981091328  # 812989543229685800
 
         self.role_manager_messages: list[RoleManagerMessage] = []
 
@@ -122,7 +126,7 @@ class RolesManagement(commands.Cog):
                     creation_time=creation_time
                 ))
 
-            except Exception as e:
+            except Exception:
                 self.log.exception('Unable to recreate a role manager')
 
     def cog_unload(self):
@@ -220,7 +224,7 @@ class RolesManagement(commands.Cog):
                 )
 
     @commands.slash_command(name='add-role-message', default_permission=False)
-    @permissions.permission(role_id=949935758981091328, permission=True)
+    @permissions.has_any_role(*gm_roles)
     async def add_role_manager_message(
             self,
             ctx: ApplicationContext,
