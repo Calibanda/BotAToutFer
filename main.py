@@ -74,10 +74,10 @@ def main() -> None:
         description="BotAToutFer, le bot qui fait tout, même le café !",
         help_command=None,
         activity=discord.Activity(
-            name='!help',
+            name='Now with slash commands!',
             type=discord.ActivityType.playing
         ),
-        debug_guilds=set(map(int, os.getenv('DEBUG_GUILDS').split(';'))),
+        # debug_guilds=set(map(int, os.getenv('DEBUG_GUILDS').split(';'))),
         owner_ids=set(map(int, os.getenv('OWNER_IDS').split(';')))
     )
 
