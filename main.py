@@ -35,34 +35,44 @@ def initialize_logger(level: int, name: str) -> None:
 
     Args:
         level (int): The level of logging (e.g. logging.DEBUG).
-        name (str): The name of the log file.
+        name (str): The name of the logger and name of the log file.
     """
     # Retrieve the directory path of the script
     script_dir = pathlib.Path(__file__).resolve().parent
 
     # The directory containing logs
     log_dir = script_dir / 'logs'
-    # Create log_dir if needed
-    log_dir.mkdir(parents=True, exist_ok=True)
+    if not log_dir.exists():
+        # Create log_dir if needed
+        log_dir.mkdir(parents=True)
 
     # Absolute path of the new log file
     log_file_path = log_dir / f'{name}.log'
 
-    # Setting up the logging system
+    # Get the root logger
     logger = logging.getLogger()
     logger.setLevel(level)
-    handler = TimedRotatingFileHandler(
+
+    # Create a formatter
+    formatter = logging.Formatter(
+        '[%(asctime)s] %(threadName)s %(levelname)s '
+        'in %(module)s: %(message)s'
+    )
+
+    # Create a TimedRotatingFileHandler
+    file_handler = logging.handlers.TimedRotatingFileHandler(
         filename=log_file_path,
         when='midnight',
+        interval=1,
         backupCount=5,
         encoding='utf-8'
     )
-    handler.suffix = '%Y-%m-%d.log'
-    handler.setFormatter(
-        logging.Formatter('%(asctime)s %(levelname)s %(name)s: %(message)s')
-    )
+    file_handler.setLevel(level)
+    file_handler.suffix = '%Y-%m-%d.log'
+    file_handler.setFormatter(formatter)
 
-    logger.addHandler(handler)
+    # Attach handler to the logger
+    logger.addHandler(file_handler)
 
 
 def main() -> None:
