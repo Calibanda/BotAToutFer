@@ -307,6 +307,8 @@ class Music(commands.Cog):
 
         self.jukeboxes = {}
 
+        self.audio_files_cleaning_loop.start()
+
         self.log.info(f'Load {__class__.__name__}')
 
     def cog_unload(self):
