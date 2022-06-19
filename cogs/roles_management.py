@@ -89,6 +89,7 @@ class RolesManagement(commands.Cog):
         self.role_manager_messages: list[RoleManagerMessage] = []
 
         self.log.info(f'Load {__class__.__name__}')
+        self.log.info(f'{gm_roles=}')
 
         # @self.bot.message_command(name='Show ID', default_permission=False)
         # @permissions.permission(role_id=self.gm_role_id, permission=True)
